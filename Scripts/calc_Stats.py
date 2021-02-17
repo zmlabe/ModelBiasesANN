@@ -11,11 +11,12 @@ Usage
     [1] rmse(a,b)
     [2] remove_annual_mean(data,data_obs,lats,lons,lats_obs,lons_obs)
     [3] remove_merid_mean(data,data_obs)
-    [4] remove_ensemble_mean(data)
+    [4] remove_ensemble_mean(data,ravel_modelens)
     [5] remove_ocean(data,data_obs)
     [6] remove_land(data,data_obs)
     [7] standardize_data(Xtrain,Xtest)
-    [8] rm_ensemble_mean(data,window)
+    [8] rm_standard_dev(var,window)
+    [9] rm_variance_dev(var,window)
 """
 
 def rmse(a,b):
@@ -70,7 +71,7 @@ def remove_merid_mean(data, data_obs):
 
 ###############################################################################
 
-def remove_ensemble_mean(data):
+def remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev):
     """
     Removes ensemble mean
     """
@@ -79,7 +80,29 @@ def remove_ensemble_mean(data):
     import numpy as np
     
     ### Remove ensemble mean
-    datameangone = data - np.nanmean(data,axis=0)
+    if data.ndim == 4:
+        datameangoneq = data - np.nanmean(data,axis=0)
+    elif data.ndim == 5:
+        ensmeanmodel = np.nanmean(data,axis=1)
+        datameangoneq = np.empty((data.shape))
+        for i in range(data.shape[0]):
+            datameangoneq[i,:,:,:,:] = data[i,:,:,:,:] - ensmeanmodel[i,:,:,:]
+            print('Completed: Ensemble mean removed for model %s!' % (i+1))
+    
+    if ravel_modelens == True:
+        datameangone = np.reshape(datameangoneq,(datameangoneq.shape[0]*datameangoneq.shape[1],
+                                                 datameangoneq.shape[2],
+                                                 datameangoneq.shape[3],
+                                                 datameangoneq.shape[4]))
+    else: 
+        datameangone = datameangoneq
+    if rm_standard_dev == False:
+        if ravelmodeltime == True:
+            datameangone = np.reshape(datameangoneq,(datameangoneq.shape[0]*datameangoneq.shape[1]*datameangoneq.shape[2],
+                                                      datameangoneq.shape[3],
+                                                      datameangoneq.shape[4]))
+        else: 
+            datameangone = datameangoneq
     
     return datameangone
 
@@ -162,131 +185,8 @@ def standardize_data(Xtrain,Xtest):
     return Xtrain,Xtest,stdVals
 
 ###############################################################################
-
-def convert_fuzzyDecade(data,startYear,classChunk):
-    ### Import modules
-    import numpy as np
-    import scipy.stats as stats
     
-    years = np.arange(startYear-classChunk*2,2100+classChunk*2)
-    chunks = years[::int(classChunk)] + classChunk/2
-    
-    labels = np.zeros((np.shape(data)[0],len(chunks)))
-    
-    for iy,y in enumerate(data):
-        norm = stats.uniform.pdf(years,loc=y-classChunk/2.,scale=classChunk)
-        
-        vec = []
-        for sy in years[::classChunk]:
-            j=np.logical_and(years>sy,years<sy+classChunk)
-            vec.append(np.sum(norm[j]))
-        vec = np.asarray(vec)
-        vec[vec<.0001] = 0. # This should not matter
-        
-        vec = vec/np.sum(vec)
-        
-        labels[iy,:] = vec
-    return labels, chunks
-
-###############################################################################
-
-def convert_fuzzyDecade_toYear(label,startYear,classChunk):
-    ### Import modules
-    import numpy as np
-    
-    print('SELECT END YEAR - HARD CODED IN FUNCTION')
-    years = np.arange(startYear-classChunk*2,2099+classChunk*2)
-    chunks = years[::int(classChunk)] + classChunk/2
-    
-    return np.sum(label*chunks,axis=1)
-
-###############################################################################
-
-def invert_year_output(ypred,startYear):
-    ### Import modules
-    import numpy as np
-    import scipy.stats as stats
-    
-    if(option4):
-        inverted_years = convert_fuzzyDecade_toYear(ypred,startYear,classChunk)
-    else:
-        inverted_years = invert_year_outputChunk(ypred,startYear)
-    
-    return inverted_years
-
-###############################################################################
-
-def invert_year_outputChunk(ypred,startYear):
-    ### Import modules
-    import numpy as np
-    import scipy.stats as stats
-    
-    if(len(np.shape(ypred))==1):
-        maxIndices = np.where(ypred==np.max(ypred))[0]
-        if(len(maxIndices)>classChunkHalf):
-            maxIndex = maxIndices[classChunkHalf]
-        else:
-            maxIndex = maxIndices[0]
-
-        inverted = maxIndex + startYear - classChunkHalf
-
-    else:    
-        inverted = np.zeros((np.shape(ypred)[0],))
-        for ind in np.arange(0,np.shape(ypred)[0]):
-            maxIndices = np.where(ypred[ind]==np.max(ypred[ind]))[0]
-            if(len(maxIndices)>classChunkHalf):
-                maxIndex = maxIndices[classChunkHalf]
-            else:
-                maxIndex = maxIndices[0]
-            inverted[ind] = maxIndex + startYear - classChunkHalf
-    
-    return inverted
-
-###############################################################################
-
-def convert_to_class(data,startYear):
-    ### Import modules
-    import numpy as np
-    
-    data = np.array(data) - startYear + classChunkHalf
-    dataClass = to_categorical(data)
-    
-    return dataClass
-
-###############################################################################
-
-def create_multiClass(xInput,yOutput):
-    ### Import modules
-    import numpy as np
-    import copy as copy
-    
-    yMulti = copy.deepcopy(yOutput)
-    
-    for stepVal in np.arange(-classChunkHalf,classChunkHalf+1,1.):
-        if(stepVal==0):
-            continue
-        y = yOutput + stepVal
-        
-    return xInput, yMulti
-
-###############################################################################
-
-def create_multiLabel(yClass):
-    ### Import modules
-    import numpy as np
-    
-    youtClass = yClass
-    
-    for i in np.arange(0,np.shape(yClass)[0]):
-        v = yClass[i,:]
-        j = np.argmax(v)
-        youtClass[i,j-classChunkHalf:j+classChunkHalf+1] = 1
-    
-    return youtClass
-
-###############################################################################
-    
-def rm_standard_dev(var,window):
+def rm_standard_dev(var,window,ravelmodeltime):
     """
     Smoothed standard deviation
     """
@@ -295,20 +195,34 @@ def rm_standard_dev(var,window):
     
     print('\n\n-----------STARTED: Rolling std!\n\n')
     
-    rollingstd = np.empty((var.shape))
-    for ens in range(var.shape[0]):
-        for i in range(var.shape[2]):
-            for j in range(var.shape[3]):
-                series = pd.Series(var[ens,:,i,j])
-                rollingstd[ens,:,i,j] = series.rolling(window).std().to_numpy()
     
-    newdata = rollingstd[:,window:,:,:] 
+    if var.ndim == 3:
+        rollingstd = np.empty((var.shape))
+        for i in range(var.shape[1]):
+            for j in range(var.shape[2]):
+                series = pd.Series(var[:,i,j])
+                rollingstd[:,i,j] = series.rolling(window).std().to_numpy()
+    elif var.ndim == 4:
+        rollingstd = np.empty((var.shape))
+        for ens in range(var.shape[0]):
+            for i in range(var.shape[2]):
+                for j in range(var.shape[3]):
+                    series = pd.Series(var[ens,:,i,j])
+                    rollingstd[ens,:,i,j] = series.rolling(window).std().to_numpy()
+    
+    newdataq = rollingstd[:,window:,:,:] 
+    
+    if ravelmodeltime == True:
+        newdata = np.reshape(newdataq,(newdataq.shape[0]*newdataq.shape[1],
+                                       newdataq.shape[2],newdataq.shape[3]))
+    else:
+        newdata = newdataq
     print('-----------COMPLETED: Rolling std!\n\n')     
     return newdata 
 
 ###############################################################################
     
-def rm_variance_dev(var,window):
+def rm_variance_dev(var,window,ravelmodeltime):
     """
     Smoothed variance
     """
@@ -324,6 +238,12 @@ def rm_variance_dev(var,window):
                 series = pd.Series(var[ens,:,i,j])
                 rollingvar[ens,:,i,j] = series.rolling(window).var().to_numpy()
     
-    newdata = rollingvar[:,window:,:,:] 
+    newdataq = rollingvar[:,window:,:,:] 
+    
+    if ravelmodeltime == True:
+        newdata = np.reshape(newdataq,(newdataq.shape[0]*newdataq.shape[1],
+                                       newdataq.shape[2],newdataq.shape[3]))
+    else:
+        newdata = newdataq
     print('-----------COMPLETED: Rolling vari!\n\n')     
     return newdata 

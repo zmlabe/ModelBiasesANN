@@ -8,15 +8,15 @@ Notes
     
 Usage
 -----
-    [1] calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons)
-    [2] calc_LRPObs(model,XobsS,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons)
+    [1] calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons,numDim)
+    [2] calc_LRPObs(model,XobsS,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons,numDim)
 """
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 
-def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons):
+def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons,numDim):
     """
     Calculate Deep Taylor for LRP
     """
@@ -76,18 +76,34 @@ def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule
     ### Compute the frequency of data at each point and the average relevance 
     ### normalized by the sum over the area and the frequency above the 90th 
     ### percentile of the map
-    summaryDTq = np.reshape(deepTaylorMaps,(deepTaylorMaps.shape[0]//len(yearlabels),
-                                            len(yearlabels),deepTaylorMaps.shape[1]))
-    
-    ### Reshape into gridded maps and scale
-    scale = 1000
-    lrpmaps = np.reshape(summaryDTq,(summaryDTq.shape[0],len(yearlabels),
-                                     numLats,numLons))*scale
-    
-    ### Normalize lrp to have maximum of 1
-    if normLRP == True:
-        lrpmaps = lrpmaps/np.nanmax(lrpmaps,axis=(-2,-1))[:,:,np.newaxis,np.newaxis]
-        print('\n <<< Normalized LRP for max value of 1 >>> \n')
+    if numDim == 3:
+        summaryDTq = np.reshape(deepTaylorMaps,(deepTaylorMaps.shape[0],deepTaylorMaps.shape[1]))
+        
+        ### Reshape into gridded maps and scale
+        scale = 1000
+        lrpmaps = np.reshape(summaryDTq,(summaryDTq.shape[0],numLats,numLons))*scale
+        
+        ### Normalize lrp to have maximum of 1
+        if normLRP == True:
+            lrpmaps = lrpmaps/np.nanmax(lrpmaps,axis=(-2,-1))[:,np.newaxis,np.newaxis]
+            print('\n <<< Normalized LRP for max value of 1 >>> \n')
+    ###########################################################################
+    elif numDim == 4:
+        summaryDTq = np.reshape(deepTaylorMaps,(deepTaylorMaps.shape[0]//len(yearlabels),
+                                                len(yearlabels),deepTaylorMaps.shape[1]))
+        
+        ### Reshape into gridded maps and scale
+        scale = 1000
+        lrpmaps = np.reshape(summaryDTq,(summaryDTq.shape[0],len(yearlabels),
+                                         numLats,numLons))*scale
+        
+        ### Normalize lrp to have maximum of 1
+        if normLRP == True:
+            lrpmaps = lrpmaps/np.nanmax(lrpmaps,axis=(-2,-1))[:,:,np.newaxis,np.newaxis]
+            print('\n <<< Normalized LRP for max value of 1 >>> \n')
+    else:
+        print(ValueError('ISSUE WITH LRP FILE SIZE - CHECK!'))
+    ###########################################################################        
     
     print('<<<< Completed LRP-Rules() >>>>')    
     return lrpmaps
@@ -98,7 +114,7 @@ def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule
 ###############################################################################
 ###############################################################################
 
-def calc_LRPObs(model,XobsS,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons):
+def calc_LRPObs(model,XobsS,biasBool,annType,num_of_class,yearlabels,lrpRule,normLRP,numLats,numLons,numDim):
     """
     Calculate Deep Taylor for LRP observations
     """

@@ -190,8 +190,14 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
         varshape = varshape - 273.15 # K to C
         print('Completed: Changed units (K to C)!')
         
+    ###########################################################################
+    ### Change years
+    yearhistq = np.where((time >= 1950) & (time <= 2015))[0]
+    print(time[yearhistq])
+    histmodel = varshape[yearhistq,:,:]
+        
     print('>>>>>>>>>> ENDING read_20CRv3_monthly function!')
-    return lat1,lon1,varshape
+    return lat1,lon1,histmodel
 
 # ### Test functions - do not use!
 # import numpy as np

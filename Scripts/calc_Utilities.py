@@ -927,7 +927,7 @@ def regions(name):
         lat_bounds = (-90.,90.)
         lon_bounds = (0., 360.)
     elif name == 'SMILEGlobe':
-        lat_bounds = (-89.,89.)
+        lat_bounds = (-87.,87.)
         lon_bounds = (0., 360.)
     elif name == 'GlobeNoSP':
         lat_bounds = (-64.,89.)

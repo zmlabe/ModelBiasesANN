@@ -55,6 +55,7 @@ def read_LENShistorical(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns)
     ### Import modules
     import numpy as np
     from netCDF4 import Dataset
+    import calc_Utilities as UT
     import warnings
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.simplefilter(action='ignore', category=RuntimeWarning)

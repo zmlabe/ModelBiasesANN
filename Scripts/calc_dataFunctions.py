@@ -4,15 +4,15 @@ Functions are useful untilities for data processing in the NN
 Notes
 -----
     Author : Zachary Labe
-    Date   : 8 July 2020
+    Date   : 16 February 2021
     
 Usage
 -----
-    [1] readFiles(variq,dataset)
+    [1] readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary)
     [2] getRegion(data,lat1,lon1,lat_bounds,lon_bounds)
 """
 
-def readFiles(variq,dataset,monthlychoice):
+def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary):
     """
     Function reads in data for selected dataset
 
@@ -22,6 +22,16 @@ def readFiles(variq,dataset,monthlychoice):
         variable for analysis
     dataset : string
         name of data set for primary data
+    monthlychoice : string
+        time period of analysis
+    numOfEns : integer
+        number of ensembles to include
+    lensalso : whether to include lens model
+        binary
+    ravelyearsbinary : whether to ravel years and ens/models together
+        binary
+    rivalbinary : whether to ravel the models together or not
+        binary
         
     Returns
     -------
@@ -41,19 +51,7 @@ def readFiles(variq,dataset,monthlychoice):
     ### Import modules
     import numpy as np
     
-    if dataset == 'lens':
-        import read_LENS as LL
-        directorydataLL = '/Users/zlabe/Data/LENS/monthly/'
-        slicebaseLL = np.arange(1951,1980+1,1)
-        sliceshapeLL = 4
-        slicenanLL = 'nan'
-        addclimoLL = True
-        takeEnsMeanLL = False
-        lat1,lon1,data,ENSmean = LL.read_LENS(directorydataLL,variq,
-                                               monthlychoice,slicebaseLL,
-                                               sliceshapeLL,addclimoLL,
-                                               slicenanLL,takeEnsMeanLL)
-    elif dataset == 'best':
+    if dataset == 'best':
         import read_BEST as BB
         directorydataBB = '/Users/zlabe/Data/BEST/'
         sliceyearBB = np.arange(1956,2019+1,1)
@@ -100,20 +98,20 @@ def readFiles(variq,dataset,monthlychoice):
                                                monthlychoice,slicebaseRA,
                                                sliceshapeRA,addclimoRA,
                                                slicenanRA,takeEnsMeanRA)
-    elif any([dataset=='CCCma_canesm2',dataset=='CSIRO_MK3.6',
-              dataset=='GFDL_CM3',dataset=='GFDL_ESM2M',
-              dataset=='KNMI_ecearth',dataset=='MPI']):
-        import read_SMILE as SM
-        directorySS = '/Users/zlabe/Data/SMILE/'
-        simulationSS = dataset
-        slicebaseSS = np.arange(1951,1980+1,1)
-        sliceshapeSS = 4
-        slicenanSS = 'nan'
-        addclimoSS = True
-        takeEnsMeanSS = False
-        lat1,lon1,data,ENSmean = SM.read_SMILE(directorySS,simulationSS,variq,monthlychoice,
-                                                slicebaseSS,sliceshapeSS,addclimoSS,
-                                                slicenanSS,takeEnsMeanSS)       
+    elif dataset == 'SMILE':
+        import read_SMILE_historical as SM
+        directorydataSM = '/Users/zlabe/Data/SMILE/'
+        modelGCMsSM = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
+                      'GFDL_CM3','GFDL_ESM2M']
+        sliceperiodSM = 'annual'
+        sliceshapeSM = 4
+        slicenanSM = 'nan'
+        numOfEnsSM = 16
+        ENSmean = np.nan
+        lat1,lon1,data = SM.readAllSmileDataHist(directorydataSM,modelGCMsSM,
+                                                         variq,sliceperiodSM,sliceshapeSM,
+                                                         slicenanSM,numOfEnsSM,ravelbinary,
+                                                         lensalso,ravelyearsbinary)    
     elif any([dataset=='XGHG',dataset=='XAER',
               dataset=='XBMB',dataset=='XLULC']):
         import read_SINGLE_LENS as SI
@@ -199,7 +197,7 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
         lonn = lon1[lonq]
         datalonq = datalatq[:,:,:,lonq]
         
-    elif data.ndim == 6:
+    elif data.ndim == 5:
         latq = np.where((lat1 >= lat_bounds[0]) & (lat1 <= lat_bounds[1]))[0]
         latn = lat1[latq]
         datalatq = data[:,:,:,latq,:]
@@ -218,4 +216,8 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
-# data,lat1,lon1 = readFiles('T2M','RANDOM','annual')
+# numOfEns = 16
+# lensalso = True
+# ravelyearsbinary = False
+# ravelbinary = False
+# data,lat1,lon1 = readFiles('T2M','SMILE','annual',numOfEns,lensalso,ravelyearsbinary,ravelbinary)

@@ -55,6 +55,7 @@ def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicen
     ### Import modules
     import numpy as np
     from netCDF4 import Dataset
+    import calc_Utilities as UT
     import warnings
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -333,7 +334,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     return lat,lon,combyr
 
 
-### Test functions - do not use!
+# ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
@@ -346,7 +347,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
 # sliceshape = 4
 # slicenan = 'nan'
 # numOfEns = 16
-# lensalso = False
+# lensalso = True
 # ravelyearsbinary = False
 # ravelbinary = False
 # # lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
@@ -358,7 +359,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
 #                                     lensalso,ravelyearsbinary)
 # lon2,lat2 = np.meshgrid(lon,lat)
 # ave = UT.calc_weightedAve(comb,lat2)
-    
-# mean = np.empty((6,16,70))
+#    
+# mean = np.empty((comb.shape[0],comb.shape[1],comb.shape[2]))
 # for i in range(ave.shape[0]):
 #     mean[i,:,:] = ave[i] - np.nanmean(ave[i],axis=0)
