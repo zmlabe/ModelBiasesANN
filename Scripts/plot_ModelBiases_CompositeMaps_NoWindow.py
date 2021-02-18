@@ -54,7 +54,7 @@ rm_annual_mean = False
 rm_ensemble_mean = True
 ###############################################################################
 ###############################################################################
-window = 5
+window = 0
 if window == 0:
     rm_standard_dev = False
     yearsall = np.arange(1950,2019+1,1)
@@ -197,15 +197,12 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
 
-plt.savefig(directoryfigure + 'LRP_Composites_ModelBiases_Training.png',dpi=300)
+plt.savefig(directoryfigure + 'LRP_Composites_ModelBiases_Training_NoWindow.png',dpi=300)
 
 #######################################################################
 #######################################################################
 #######################################################################
 ### Plot subplot of LRP means testing
-plt.rc('text',usetex=True)
-plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
-
 limit = np.arange(0,0.4001,0.005)
 barlim = np.round(np.arange(0,0.5,0.1),2)
 cmap = cm.cubehelix2_16.mpl_colormap
@@ -251,7 +248,7 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
 
-plt.savefig(directoryfigure + 'LRP_Composites_ModelBiases_Testing.png',dpi=300)
+plt.savefig(directoryfigure + 'LRP_Composites_ModelBiases_Testing_NoWindow.png',dpi=300)
 
 #######################################################################
 #######################################################################
@@ -305,7 +302,7 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
 
-plt.savefig(directoryfigure + 'LRP_Composites_ModelBiases_Combined.png',dpi=300)
+plt.savefig(directoryfigure + 'LRP_Composites_ModelBiases_Combined_NoWindow.png',dpi=300)
 
 #######################################################################
 #######################################################################
@@ -356,4 +353,4 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.14)
 
-plt.savefig(directoryfigure + 'LRP_ALLComposites_ModelBiases_Combined',dpi=300)
+plt.savefig(directoryfigure + 'LRP_ALLComposites_ModelBiases_Combined_NoWindow.png',dpi=300)

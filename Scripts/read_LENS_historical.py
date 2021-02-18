@@ -198,7 +198,7 @@ def read_LENShistorical(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns)
     
     ###########################################################################
     ### Change years
-    yearhistq = np.where((time >= 1950) & (time <= 2019))[0]
+    yearhistq = np.where((time >= 1950) & (time <= 2020))[0]
     print(time[yearhistq])
     histmodel = ensshape[:,yearhistq,:,:]
 
