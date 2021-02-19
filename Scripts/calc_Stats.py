@@ -11,11 +11,11 @@ Usage
     [1] rmse(a,b)
     [2] remove_annual_mean(data,data_obs,lats,lons,lats_obs,lons_obs)
     [3] remove_merid_mean(data,data_obs)
-    [4] remove_ensemble_mean(data,ravel_modelens)
+    [4] remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev,numOfEns)
     [5] remove_ocean(data,data_obs)
     [6] remove_land(data,data_obs)
     [7] standardize_data(Xtrain,Xtest)
-    [8] rm_standard_dev(var,window)
+    [8] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
     [9] rm_variance_dev(var,window)
 """
 
@@ -71,7 +71,7 @@ def remove_merid_mean(data, data_obs):
 
 ###############################################################################
 
-def remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev):
+def remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev,numOfEns):
     """
     Removes ensemble mean
     """
@@ -186,7 +186,7 @@ def standardize_data(Xtrain,Xtest):
 
 ###############################################################################
     
-def rm_standard_dev(var,window,ravelmodeltime):
+def rm_standard_dev(var,window,ravelmodeltime,numOfEns):
     """
     Smoothed standard deviation
     """
@@ -216,7 +216,8 @@ def rm_standard_dev(var,window,ravelmodeltime):
         newdata = np.reshape(newdataq,(newdataq.shape[0]*newdataq.shape[1],
                                        newdataq.shape[2],newdataq.shape[3]))
     else:
-        newdata = newdataq
+        newdata = np.reshape(newdataq,(newdataq.shape[0]//numOfEns,numOfEns,newdataq.shape[1],
+                                       newdataq.shape[2],newdataq.shape[3]))
     print('-----------COMPLETED: Rolling std!\n\n')     
     return newdata 
 

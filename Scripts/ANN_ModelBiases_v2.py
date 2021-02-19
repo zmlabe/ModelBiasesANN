@@ -1,10 +1,11 @@
 """
 ANN for evaluating model biases of historical internal variability using the
-SMILE repository 
+SMILE repository
 
 Reference  : Barnes et al. [2020, JAMES]
-Author    : Zachary M. Labe
-Date      : 16 February 2021
+Author     : Zachary M. Labe
+Date       : 18 February 2021
+Version    : 2 *updates to training/testing*
 """
 
 ### Import packages
@@ -74,19 +75,20 @@ rm_annual_mean = False
 rm_ensemble_mean = True
 ###############################################################################
 ###############################################################################
-window = 5
+window = 2
 if window == 0:
     rm_standard_dev = False
     yearsall = np.arange(1950,2020+1,1)
     ravel_modelens = False
-    ravelmodeltime = True
+    ravelmodeltime = False
 else:
     rm_standard_dev = True
     yearsall = np.arange(1950+window,2020+1,1)
-    ravelmodeltime = True
+    ravelmodeltime = False
     ravel_modelens = True
 ###############################################################################
 ###############################################################################
+ensTypeExperi = 'ENS'
 numOfEns = 16
 ensnum = numOfEns
 lensalso = True
@@ -102,12 +104,12 @@ lrpRule = 'z'
 normLRP = True
 ###############################################################################
 ###############################################################################
-    
 ### Create sample class labels for each model for my own testing
 if seasons != 'none':
-    lengthlabels = numOfEns * lentime #ensembles*years
-    arrayintegers = np.arange(0,num_of_class,1)
-    classesl = np.repeat(arrayintegers,lengthlabels)
+    classesl = np.empty((len(modelGCMs),numOfEns,len(yearsall)))
+    for i in range(len(modelGCMs)):
+        classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
+    classeslnew = np.swapaxes(classesl,0,1)
         
 ### Begin ANN and the entire script
 for sis,singlesimulation in enumerate(datasetsingle):
@@ -156,7 +158,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         
         ### Split the data into training and testing sets? value of 1 will use all 
         ### data as training
-        segment_data_factor = .8
+        segment_data_factor = .75
         
         ### Hiddens corresponds to the number of hidden layers the nnet will use - 0 
         ### for linear model, or a list [10, 20, 5] for multiple layers of nodes 
@@ -200,156 +202,101 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ###############################################################################
         ###############################################################################
         ### Select data to test, train on           
-        def segment_data(data,classesl,fac = segment_data_factor):
+        def segment_data(data,classesl,ensTypeExperi,fac = segment_data_factor):
           
             global random_segment_seed,trainIndices,testIndices
             if random_segment_seed == None:
                 random_segment_seed = int(int(np.random.randint(1, 100000)))
             np.random.seed(random_segment_seed)
             
-            if fac < 1 :
-                nrows = data.shape[0]
-                segment_train = int(np.round(nrows * fac))
-                segment_test = nrows - segment_train
-                print('Training on',segment_train,'ensembles, testing on',segment_test)
+            ###################################################################
+            ### Large Ensemble experiment
+            if ensTypeExperi == 'ENS':
+                
+                ### Flip GCM and ensemble member axes
+                datanew = np.swapaxes(data,0,1)
+                classeslnew = np.swapaxes(classesl,0,1)
         
-                ### Picking out random ensembles
-                i = 0
-                trainIndices = list()
-                while i < segment_train:
-                    line = np.random.randint(0, nrows)
-                    if line not in trainIndices:
-                        trainIndices.append(line)
-                        i += 1
-                    else:
-                        pass
+                if fac < 1 :
+                    nrows = datanew.shape[0]
+                    segment_train = int(np.round(nrows * fac))
+                    segment_test = nrows - segment_train
+                    print('Training on',segment_train,'ensembles, testing on',segment_test)
             
-                i = 0
-                testIndices = list()
-                while i < segment_test:
-                    line = np.random.randint(0, nrows)
-                    if line not in trainIndices:
-                        if line not in testIndices:
-                            testIndices.append(line)
+                    ### Picking out random ensembles
+                    i = 0
+                    trainIndices = list()
+                    while i < segment_train:
+                        line = np.random.randint(0, nrows)
+                        if line not in trainIndices:
+                            trainIndices.append(line)
                             i += 1
-                    else:
-                        pass
+                        else:
+                            pass
                 
-                ### Random ensembles are picked
-                if debug:
-                    print('Training on ensembles: %s' % len(trainIndices))
-                    print('Testing on ensembles: %s' % len(testIndices))
-                
-                # # ### Training segment----------
-                # # data_train = np.empty((len(trainIndices),data.shape[1],data.shape[2]))
-                # Ytrain = np.empty((len(trainIndices)))
-                # for index,ensemble in enumerate(trainIndices):
-                # #     data_train[index,:,:] = data[ensemble, :, :]
-                #     Ytrain[index] = classesl[ensemble]
-                    
-                # data_train = ''
-                # for ensemble in trainIndices:
-                #     this_row = data[ensemble, :, :]
-                #     this_row = this_row.reshape(-1,data.shape[1],data.shape[2])
-                #     if data_train == '':
-                #         data_train = np.empty_like(this_row)
-                #     data_train = np.vstack((data_train,this_row))
-                # data_train = data_train[1:, :, :]
-                
-                # if debug:
-                #     print('org data - shape', data.shape)
-                #     print('training data - shape', data_train.shape)
-            
-                # ### Reshape into X and T
-                # Xtrain = data_train.reshape(data_train.shape[0],(data_train.shape[1] * data_train.shape[2]))
-                # Xtrain_shape = (data_train.shape[0])
+                    i = 0
+                    testIndices = list()
+                    while i < segment_test:
+                        line = np.random.randint(0, nrows)
+                        if line not in trainIndices:
+                            if line not in testIndices:
+                                testIndices.append(line)
+                                i += 1
+                        else:
+                            pass
                         
-                # # ### Testing segment----------
-                # # data_test = np.empty((len(testIndices),data.shape[1],data.shape[2]))
-                # Ytest = np.empty((len(testIndices)))
-                # for index,ensemble in enumerate(testIndices):
-                # #     data_test[index,:,:] = data[ensemble, :, :]
-                #     Ytest[index] = classesl[ensemble]
-                    
-                # data_test = ''
-                # for ensemble in testIndices:
-                #     this_row = data[ensemble, :, :]
-                #     this_row = this_row.reshape(-1,data.shape[1],data.shape[2])
-                #     if data_test == '':
-                #         data_test = np.empty_like(this_row)
-                #     data_test = np.vstack((data_test, this_row))
-                # data_test = data_test[1:, :, :]                
-                # if debug:
-                #     print('testing data', data_test.shape)
-                    
-################
-                data_train = ''
-                Ytrain = ''
-                for ensemble in trainIndices:
-                    this_row = data[ensemble, :, :]
-                    this_row = this_row.reshape(-1,data.shape[1],data.shape[2])
-                    row_temp = classesl[ensemble]
-                    if data_train == '':
-                        data_train = np.empty_like(this_row)
-                        Ytrain = np.empty_like(row_temp)
-                    data_train = np.vstack((data_train,this_row))
-                    Ytrain = np.vstack((Ytrain,row_temp))
-                data_train = data_train[1:, :, :]
-                Ytrain = Ytrain[1:]
-                print(Ytrain.shape)
+                    ### Training segment----------
+                    data_train = np.empty((len(trainIndices),datanew.shape[1],
+                                           datanew.shape[2],datanew.shape[3],
+                                           datanew.shape[4]))
+                    Ytrain = np.empty((len(trainIndices),classeslnew.shape[1],
+                                       classeslnew.shape[2]))
+                    for index,ensemble in enumerate(trainIndices):
+                        data_train[index,:,:,:,:] = datanew[ensemble,:,:,:,:]
+                        Ytrain[index,:,:] = classeslnew[ensemble,:,:]
+                        
+                    ### Random ensembles are picked
+                    if debug:
+                        print('\nTraining on ensembles: ',trainIndices)
+                        print('Testing on ensembles: ',testIndices)
+                        print('\norg data - shape', datanew.shape)
+                        print('training data - shape', data_train.shape)
                 
-                if debug:
-                    print('org data - shape', data.shape)
-                    print('training data - shape', data_train.shape)
-            
-                ### Reshape into X and T
-                Xtrain = data_train.reshape(data_train.shape[0],(data_train.shape[1] * data_train.shape[2]))
-                Xtrain_shape = (data_train.shape[0])
-
-                data_test = ''
-                Ytest = ''
-                for ensemble in testIndices:
-                    this_row = data[ensemble, :, :]
-                    this_row = this_row.reshape(-1,data.shape[1],data.shape[2])
-                    row_temp = classesl[ensemble]
-                    if data_test == '':
-                        data_test = np.empty_like(this_row)
-                        Ytest = classesl[ensemble]
-                    data_test = np.vstack((data_test, this_row))
-                    Ytest = np.vstack((Ytest,row_temp))
-                data_test = data_test[1:, :, :]           
-                Ytest = Ytest[1:]
-                print(Ytest.shape)
-                if debug:
-                    print('testing data', data_test.shape)
-################                  
-                ### Reshape into X and T
-                Xtest = data_test.reshape(data_test.shape[0],(data_test.shape[1] * data_test.shape[2]))
+                    ### Reshape into X and Y
+                    Xtrain = data_train.reshape((data_train.shape[0]*data_train.shape[1]*data_train.shape[2]),(data_train.shape[3]*data_train.shape[4]))
+                    Ytrain = Ytrain.reshape((Ytrain.shape[0]*Ytrain.shape[1]*Ytrain.shape[2]))
+                    Xtrain_shape = (data_train.shape[0])
+                            
+                    ### Testing segment----------
+                    data_test = np.empty((len(testIndices),datanew.shape[1],
+                                           datanew.shape[2],datanew.shape[3],
+                                           datanew.shape[4]))
+                    Ytest = np.empty((len(testIndices),classeslnew.shape[1],
+                                       classeslnew.shape[2]))
+                    for index,ensemble in enumerate(testIndices):
+                        data_test[index,:,:,:,:] = datanew[ensemble,:,:,:,:]
+                        Ytest[index,:,:] = classeslnew[ensemble,:,:]
+                    
+                    ### Random ensembles are picked
+                    if debug:
+                        print('Training on ensembles: %s' % len(trainIndices))
+                        print('Testing on ensembles: %s' % len(testIndices))
         
-            else:
-                trainIndices = np.arange(0,np.shape(data)[0])
-                testIndices = np.arange(0,np.shape(data)[0])    
-                print('Training on ensembles: %s' % len(trainIndices))
-                print('Testing on ensembles: %s' % len(testIndices))
-        
-                data_train = data
-                data_test = data
+                    ### Reshape into X and Y
+                    Xtest= data_test.reshape((data_test.shape[0]*data_test.shape[1]*data_test.shape[2]),(data_test.shape[3]*data_test.shape[4]))
+                    Ytest = Ytest.reshape((Ytest.shape[0]*Ytest.shape[1]*Ytest.shape[2]))
+                    Xtest_shape = (data_test.shape[0])
             
-                Xtrain = data_train.reshape((data_train.shape[0] * data_train.shape[1]),
-                                            (data_train.shape[2] * data_train.shape[3]))
-                Ytrain = np.tile(classesl.reshape(data_train.shape[1],1),(data_train.shape[0],1))
-                Xtrain_shape = (data_train.shape[0])
-        
-            Xtest_shape = (data_test.shape[0], data_test.shape[1])
-            data_train_shape = data_train.shape[0]
-            data_test_shape = data_test.shape[0]
-          
-            ### 'unlock' the random seed
-            np.random.seed(None)
-            
-            ### One-hot vectors
-            Ytrain = keras.utils.to_categorical(Ytrain)
-            Ytest = keras.utils.to_categorical(Ytest)
+                Xtest_shape = (data_test.shape[0], data_test.shape[1])
+                data_train_shape = data_train.shape[0]
+                data_test_shape = data_test.shape[0]
+              
+                ### 'unlock' the random seed
+                np.random.seed(None)
+                
+                ### One-hot vectors
+                Ytrain = keras.utils.to_categorical(Ytrain)
+                Ytest = keras.utils.to_categorical(Ytest)                
           
             return Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices
         
@@ -587,15 +534,17 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         
                     if rm_ensemble_mean == True:
                         datae = dSS.remove_ensemble_mean(data,ravel_modelens,
-                                                         ravelmodeltime,
-                                                         rm_standard_dev,
-                                                         numOfEns)
+                                                          ravelmodeltime,
+                                                          rm_standard_dev,
+                                                          numOfEns)
                         print('\n*Removed ensemble mean*')
                         if rm_standard_dev == False:
                             data = datae
                         
                     if rm_standard_dev == True:
-                        data = dSS.rm_standard_dev(datae,window,ravelmodeltime,numOfEns)
+                        data = dSS.rm_standard_dev(datae,window,
+                                                    ravelmodeltime,
+                                                    numOfEns)
                         print('\n*Removed standard deviation*')
                         
                     if land_only == True:
@@ -619,7 +568,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         #random_segment_seed = 34515
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
                         #---------------------------
-                        Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices = segment_data(data,classesl,segment_data_factor)
+                        Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices = segment_data(data,classesl,ensTypeExperi,segment_data_factor)
         
                         YtrainClassMulti = Ytrain  
                         YtestClassMulti = Ytest  
@@ -701,6 +650,8 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ### Get output from model
         trainingout = YpredTrain
         testingout = YpredTest
+        classesltrain = classeslnew[trainIndices,:,:].ravel()
+        classesltest = classeslnew[testIndices,:,:].ravel()
         
         def truelabel(data):
             """
@@ -710,21 +661,21 @@ for sis,singlesimulation in enumerate(datasetsingle):
             
             return maxindexdata
         
-        def accuracyTotalTime(data_pred,data_true,indices):
+        def accuracyTotalTime(data_pred,data_true):
             """
             Compute accuracy for the entire time series
             """
             
-            data_truer = data_true[indices]
+            data_truer = data_true
             data_predr = data_pred
             accdata_pred = accuracy_score(data_truer,data_predr)
                 
             return accdata_pred
         
         ## Save the output for plotting
-        np.savetxt(directoryoutput + 'trainingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev),trainIndices)
-        np.savetxt(directoryoutput + 'testingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev),testIndices)
-        np.savetxt(directoryoutput + 'allClasses_ModelBiases_%s_%s_%s_%s-%s_iterations%s_STD-%s.txt' % (variq,monthlychoice,reg_name,dataset_obs,dataset,iterations[0],rm_standard_dev),classesl)
+        np.savetxt(directoryoutput + 'trainingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi),trainIndices)
+        np.savetxt(directoryoutput + 'testingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi),testIndices)
+        np.savetxt(directoryoutput + 'allClasses_ModelBiases_%s_%s_%s_%s-%s_iterations%s_STD-%s_%s.txt' % (variq,monthlychoice,reg_name,dataset_obs,dataset,iterations[0],rm_standard_dev,ensTypeExperi),classesl.ravel())
     
         ### See more more details
         model.layers[0].get_config()
@@ -759,22 +710,23 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ## Visualizing through LRP
         numLats = lats.shape[0]
         numLons = lons.shape[0]  
-        numDim = modeldata.ndim
+        numDim = 3
+        
+        indextrain = truelabel(trainingout)
+        acctrain = accuracyTotalTime(indextrain,classesltrain)
+        indextest = truelabel(testingout)
+        acctest = accuracyTotalTime(indextest,classesltest)
+        print('\n\nAccuracy Training == ',acctrain)
+        print('Accuracy Testing == ',acctest)
+        
         lrpall = LRP.calc_LRPModel(model,np.append(XtrainS,XtestS,axis=0),
                                                 np.append(Ytrain,Ytest,axis=0),
                                                 biasBool,annType,num_of_class,
                                                 yearsall,lrpRule,normLRP,
                                                 numLats,numLons,numDim)
-        
-        indextrain = truelabel(trainingout)
-        acctrain = accuracyTotalTime(indextrain,classesl,trainIndices)
-        indextest = truelabel(testingout)
-        acctest = accuracyTotalTime(indextest,classesl,testIndices)
         meanlrp = np.nanmean(lrpall,axis=0)
         fig=plt.figure()
         plt.contourf(meanlrp,300,cmap=cmocean.cm.thermal)
-        print('\n\nAccuracy Training == ',acctrain)
-        print('Accuracy Testing == ',acctest)
         
         ### For training data only
         lrptrain = LRP.calc_LRPModel(model,XtrainS,Ytrain,biasBool,
@@ -789,21 +741,21 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                 numLats,numLons,numDim)
         
         
-#         ### For observations data only
-#         lrpobservations = LRP.calc_LRPObs(model,XobsS,biasBool,annType,
-#                                             num_of_class,yearlabels,lrpRule,
-#                                             normLRP,numLats,numLons,numDim)
+        ### For observations data only
+        lrpobservations = LRP.calc_LRPObs(model,XobsS,biasBool,annType,
+                                            num_of_class,yearsall,lrpRule,
+                                            normLRP,numLats,numLons,numDim)
       
         ##############################################################################
         ##############################################################################
         ##############################################################################
-        def netcdfLRP(lats,lons,var,directory,window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev):
+        def netcdfLRP(lats,lons,var,directory,window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi):
             print('\n>>> Using netcdfLRP function!')
             
             from netCDF4 import Dataset
             import numpy as np
             
-            name = 'LRP_Maps_ModelBiases-STDDEV%syrs_%s_Annual_%s_%s_land_only-%s_%s_STD-%s.nc' % (window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev)
+            name = 'LRP_Maps_ModelBiases-STDDEV%syrs_%s_Annual_%s_%s_land_only-%s_%s_STD-%s_%s.nc' % (window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
             filename = directory + name
             ncfile = Dataset(filename,'w',format='NETCDF4')
             ncfile.description = 'LRP maps for using selected seed' 
@@ -834,8 +786,8 @@ for sis,singlesimulation in enumerate(datasetsingle):
             ncfile.close()
             print('*Completed: Created netCDF4 File!')
             
-        netcdfLRP(lats,lons,lrptrain,directoryoutput,window,'train',variq,simuqq,land_only,reg_name,rm_standard_dev)
-        netcdfLRP(lats,lons,lrptest,directoryoutput,window,'test',variq,simuqq,land_only,reg_name,rm_standard_dev)
+        netcdfLRP(lats,lons,lrptrain,directoryoutput,window,'train',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
+        netcdfLRP(lats,lons,lrptest,directoryoutput,window,'test',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
       
     ### Delete memory!!!
     if sis < len(datasetsingle):
