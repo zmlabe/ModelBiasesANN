@@ -1,11 +1,11 @@
 """
-ANN for evaluating model biases of historical internal variability using the
-SMILE repository
+ANN for evaluating absolute model biases using 20CRv3, ERA5, and the SMILE
+repository
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 18 February 2021
-Version    : 2 *updates to training/testing*
+Date       : 22 February 2021
+Version    : 1
 """
 
 ### Import packages
@@ -72,10 +72,11 @@ land_only = False
 ocean_only = False
 rm_merid_mean = False
 rm_annual_mean = False
-rm_ensemble_mean = True
+rm_ensemble_mean = False
+rm_observations_mean = True
 ###############################################################################
 ###############################################################################
-window = 5
+window = 0
 ensTypeExperi = 'GCM'
 ###############################################################################
 ###############################################################################
@@ -666,8 +667,8 @@ for sis,singlesimulation in enumerate(datasetsingle):
         
                         K.clear_session()
                         #---------------------------
-                        # random_segment_seed = 34515
-                        random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
+                        random_segment_seed = 34515
+                        # random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
                         #---------------------------
                         Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices = segment_data(data,classesl,ensTypeExperi,segment_data_factor)
         
