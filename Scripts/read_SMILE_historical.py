@@ -229,7 +229,7 @@ def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicen
     
     ###########################################################################
     ### Change years
-    yearhistq = np.where((time >= 1950) & (time <= 2020))[0]
+    yearhistq = np.where((time >= 1950) & (time <= 2019))[0]
     print(time[yearhistq])
     histmodel = ensshape[:,yearhistq,:,:]
 
@@ -292,7 +292,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     
     ###########################################################################
     ### Read in smile archive
-    yearshistorical = np.arange(1950,2020+1,1)
+    yearshistorical = np.arange(1950,2019+1,1)
     allmodelstestq = np.empty((len(simulation),numOfEns,len(yearshistorical),96,144))
     for i in range(len(simulation)):
         lat,lon,allmodelstestq[i,:,:,:,:] = read_SMILEhistorical(directory,
@@ -335,32 +335,32 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     return lat,lon,combyr
 
 
-### Test functions - do not use!
-import numpy as np
-import matplotlib.pyplot as plt
-import calc_Utilities as UT
-modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
-              'GFDL_CM3','GFDL_ESM2M']
-directory = '/Users/zlabe/Data/SMILE/'
-simulation = modelGCMs[2]
-vari = 'T2M'
-sliceperiod = 'annual'
-sliceshape = 4
-slicenan = 'nan'
-numOfEns = 16
-lensalso = True
-ravelyearsbinary = False
-ravelbinary = False
-# # lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
-# #                                            sliceperiod,sliceshape,
-# #                                            slicenan,numOfEns)
-lat,lon,comb = readAllSmileDataHist(directory,modelGCMs,
-                                    vari,sliceperiod,sliceshape,
-                                    slicenan,numOfEns,ravelbinary,
-                                    lensalso,ravelyearsbinary)
-lon2,lat2 = np.meshgrid(lon,lat)
-ave = UT.calc_weightedAve(comb,lat2)
+# ### Test functions - do not use!
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import calc_Utilities as UT
+# modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
+#               'GFDL_CM3','GFDL_ESM2M']
+# directory = '/Users/zlabe/Data/SMILE/'
+# simulation = modelGCMs[2]
+# vari = 'T2M'
+# sliceperiod = 'annual'
+# sliceshape = 4
+# slicenan = 'nan'
+# numOfEns = 16
+# lensalso = True
+# ravelyearsbinary = False
+# ravelbinary = False
+# # # lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
+# # #                                            sliceperiod,sliceshape,
+# # #                                            slicenan,numOfEns)
+# lat,lon,comb = readAllSmileDataHist(directory,modelGCMs,
+#                                     vari,sliceperiod,sliceshape,
+#                                     slicenan,numOfEns,ravelbinary,
+#                                     lensalso,ravelyearsbinary)
+# lon2,lat2 = np.meshgrid(lon,lat)
+# ave = UT.calc_weightedAve(comb,lat2)
     
-mean = np.empty((comb.shape[0],comb.shape[1],comb.shape[2]))
-for i in range(ave.shape[0]):
-    mean[i,:,:] = ave[i] - np.nanmean(ave[i],axis=0)
+# mean = np.empty((comb.shape[0],comb.shape[1],comb.shape[2]))
+# for i in range(ave.shape[0]):
+#     mean[i,:,:] = ave[i] - np.nanmean(ave[i],axis=0)

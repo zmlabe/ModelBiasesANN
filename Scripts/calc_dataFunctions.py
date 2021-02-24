@@ -74,6 +74,18 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
                                               monthlychoice,sliceyearER,
                                               sliceshapeER,addclimoER,
                                               slicenanER)
+    elif dataset == 'ERA5BE':
+        import read_ERA5_monthlyBE as BE
+        directorydataBE = '/Users/zlabe/Data/ERA5/'
+        sliceyearBE = np.arange(1950,2019+1,1)
+        sliceshapeBE = 3
+        slicenanBE = 'nan'
+        addclimoBE = True
+        ENSmean = np.nan
+        lat1,lon1,data = BE.read_ERA5_monthlyBE(variq,directorydataBE,
+                                              monthlychoice,sliceyearBE,
+                                              sliceshapeBE,addclimoBE,
+                                              slicenanBE)
     elif dataset == '20CRv3':
         import read_20CRv3_monthly as TW
         directorydataTW = '/Users/zlabe/Data/20CRv3/'
@@ -103,13 +115,12 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
         directorydataSM = '/Users/zlabe/Data/SMILE/'
         modelGCMsSM = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
                       'GFDL_CM3','GFDL_ESM2M']
-        sliceperiodSM = 'annual'
         sliceshapeSM = 4
         slicenanSM = 'nan'
         numOfEnsSM = 16
         ENSmean = np.nan
         lat1,lon1,data = SM.readAllSmileDataHist(directorydataSM,modelGCMsSM,
-                                                         variq,sliceperiodSM,sliceshapeSM,
+                                                         variq,monthlychoice,sliceshapeSM,
                                                          slicenanSM,numOfEnsSM,ravelbinary,
                                                          lensalso,ravelyearsbinary)    
     elif any([dataset=='XGHG',dataset=='XAER',

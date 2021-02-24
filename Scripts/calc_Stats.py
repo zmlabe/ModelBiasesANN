@@ -1,5 +1,5 @@
 """
-Functions are useful statistical untilities for data processing in the NN
+Functions are useful statistical untilities for data processing in the ANN
  
 Notes
 -----
@@ -11,16 +11,19 @@ Usage
     [1] rmse(a,b)
     [2] remove_annual_mean(data,data_obs,lats,lons,lats_obs,lons_obs)
     [3] remove_merid_mean(data,data_obs)
-    [4] remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev,numOfEns)
-    [5] remove_ocean(data,data_obs)
-    [6] remove_land(data,data_obs)
-    [7] standardize_data(Xtrain,Xtest)
-    [8] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
-    [9] rm_variance_dev(var,window)
+    [4] remove_observations_mean(data,data_obs,lats,lons)
+    [5] calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall)
+    [6] remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev,numOfEns)
+    [7] remove_ocean(data,data_obs)
+    [8] remove_land(data,data_obs)
+    [9] standardize_data(Xtrain,Xtest)
+    [10] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
+    [11] rm_variance_dev(var,window)
 """
 
 def rmse(a,b):
-    """calculates the root mean squared error
+    """
+    Calculates the root mean squared error
     takes two variables, a and b, and returns value
     """
     
@@ -48,26 +51,73 @@ def remove_annual_mean(data,data_obs,lats,lons,lats_obs,lons_obs):
     lons2_obs,lats2_obs = np.meshgrid(lons_obs,lats_obs)
     
     ### Calculate weighted average and remove mean
-    data = data - UT.calc_weightedAve(data,lats2)[:,:,np.newaxis,np.newaxis]
+    data = data - UT.calc_weightedAve(data,lats2)[:,:,:,np.newaxis,np.newaxis]
     data_obs = data_obs - UT.calc_weightedAve(data_obs,lats2_obs)[:,np.newaxis,np.newaxis]
     
     return data,data_obs
 
 ###############################################################################
 
-def remove_merid_mean(data, data_obs):
+def remove_merid_mean(data,data_obs,lats,lons,lats_obs,lons_obs):
     """
-    Removes annual mean from data set
+    Removes meridional mean from data set
     """
     
-    ### Import modulates
+    ### Import modules
     import numpy as np
     
-    ### Move mean of latitude
-    data = data - np.nanmean(data,axis=2)[:,:,np.newaxis,:]
+    ### Remove mean of latitude
+    data = data - np.nanmean(data,axis=3)[:,:,:,np.newaxis,:]
     data_obs = data_obs - np.nanmean(data_obs,axis=1)[:,np.newaxis,:]
 
     return data,data_obs
+
+###############################################################################
+
+def remove_observations_mean(data,data_obs,lats,lons):
+    """
+    Removes observations to calculate model biases
+    """
+    
+    ### Import modules
+    import numpy as np
+    
+    ### Remove observational data
+    databias = data - data_obs[np.newaxis,np.newaxis,:,:,:]
+
+    return databias
+
+###############################################################################
+
+def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
+    """
+    Calculates anomalies for each model and observational data set. Note that
+    it assumes the years at the moment
+    """
+    
+    ### Import modules
+    import numpy as np
+    
+    ### Select years to slice
+    minyr = baseline.min()
+    maxyr = baseline.max()
+    yearq = np.where((yearsall >= minyr) & (yearsall <= maxyr))[0]
+    
+    if data.ndim == 5:
+        
+        ### Slice years
+        modelnew = data[:,:,yearq,:,:]
+        obsnew = data_obs[yearq,:,:]
+        
+        ### Average climatology
+        meanmodel = np.nanmean(modelnew[:,:,:,:,:],axis=2)
+        meanobs = np.nanmean(obsnew,axis=0)
+        
+        ### Calculate anomalies
+        modelanom = data[:,:,:,:,:] - meanmodel[:,:,np.newaxis,:,:]
+        obsanom = data_obs[:,:,:] - meanobs[:,:]
+
+    return modelanom,obsanom
 
 ###############################################################################
 
@@ -208,6 +258,14 @@ def rm_standard_dev(var,window,ravelmodeltime,numOfEns):
             for i in range(var.shape[2]):
                 for j in range(var.shape[3]):
                     series = pd.Series(var[ens,:,i,j])
+                    rollingstd[ens,:,i,j] = series.rolling(window).std().to_numpy()
+    elif var.ndim == 5:
+        varn = np.reshape(var,(var.shape[0]*var.shape[1],var.shape[2],var.shape[3],var.shape[4]))
+        rollingstd = np.empty((varn.shape))
+        for ens in range(varn.shape[0]):
+            for i in range(varn.shape[2]):
+                for j in range(varn.shape[3]):
+                    series = pd.Series(varn[ens,:,i,j])
                     rollingstd[ens,:,i,j] = series.rolling(window).std().to_numpy()
     
     newdataq = rollingstd[:,window:,:,:] 
