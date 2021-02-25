@@ -72,7 +72,7 @@ reg_name = 'SMILEGlobe'
 land_only = False
 ocean_only = False
 rm_merid_mean = False
-rm_annual_mean = True
+rm_annual_mean = False
 rm_ensemble_mean = False
 ###############################################################################
 ###############################################################################
@@ -796,9 +796,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
             return accdata_pred
         
         ## Save the output for plotting
-        np.savetxt(directoryoutput + 'trainingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi),trainIndices)
-        np.savetxt(directoryoutput + 'testingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi),testIndices)
-        np.savetxt(directoryoutput + 'allClasses_ModelBiases_%s_%s_%s_%s-%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset_obs,dataset,iterations[0],rm_standard_dev,ensTypeExperi),classesl.ravel())
+        np.savetxt(directoryoutput + 'trainingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean),trainIndices)
+        np.savetxt(directoryoutput + 'testingEnsIndices_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean),testIndices)
+        np.savetxt(directoryoutput + 'allClasses_ModelBiases_%s_%s_%s_%s-%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s.txt' % (variq,monthlychoice,reg_name,dataset_obs,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean),classesl.ravel())
     
         ### See more more details
         model.layers[0].get_config()
@@ -874,13 +874,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ##############################################################################
         ##############################################################################
         ##############################################################################
-        def netcdfLRP(lats,lons,var,directory,window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi):
+        def netcdfLRP(lats,lons,var,directory,window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean):
             print('\n>>> Using netcdfLRP function!')
             
             from netCDF4 import Dataset
             import numpy as np
             
-            name = 'LRP_Maps_ModelBiases-STDDEV%syrs_%s_Annual_%s_%s_land_only-%s_%s_STD-%s_%s_ClimateChange.nc' % (window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
+            name = 'LRP_Maps_ModelBiases-STDDEV%syrs_%s_Annual_%s_%s_land_only-%s_%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s.nc' % (window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean)
             filename = directory + name
             ncfile = Dataset(filename,'w',format='NETCDF4')
             ncfile.description = 'LRP maps for using selected seed' 
@@ -911,9 +911,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
             ncfile.close()
             print('*Completed: Created netCDF4 File!')
             
-        netcdfLRP(lats,lons,lrptrain,directoryoutput,window,'train',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
-        netcdfLRP(lats,lons,lrptest,directoryoutput,window,'test',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
-        netcdfLRP(lats,lons,lrpobservations,directoryoutput,window,'obs',variq,dataset_obs,land_only,reg_name,rm_standard_dev,ensTypeExperi)
+        netcdfLRP(lats,lons,lrptrain,directoryoutput,window,'train',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean)
+        netcdfLRP(lats,lons,lrptest,directoryoutput,window,'test',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean)
+        netcdfLRP(lats,lons,lrpobservations,directoryoutput,window,'obs',variq,dataset_obs,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean)
       
     ### Delete memory!!!
     if sis < len(datasetsingle):

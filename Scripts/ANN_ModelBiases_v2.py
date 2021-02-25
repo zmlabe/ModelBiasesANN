@@ -75,30 +75,30 @@ rm_annual_mean = False
 rm_ensemble_mean = True
 ###############################################################################
 ###############################################################################
-window = 5
+window = 0
 ensTypeExperi = 'ENS'
 ###############################################################################
 ###############################################################################
 if ensTypeExperi == 'ENS':
     if window == 0:
         rm_standard_dev = False
-        yearsall = np.arange(1950,2020+1,1)
+        yearsall = np.arange(1950,2019+1,1)
         ravel_modelens = False
         ravelmodeltime = False
     else:
         rm_standard_dev = True
-        yearsall = np.arange(1950+window,2020+1,1)
+        yearsall = np.arange(1950+window,2019+1,1)
         ravelmodeltime = False
         ravel_modelens = True
 elif ensTypeExperi == 'GCM':
     if window == 0:
         rm_standard_dev = False
-        yearsall = np.arange(1950,2020+1,1)
+        yearsall = np.arange(1950,2019+1,1)
         ravel_modelens = False
         ravelmodeltime = False
     else:
         rm_standard_dev = True
-        yearsall = np.arange(1950+window,2020+1,1)
+        yearsall = np.arange(1950+window,2019+1,1)
         ravelmodeltime = False
         ravel_modelens = True
 ###############################################################################

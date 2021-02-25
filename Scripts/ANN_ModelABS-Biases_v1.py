@@ -63,9 +63,9 @@ directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/ClimateC
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
               'GFDL_CM3','GFDL_ESM2M','lens']
 datasetsingle = ['SMILE']
-dataset_obs = 'ERA5BE'
+dataset_obs = '20CRv3'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'SLP'
 reg_name = 'SMILEGlobe'
 ###############################################################################
 ###############################################################################
@@ -78,7 +78,7 @@ rm_annual_mean = False
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
-rm_observational_mean = True
+rm_observational_mean = False
 ###############################################################################
 ###############################################################################
 calculate_anomalies = True
@@ -813,9 +813,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
             return accdata_pred
         
         ## Save the output for plotting
-        np.savetxt(directoryoutput + 'trainingEnsIndices_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi),trainIndices)
-        np.savetxt(directoryoutput + 'testingEnsIndices_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi),testIndices)
-        np.savetxt(directoryoutput + 'allClasses_ABS_ModelBiases_%s_%s_%s_%s-%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset_obs,dataset,iterations[0],rm_standard_dev,ensTypeExperi),classesl.ravel())
+        np.savetxt(directoryoutput + 'trainingEnsIndices_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies),trainIndices)
+        np.savetxt(directoryoutput + 'testingEnsIndices_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies),testIndices)
+        np.savetxt(directoryoutput + 'allClasses_ABS_ModelBiases_%s_%s_%s_%s-%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.txt' % (variq,monthlychoice,reg_name,dataset_obs,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies),classesl.ravel())
     
         ### See more more details
         model.layers[0].get_config()
@@ -853,13 +853,19 @@ for sis,singlesimulation in enumerate(datasetsingle):
         numLats = lats.shape[0]
         numLons = lons.shape[0]  
         numDim = 3
-        
+
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################        
         indextrain = truelabel(trainingout)
         acctrain = accuracyTotalTime(indextrain,classesltrain)
         indextest = truelabel(testingout)
         acctest = accuracyTotalTime(indextest,classesltest)
         print('\n\nAccuracy Training == ',acctrain)
         print('Accuracy Testing == ',acctest)
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
         
         lrpall = LRP.calc_LRPModel(model,np.append(XtrainS,XtestS,axis=0),
                                                 np.append(Ytrain,Ytest,axis=0),
@@ -891,13 +897,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ##############################################################################
         ##############################################################################
         ##############################################################################
-        def netcdfLRP(lats,lons,var,directory,window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi):
+        def netcdfLRP(lats,lons,var,directory,window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies):
             print('\n>>> Using netcdfLRP function!')
             
             from netCDF4 import Dataset
             import numpy as np
             
-            name = 'LRP_Maps_ABS_ModelBiases-STDDEV%syrs_%s_Annual_%s_%s_land_only-%s_%s_STD-%s_%s_ClimateChange.nc' % (window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
+            name = 'LRP_Maps_ABS_ModelBiases-STDDEV%syrs_%s_Annual_%s_%s_land_only-%s_%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.nc' % (window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
             filename = directory + name
             ncfile = Dataset(filename,'w',format='NETCDF4')
             ncfile.description = 'LRP maps for using selected seed' 
@@ -928,9 +934,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
             ncfile.close()
             print('*Completed: Created netCDF4 File!')
             
-        netcdfLRP(lats,lons,lrptrain,directoryoutput,window,'train',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
-        netcdfLRP(lats,lons,lrptest,directoryoutput,window,'test',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi)
-        # netcdfLRP(lats,lons,lrpobservations,directoryoutput,window,'obs',variq,dataset_obs,land_only,reg_name,rm_standard_dev,ensTypeExperi)
+        netcdfLRP(lats,lons,lrptrain,directoryoutput,window,'train',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
+        netcdfLRP(lats,lons,lrptest,directoryoutput,window,'test',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
+        netcdfLRP(lats,lons,lrpobservations,directoryoutput,window,'obs',variq,dataset_obs,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
       
     ### Delete memory!!!
     if sis < len(datasetsingle):
