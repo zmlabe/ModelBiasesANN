@@ -86,6 +86,18 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
                                               monthlychoice,sliceyearBE,
                                               sliceshapeBE,addclimoBE,
                                               slicenanBE)
+    elif dataset == 'GPCP':
+        import read_GPCP_monthly as GG
+        directorydataGG = '/Users/zlabe/Data/GPCP/'
+        sliceyearGG = np.arange(1979,2019+1,1)
+        sliceshapeGG = 3
+        slicenanGG = 'nan'
+        addclimoGG = True
+        ENSmean = np.nan
+        lat1,lon1,data = GG.read_GPCP_monthly(variq,directorydataGG,
+                                              monthlychoice,sliceyearGG,
+                                              sliceshapeGG,addclimoGG,
+                                              slicenanGG)
     elif dataset == '20CRv3':
         import read_20CRv3_monthly as TW
         directorydataTW = '/Users/zlabe/Data/20CRv3/'
@@ -148,7 +160,7 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
 
     Parameters
     ----------
-    data : 3d+ numpy array
+    data : 2d+ numpy array
         original data set
     lat1 : 1d array
         latitudes
@@ -216,6 +228,15 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
         lonq = np.where((lon1 >= lon_bounds[0]) & (lon1 <= lon_bounds[1]))[0]
         lonn = lon1[lonq]
         datalonq = datalatq[:,:,:,:,lonq]
+        
+    elif data.ndim == 6:
+        latq = np.where((lat1 >= lat_bounds[0]) & (lat1 <= lat_bounds[1]))[0]
+        latn = lat1[latq]
+        datalatq = data[:,:,:,:,latq,:]
+        ### Mask longitudes
+        lonq = np.where((lon1 >= lon_bounds[0]) & (lon1 <= lon_bounds[1]))[0]
+        lonn = lon1[lonq]
+        datalonq = datalatq[:,:,:,:,:,lonq]
     
     ### New variable name
     datanew = datalonq
@@ -223,7 +244,7 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
     print('>>>>>>>>>> Completed: getRegion function!')
     return datanew,latn,lonn   
 
-### Test functions - do not use!
+# ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
@@ -231,4 +252,4 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
 # lensalso = True
 # ravelyearsbinary = False
 # ravelbinary = False
-# data,lat1,lon1 = readFiles('T2M','SMILE','annual',numOfEns,lensalso,ravelyearsbinary,ravelbinary)
+# data,lat1,lon1 = readFiles('T2M','GPCP','annual',numOfEns,lensalso,ravelyearsbinary,ravelbinary)

@@ -63,16 +63,16 @@ directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/ClimateC
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
               'GFDL_CM3','GFDL_ESM2M','lens']
 datasetsingle = ['SMILE']
-dataset_obs = '20CRv3'
+dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'P'
 reg_name = 'SMILEGlobe'
 ###############################################################################
 ###############################################################################
 land_only = False
 ocean_only = False
 rm_merid_mean = False
-rm_annual_mean = False
+rm_annual_mean = True
 rm_ensemble_mean = False
 ###############################################################################
 ###############################################################################

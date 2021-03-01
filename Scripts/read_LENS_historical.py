@@ -75,6 +75,9 @@ def read_LENShistorical(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns)
         if vari == 'SLP':
             filename = directory + '%s/%s_%s_1920_2100.nc' % (vari,vari,
                                                               ensmember)
+        elif vari == 'P':
+            filename = directory + '%s/%s_%s_1920-2100.nc' % (vari,vari,
+                                                              (i+1))
         else:
             filename = directory + '%s/%s_%s_1920-2100.nc' % (vari,vari,
                                                               ensmember)
@@ -195,6 +198,10 @@ def read_LENShistorical(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns)
     elif vari == 'T2M':
         ensshape = ensshape - 273.15 # K to C
         print('Completed: Changed units (K to C)!')
+    elif vari == 'P':
+        ensshape = ensshape * 86400 # kg/m2/s to mm/day
+        ### "Average Monthly Rate of Precipitation"
+        print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
     
     ###########################################################################
     ### Change years
@@ -211,8 +218,8 @@ def read_LENShistorical(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns)
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
 # directory = '/Users/zlabe/Data/LENS/monthly/'
-# vari = 'T2M'
-# sliceperiod = 'none'
+# vari = 'P'
+# sliceperiod = 'annual'
 # sliceshape = 4
 # slicenan = 'nan'
 # numOfEns = 16
@@ -221,3 +228,5 @@ def read_LENShistorical(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns)
 # lat,lon,var = read_LENShistorical(directory,vari,
 #                                             sliceperiod,sliceshape,
 #                                             slicenan,numOfEns)
+# lon2,lat2 = np.meshgrid(lon,lat)
+# ave = UT.calc_weightedAve(var,lat2)

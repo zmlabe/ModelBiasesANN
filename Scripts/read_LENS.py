@@ -80,6 +80,9 @@ def read_LENS(directory,vari,sliceperiod,slicebase,sliceshape,addclimo,slicenan,
         if vari == 'SLP':
             filename = directory + '%s/%s_%s_1920_2100.nc' % (vari,vari,
                                                               ensmember)
+        elif vari == 'P':
+            filename = directory + '%s/%s_%s_1920-2100.nc' % (vari,vari,
+                                                              (i+1))
         else:
             filename = directory + '%s/%s_%s_1920-2100.nc' % (vari,vari,
                                                               ensmember)
@@ -227,6 +230,10 @@ def read_LENS(directory,vari,sliceperiod,slicebase,sliceshape,addclimo,slicenan,
         ensshape = ensshape - 273.15 # K to C
         ENSmean = ENSmean - 273.15 # K to C
         print('Completed: Changed units (K to C)!')
+    elif vari == 'P':
+        ensshape = ensshape * 86400 # kg/m2/s to mm/day
+        ### "Average Monthly Rate of Precipitation"
+        print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
 
     print('>>>>>>>>>> ENDING read_LENS function!')
     
@@ -248,8 +255,8 @@ def read_LENS(directory,vari,sliceperiod,slicebase,sliceshape,addclimo,slicenan,
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
 # directory = '/Users/zlabe/Data/LENS/monthly/'
-# vari = 'T2M'
-# sliceperiod = 'none'
+# vari = 'P'
+# sliceperiod = 'annual'
 # slicebase = np.arange(1951,1980+1,1)
 # sliceshape = 4
 # slicenan = 'nan'
@@ -258,3 +265,5 @@ def read_LENS(directory,vari,sliceperiod,slicebase,sliceshape,addclimo,slicenan,
 # lat,lon,var,ENSmean = read_LENS(directory,vari,sliceperiod,
 #                         slicebase,sliceshape,addclimo,
 #                         slicenan,takeEnsMean)
+# lon2,lat2 = np.meshgrid(lon,lat)
+# ave = UT.calc_weightedAve(var,lat2)

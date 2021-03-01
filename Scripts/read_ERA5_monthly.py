@@ -173,6 +173,10 @@ def read_ERA5_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,
     elif variq == 'T2M':
         varshape = varshape - 273.15 # K to C
         print('Completed: Changed units (K to C)!')
+    elif variq == 'P':
+        varshape = varshape*1000 # m/day to mm/day
+        ### "Average Monthly Rate of Precipitation"
+        print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
         
     print('>>>>>>>>>> ENDING read_ERA5_monthly function!')
     return lat1,lon1,varshape
@@ -180,9 +184,10 @@ def read_ERA5_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,
 # ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
-# variq = 'T2M'
+# import calc_Utilities as UT
+# variq = 'P'
 # directory = '/Users/zlabe/Data/ERA5/'
-# sliceperiod = 'OND'
+# sliceperiod = 'annual'
 # sliceyear = np.arange(1979,2019+1,1)
 # sliceshape = 3
 # slicenan = 'nan'
@@ -190,3 +195,5 @@ def read_ERA5_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,
 # lat,lon,var = read_ERA5_monthly(variq,directory,sliceperiod,
 #                                 sliceyear,sliceshape,addclimo,
 #                                 slicenan)
+# lon2,lat2 = np.meshgrid(lon,lat)
+# ave = UT.calc_weightedAve(var,lat2)

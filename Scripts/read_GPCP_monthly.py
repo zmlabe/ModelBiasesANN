@@ -1,20 +1,20 @@
 """
-Function reads in monthly data from 20CRv3
+Function reads in monthly data from GPCP
  
 Notes
 -----
     Author : Zachary Labe
-    Date   : 15 July 2020
+    Date   : 26 February 2021
     
 Usage
 -----
-    [1] read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,
+    [1] read_GPCP_monthly(variq,directory,sliceperiod,sliceyear,
                   sliceshape,addclimo,slicenan)
 """
 
-def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
+def read_GPCP_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     """
-    Function reads monthly data from 20CRv3
+    Function reads monthly data from GPCP
     
     Parameters
     ----------
@@ -44,10 +44,10 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
         
     Usage
     -----
-    lat,lon,var = read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,
+    lat,lon,var = read_GPCP_monthly(variq,directory,sliceperiod,sliceyear,
                             sliceshape,addclimo,slicenan)
     """
-    print('\n>>>>>>>>>> STARTING read_20CRv3_monthly function!')
+    print('\n>>>>>>>>>> STARTING read_GPCP_monthly function!')
     
     ### Import modules
     import numpy as np
@@ -59,13 +59,13 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
     
     ###########################################################################
     ### Parameters
-    time = np.arange(1836,2015+1,1)
+    time = np.arange(1979,2019+1,1)
     monthslice = sliceyear.shape[0]*12
     mon = 12
     
     ###########################################################################
     ### Read in data
-    filename = 'monthly/%s_1836-2015.nc' % variq
+    filename = '%s_GPCP_1979-2019.nc' % variq
     data = Dataset(directory + filename,'r')
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
@@ -79,7 +79,7 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
                                lat1.shape[0],lon1.shape[0]))
     
     ###########################################################################
-    ### Return absolute temperature (1951-1980 baseline)
+    ### Return absolute temperature (1981-2010 baseline)
     if addclimo == True:
         varmon = datamon
         print('Completed: calculated absolute variable!')
@@ -105,14 +105,6 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
         varshape = UT.calcDecJanFeb(varmon,lat1,lon1,'surface',1)
         print('Shape of output = ', varshape.shape,[[varshape.ndim]])
         print('Completed: DJF MEAN!')
-    elif sliceperiod == 'MAM':
-        vartime = np.nanmean(varmon[:,2:5,:,:],axis=1)
-        if sliceshape == 1:
-            varshape = vartime.ravel()
-        elif sliceshape == 3:
-            varshape = vartime
-        print('Shape of output = ', varshape.shape,[[varshape.ndim]])
-        print('Completed: MAM MEAN!')
     elif sliceperiod == 'JJA':
         vartime = np.nanmean(varmon[:,5:8,:,:],axis=1)
         if sliceshape == 1:
@@ -121,14 +113,6 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
             varshape = vartime
         print('Shape of output = ', varshape.shape,[[varshape.ndim]])
         print('Completed: JJA MEAN!')
-    elif sliceperiod == 'SON':
-        vartime = np.nanmean(varmon[:,8:11,:,:],axis=1)
-        if sliceshape == 1:
-            varshape = vartime.ravel()
-        elif sliceshape == 3:
-            varshape = vartime
-        print('Shape of output = ', varshape.shape,[[varshape.ndim]])
-        print('Completed: SON MEAN!')     
     elif sliceperiod == 'JFM':
         vartime = np.nanmean(varmon[:,0:3,:,:],axis=1)
         if sliceshape == 1:
@@ -183,38 +167,25 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
         
     ###########################################################################
     ### Change units
-    if variq == 'SLP':
-        varshape = varshape/100 # Pa to hPa
-        print('Completed: Changed units (Pa to hPa)!')
-    elif variq == 'T2M':
-        varshape = varshape - 273.15 # K to C
-        print('Completed: Changed units (K to C)!')
-    elif variq == 'P':
-        varshape = varshape * 8 # kg/m^2 (accumulated per 3 hours, so 24/3=8) to mm/day
+    if variq == 'P':
         ### "Average Monthly Rate of Precipitation"
         print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
         
-    ###########################################################################
-    ### Change years
-    yearhistq = np.where((time >= 1950) & (time <= 2015))[0]
-    print(time[yearhistq])
-    histmodel = varshape[yearhistq,:,:]
-        
-    print('>>>>>>>>>> ENDING read_20CRv3_monthly function!')
-    return lat1,lon1,histmodel
+    print('>>>>>>>>>> ENDING read_GPCP_monthly function!')
+    return lat1,lon1,varshape
 
 # ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
 # variq = 'P'
-# directory = '/Users/zlabe/Data/20CRv3/'
-# sliceperiod = 'annual'
-# sliceyear = np.arange(1836,2015+1,1)
+# directory = '/Users/zlabe/Data/GPCP/'
+# sliceperiod = 'OND'
+# sliceyear = np.arange(1979,2019+1,1)
 # sliceshape = 3
 # slicenan = 'nan'
 # addclimo = True
-# lat,lon,var = read_20CRv3_monthly(variq,directory,sliceperiod,
+# lat,lon,var = read_GPCP_monthly(variq,directory,sliceperiod,
 #                                 sliceyear,sliceshape,addclimo,
 #                                 slicenan)
 # lon2,lat2 = np.meshgrid(lon,lat)

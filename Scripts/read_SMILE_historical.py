@@ -227,6 +227,10 @@ def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicen
     elif vari == 'T2M':
         ensshape = ensshape - 273.15 # K to C
         print('Completed: Changed units (K to C)!')
+    elif vari == 'P':
+        ensshape = ensshape * 86400 # kg/m2/s to mm/day
+        ### "Average Monthly Rate of Precipitation"
+        print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
     
     ###########################################################################
     ### Change years
@@ -336,25 +340,25 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     return lat,lon,combyr
 
 
-### Test functions - do not use!
-import numpy as np
-import matplotlib.pyplot as plt
-import calc_Utilities as UT
-modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
-              'GFDL_CM3','GFDL_ESM2M']
-directory = '/Users/zlabe/Data/SMILE/'
-simulation = modelGCMs[4]
-vari = 'SLP'
-sliceperiod = 'annual'
-sliceshape = 4
-slicenan = 'nan'
-numOfEns = 16
-lensalso = True
-ravelyearsbinary = False
-ravelbinary = False
-lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
-                                            sliceperiod,sliceshape,
-                                            slicenan,numOfEns)
+# ### Test functions - do not use!
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import calc_Utilities as UT
+# modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
+#               'GFDL_CM3','GFDL_ESM2M']
+# directory = '/Users/zlabe/Data/SMILE/'
+# simulation = modelGCMs[4]
+# vari = 'P'
+# sliceperiod = 'annual'
+# sliceshape = 4
+# slicenan = 'nan'
+# numOfEns = 16
+# lensalso = True
+# ravelyearsbinary = False
+# ravelbinary = False
+# # lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
+# #                                             sliceperiod,sliceshape,
+# #                                             slicenan,numOfEns)
 # lat,lon,comb = readAllSmileDataHist(directory,modelGCMs,
 #                                     vari,sliceperiod,sliceshape,
 #                                     slicenan,numOfEns,ravelbinary,

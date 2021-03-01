@@ -54,6 +54,7 @@ def read_ERA5_monthlyBE(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
     from netCDF4 import Dataset
     import warnings
     import calc_Utilities as UT
+    from calendar import monthrange
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.simplefilter(action='ignore', category=RuntimeWarning)
     
@@ -173,6 +174,10 @@ def read_ERA5_monthlyBE(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
     elif variq == 'T2M':
         varshape = varshape - 273.15 # K to C
         print('Completed: Changed units (K to C)!')
+    elif variq == 'P':
+        varshape = varshape*1000 # m/day to mm/day
+        ### "Average Monthly Rate of Precipitation"
+        print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
         
     print('>>>>>>>>>> ENDING read_ERA5_monthlyBE (Back Extension) function!')
     return lat1,lon1,varshape
@@ -181,7 +186,7 @@ def read_ERA5_monthlyBE(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
-# variq = 'T2M'
+# variq = 'P'
 # directory = '/Users/zlabe/Data/ERA5/'
 # sliceperiod = 'annual'
 # sliceyear = np.arange(1950,2019+1,1)
