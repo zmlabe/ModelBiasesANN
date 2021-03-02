@@ -9,16 +9,17 @@ Notes
 Usage
 -----
     [1] rmse(a,b)
-    [2] remove_annual_mean(data,data_obs,lats,lons,lats_obs,lons_obs)
-    [3] remove_merid_mean(data,data_obs)
-    [4] remove_observations_mean(data,data_obs,lats,lons)
-    [5] calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall)
-    [6] remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev,numOfEns)
-    [7] remove_ocean(data,data_obs)
-    [8] remove_land(data,data_obs)
-    [9] standardize_data(Xtrain,Xtest)
-    [10] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
-    [11] rm_variance_dev(var,window)
+    [2] pickSmileModels(data,modelGCMs,pickSMILE)
+    [3] remove_annual_mean(data,data_obs,lats,lons,lats_obs,lons_obs)
+    [4] remove_merid_mean(data,data_obs)
+    [5] remove_observations_mean(data,data_obs,lats,lons)
+    [6] calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall)
+    [7] remove_ensemble_mean(data,ravel_modelens,ravelmodeltime,rm_standard_dev,numOfEns)
+    [8] remove_ocean(data,data_obs)
+    [9] remove_land(data,data_obs)
+    [10] standardize_data(Xtrain,Xtest)
+    [11] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
+    [12] rm_variance_dev(var,window)
 """
 
 def rmse(a,b):
@@ -34,6 +35,28 @@ def rmse(a,b):
     rmse_stat = np.sqrt(np.mean((a - b)**2))
     
     return rmse_stat
+
+###############################################################################
+    
+def pickSmileModels(data,modelGCMs,pickSMILE):
+    """
+    Select models to analyze if using a subset
+    """
+    
+    ### Pick return indices of models
+    lenOfPicks = len(pickSMILE)
+    indModels = [i for i, item in enumerate(modelGCMs) if item in pickSMILE]
+    
+    ### Slice data
+    if data.shape[0] == len(modelGCMs):
+        if len(indModels) == lenOfPicks:
+            modelSelected = data[indModels]
+        else:
+            print(ValueError('Something is wrong with the indexing of the models!'))
+    else:
+        print(ValueError('Something is wrong with the order of the data!'))
+    
+    return modelSelected
 
 ###############################################################################
 
@@ -306,3 +329,7 @@ def rm_variance_dev(var,window,ravelmodeltime):
         newdata = newdataq
     print('-----------COMPLETED: Rolling vari!\n\n')     
     return newdata 
+
+###############################################################################
+###############################################################################
+###############################################################################

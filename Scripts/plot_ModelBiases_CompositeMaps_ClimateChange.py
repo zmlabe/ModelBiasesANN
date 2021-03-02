@@ -37,9 +37,9 @@ modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth',
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 dataset = datasetsingle[0]
-dataset_obs = '20CRv3'
+dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'P'
 reg_name = 'SMILEGlobe'
 simuqq = datasetsingle[0]
 monthlychoice = seasons[0]
@@ -224,4 +224,4 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
 
-plt.savefig(directoryfigure + 'Experiment3.png',dpi=300)
+plt.savefig(directoryfigure + 'Experiment4_P.png',dpi=300)

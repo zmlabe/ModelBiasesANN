@@ -39,7 +39,7 @@ datasetsingle = ['SMILE']
 dataset = datasetsingle[0]
 dataset_obs = '20CRv3'
 seasons = ['annual']
-variq = 'SLP'
+variq = 'P'
 reg_name = 'SMILEGlobe'
 simuqq = datasetsingle[0]
 monthlychoice = seasons[0]
@@ -224,4 +224,4 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
 
-plt.savefig(directoryfigure + 'SLP.png',dpi=300)
+plt.savefig(directoryfigure + 'Experiment8_P.png',dpi=300)

@@ -1,14 +1,15 @@
 """
-ANN for evaluating model biases of historical simulations using the
-SMILE repository
+ANN for evaluating model biases, differences, and other thresholds using 
+explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 24 February 2021
+Date       : 1 March 2021
 Version    : 1 
 """
 
 ### Import packages
+import sys
 import math
 import time
 import matplotlib.pyplot as plt
@@ -57,7 +58,7 @@ directorydataLLL = '/Users/zlabe/Data/LENS/monthly'
 directorydataENS = '/Users/zlabe/Data/SMILE/'
 directorydataBB = '/Users/zlabe/Data/BEST/'
 directorydataEE = '/Users/zlabe/Data/ERA5/'
-directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/ClimateChange/'
+directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
 ###############################################################################
 ###############################################################################
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
@@ -65,8 +66,18 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'P'
+variq = 'SLP'
 reg_name = 'SMILEGlobe'
+###############################################################################
+###############################################################################
+pickSMILE = []
+# pickSMILE = ['MPI','lens']
+# pickSMILE = ['CSIRO_MK3.6','GFDL_CM3','lens']
+# pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] # create empty list for ALL 7 GCMs
+if len(pickSMILE) >= 1:
+    lenOfPicks = len(pickSMILE)
+else:
+    lenOfPicks = len(modelGCMs)
 ###############################################################################
 ###############################################################################
 land_only = False
@@ -81,9 +92,9 @@ rm_ensemble_mean = False
 rm_observational_mean = True
 ###############################################################################
 ###############################################################################
-calculate_anomalies = False
+calculate_anomalies = True
 if calculate_anomalies == True:
-    baseline = np.arange(1981,2010+1,1)
+    baseline = np.arange(1951,1980+1,1)
 ###############################################################################
 ###############################################################################
 window = 0
@@ -115,7 +126,6 @@ elif ensTypeExperi == 'GCM':
 ###############################################################################
 ###############################################################################
 numOfEns = 16
-ensnum = numOfEns
 if len(modelGCMs) == 6:
     lensalso = False
 elif len(modelGCMs) == 7:
@@ -125,17 +135,106 @@ lentime = len(yearsall)
 ###############################################################################
 ravelyearsbinary = False
 ravelbinary = False
-num_of_class = len(modelGCMs)
+num_of_class = lenOfPicks
 ###############################################################################
 ###############################################################################
 lrpRule = 'z'
 normLRP = True
 ###############################################################################
 ###############################################################################
+###############################################################################
+###############################################################################
+### Picking experiment to save
+typeOfAnalysis = 'issueWithExperiment'
+
+# Experiment #1
+if rm_ensemble_mean == True:
+    if window > 1:
+        if calculate_anomalies == False:
+            if rm_merid_mean == False:
+                if rm_observational_mean == False:
+                    if rm_annual_mean == False:
+                        typeOfAnalysis = 'Experiment-1'
+# Experiment #2
+if rm_ensemble_mean == True:
+    if window == 0:
+        if calculate_anomalies == False:
+            if rm_merid_mean == False:
+                if rm_observational_mean == False:
+                    if rm_annual_mean == False:
+                        typeOfAnalysis = 'Experiment-2'
+# Experiment #3 (raw data)
+if rm_ensemble_mean == False:
+    if window == 0:
+        if calculate_anomalies == False:
+            if rm_merid_mean == False:
+                if rm_observational_mean == False:
+                    if rm_annual_mean == False:
+                        typeOfAnalysis = 'Experiment-3'
+# Experiment #4
+if rm_ensemble_mean == False:
+    if window == 0:
+        if calculate_anomalies == False:
+            if rm_merid_mean == False:
+                if rm_observational_mean == False:
+                    if rm_annual_mean == True:
+                        typeOfAnalysis = 'Experiment-4'
+# Experiment #5
+if rm_ensemble_mean == False:
+    if window == 0:
+        if calculate_anomalies == False:
+            if rm_merid_mean == False:
+                if rm_observational_mean == True:
+                    if rm_annual_mean == False:
+                        typeOfAnalysis = 'Experiment-5'
+# Experiment #6
+if rm_ensemble_mean == False:
+    if window == 0:
+        if calculate_anomalies == False:
+            if rm_merid_mean == False:
+                if rm_observational_mean == True:
+                    if rm_annual_mean == True:
+                        typeOfAnalysis = 'Experiment-6'
+# Experiment #7
+if rm_ensemble_mean == False:
+    if window == 0:
+        if calculate_anomalies == True:
+            if rm_merid_mean == False:
+                if rm_observational_mean == True:
+                    if rm_annual_mean == False:
+                        typeOfAnalysis = 'Experiment-7'
+# Experiment #8
+if rm_ensemble_mean == False:
+    if window == 0:
+        if calculate_anomalies == True:
+            if rm_merid_mean == False:
+                if rm_observational_mean == False:
+                    if rm_annual_mean == False:
+                        typeOfAnalysis = 'Experiment-8'
+# Experiment #9
+if rm_ensemble_mean == False:
+    if window > 1:
+        if calculate_anomalies == True:
+            if rm_merid_mean == False:
+                if rm_observational_mean == False:
+                    if rm_annual_mean == False:
+                        typeOfAnalysis = 'Experiment-9'
+                        
+print('\n<<<<<<<<<<<< Analysis == %s ! >>>>>>>>>>>>>>>\n' % typeOfAnalysis)
+if typeOfAnalysis == 'issueWithExperiment':
+    sys.exit('Wrong parameters selected to analyze')
+    
+### Select how to save files
+saveData = typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+print('*Filename == < %s >' % saveData) 
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 ### Create sample class labels for each model for my own testing
 if seasons != 'none':
-    classesl = np.empty((len(modelGCMs),numOfEns,len(yearsall)))
-    for i in range(len(modelGCMs)):
+    classesl = np.empty((lenOfPicks,numOfEns,len(yearsall)))
+    for i in range(lenOfPicks):
         classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
         
     if ensTypeExperi == 'ENS':
@@ -154,7 +253,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         simuqq = datasetsingle[0]
         monthlychoice = seasons[seas]
         lat_bounds,lon_bounds = UT.regions(reg_name)
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison/ClimateChange/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
         experiment_result = pd.DataFrame(columns=['actual iters','hiddens','cascade',
                                                   'RMSE Train','RMSE Test',
                                                   'ridge penalty','zero mean',
@@ -184,11 +283,11 @@ for sis,singlesimulation in enumerate(datasetsingle):
         
         ### Remove the annual mean? True to subtract it from dataset ##########
         if rm_annual_mean == True:
-            directoryfigure = '/Users/zlabe/Desktop/ModelComparison/ClimateChange/'
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
         
         ### Rove the ensemble mean? True to subtract it from dataset ##########
         if rm_ensemble_mean == True:
-            directoryfigure = '/Users/zlabe/Desktop/ModelComparison/ClimateChange/'
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
         
         ### Split the data into training and testing sets? value of 1 will use all 
         ### data as training
@@ -284,10 +383,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         
                     ### Training segment----------
                     data_train = np.empty((len(trainIndices),datanew.shape[1],
-                                           datanew.shape[2],datanew.shape[3],
-                                           datanew.shape[4]))
+                                            datanew.shape[2],datanew.shape[3],
+                                            datanew.shape[4]))
                     Ytrain = np.empty((len(trainIndices),classeslnew.shape[1],
-                                       classeslnew.shape[2]))
+                                        classeslnew.shape[2]))
                     for index,ensemble in enumerate(trainIndices):
                         data_train[index,:,:,:,:] = datanew[ensemble,:,:,:,:]
                         Ytrain[index,:,:] = classeslnew[ensemble,:,:]
@@ -306,10 +405,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
                             
                     ### Testing segment----------
                     data_test = np.empty((len(testIndices),datanew.shape[1],
-                                           datanew.shape[2],datanew.shape[3],
-                                           datanew.shape[4]))
+                                            datanew.shape[2],datanew.shape[3],
+                                            datanew.shape[4]))
                     Ytest = np.empty((len(testIndices),classeslnew.shape[1],
-                                       classeslnew.shape[2]))
+                                        classeslnew.shape[2]))
                     for index,ensemble in enumerate(testIndices):
                         data_test[index,:,:,:,:] = datanew[ensemble,:,:,:,:]
                         Ytest[index,:,:] = classeslnew[ensemble,:,:]
@@ -364,7 +463,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
      
                     ### Training segment----------
                     data_train = np.empty((datanew.shape[0],len(trainIndices),
-                                           datanew.shape[2],datanew.shape[3]))
+                                            datanew.shape[2],datanew.shape[3]))
                     Ytrain = np.empty((classeslnew.shape[0],len(trainIndices)))
                     for index,ensemble in enumerate(trainIndices):
                         data_train[:,index,:,:] = datanew[:,ensemble,:,:]
@@ -384,7 +483,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                             
                     ### Testing segment----------
                     data_test = np.empty((datanew.shape[0],len(testIndices),
-                                           datanew.shape[2],datanew.shape[3]))
+                                            datanew.shape[2],datanew.shape[3]))
                     Ytest = np.empty((classeslnew.shape[0],len(testIndices)))
                     for index,ensemble in enumerate(testIndices):
                         data_test[:,index,:,:] = datanew[:,ensemble,:,:]
@@ -644,9 +743,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
                     ### Get the data together
                     data, data_obs, = data_all, data_obs_all,
 ###############################################################################
+                    if len(pickSMILE) >= 1:
+                        data = dSS.pickSmileModels(data,modelGCMs,pickSMILE)
+                        print('\n*Pick models to analysis from %s*\n' % pickSMILE)
+###############################################################################
                     if calculate_anomalies == True:
                         data, data_obs = dSS.calculate_anomalies(data,data_obs,
-                                         lats,lons,baseline,yearsall)
+                                          lats,lons,baseline,yearsall)
                         print('\n*Calculate anomalies for %s-%s*\n' % (baseline.min(),baseline.max()))
 ###############################################################################                        
                     if rm_annual_mean == True:
@@ -667,10 +770,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                           rm_standard_dev,
                                                           numOfEns)
                         print('\n*Removed ensemble mean*')
- ###############################################################################                       
+###############################################################################                       
                     if rm_standard_dev == True:
                         data = dSS.rm_standard_dev(data,window,ravelmodeltime,
-                                                   numOfEns)
+                                                    numOfEns)
                         print('\n*Removed standard deviation*')
 ###############################################################################                        
                     if rm_observational_mean == True:
@@ -725,7 +828,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         
                         ################################################################################################################################################                
                         # save the model
-                        dirname = '/Users/zlabe/Desktop/ModelComparison/ClimateChange/'
+                        dirname = '/Users/zlabe/Desktop/ModelComparison_v1/'
                         savename = modelType+'_'+variq+'_kerasMultiClassBinaryOption4'+'_' + NNType + '_L2_'+ str(ridge_penalty[0])+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(iterations[0]) + '_' + str(hiddensList[0][0]) + 'x' + str(hiddensList[0][-1]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
                         savenameModelTestTrain = modelType+'_'+variq+'_modelTrainTest_SegSeed'+str(random_segment_seed)+'_NetSeed'+str(random_network_seed)
         
@@ -790,8 +893,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         obsout = YpredObs
         labelsobs = np.argmax(obsout,axis=1)
         uniqueobs,countobs = np.unique(labelsobs,return_counts=True)
-        # np.savetxt(directoryoutput + 'ObservationClassification_UniqueClasses_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset_obs,iterations[0],rm_standard_dev,ensTypeExperi),uniqueobs)
-        # np.savetxt(directoryoutput + 'ObservationClassification_CountClasses_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange.txt' % (variq,monthlychoice,reg_name,dataset_obs,iterations[0],rm_standard_dev,ensTypeExperi),countobs)
+        np.savetxt(directoryoutput + 'obsLabels_' + saveData + '.txt',labelsobs)
         
         def truelabel(data):
             """
@@ -811,11 +913,26 @@ for sis,singlesimulation in enumerate(datasetsingle):
             accdata_pred = accuracy_score(data_truer,data_predr)
                 
             return accdata_pred
+
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################        
+        indextrain = truelabel(trainingout)
+        acctrain = accuracyTotalTime(indextrain,classesltrain)
+        indextest = truelabel(testingout)
+        acctest = accuracyTotalTime(indextest,classesltest)
+        print('\n\nAccuracy Training == ',acctrain)
+        print('Accuracy Testing == ',acctest)
         
         ## Save the output for plotting
-        np.savetxt(directoryoutput + 'trainingEnsIndices_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies),trainIndices)
-        np.savetxt(directoryoutput + 'testingEnsIndices_ABS_ModelBiases_%s_%s_%s_%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.txt' % (variq,monthlychoice,reg_name,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies),testIndices)
-        np.savetxt(directoryoutput + 'allClasses_ABS_ModelBiases_%s_%s_%s_%s-%s_iterations%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.txt' % (variq,monthlychoice,reg_name,dataset_obs,dataset,iterations[0],rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies),classesl.ravel())
+        np.savetxt(directoryoutput + 'trainingEnsIndices_' + saveData + '.txt',trainIndices)
+        np.savetxt(directoryoutput + 'testingEnsIndices_' + saveData + '.txt',testIndices)
+        
+        np.savetxt(directoryoutput + 'trainingTrueLabels_' + saveData + '.txt',classesltrain)
+        np.savetxt(directoryoutput + 'testingTrueLabels_' + saveData + '.txt',classesltest)
+        
+        np.savetxt(directoryoutput + 'trainingPredictedLabels_' + saveData + '.txt',indextrain)
+        np.savetxt(directoryoutput + 'testingPredictedLabels_' + saveData + '.txt',indextest)
     
         ### See more more details
         model.layers[0].get_config()
@@ -856,15 +973,6 @@ for sis,singlesimulation in enumerate(datasetsingle):
 
         ##############################################################################
         ##############################################################################
-        ##############################################################################        
-        indextrain = truelabel(trainingout)
-        acctrain = accuracyTotalTime(indextrain,classesltrain)
-        indextest = truelabel(testingout)
-        acctest = accuracyTotalTime(indextest,classesltest)
-        print('\n\nAccuracy Training == ',acctrain)
-        print('Accuracy Testing == ',acctest)
-        ##############################################################################
-        ##############################################################################
         ##############################################################################
         
         lrpall = LRP.calc_LRPModel(model,np.append(XtrainS,XtestS,axis=0),
@@ -897,13 +1005,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ##############################################################################
         ##############################################################################
         ##############################################################################
-        def netcdfLRP(lats,lons,var,directory,window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies):
+        def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
             print('\n>>> Using netcdfLRP function!')
             
             from netCDF4 import Dataset
             import numpy as np
             
-            name = 'LRP_Maps_ABS_ModelBiases-STDDEV%syrs_%s_Annual_%s_%s_land_only-%s_%s_STD-%s_%s_ClimateChange_rm_annual_mean-%s_Anomalies-%s_anom.nc' % (window,typemodel,variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
+            name = 'LRPMap' + typemodel + '_' + saveData + '.nc'
             filename = directory + name
             ncfile = Dataset(filename,'w',format='NETCDF4')
             ncfile.description = 'LRP maps for using selected seed' 
@@ -933,10 +1041,11 @@ for sis,singlesimulation in enumerate(datasetsingle):
             
             ncfile.close()
             print('*Completed: Created netCDF4 File!')
-            
-        netcdfLRP(lats,lons,lrptrain,directoryoutput,window,'train',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
-        netcdfLRP(lats,lons,lrptest,directoryoutput,window,'test',variq,simuqq,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
-        netcdfLRP(lats,lons,lrpobservations,directoryoutput,window,'obs',variq,dataset_obs,land_only,reg_name,rm_standard_dev,ensTypeExperi,rm_annual_mean,calculate_anomalies)
+        
+        netcdfLRP(lats,lons,lrpall,directoryoutput,'AllData',saveData)
+        netcdfLRP(lats,lons,lrptrain,directoryoutput,'Training',saveData)
+        netcdfLRP(lats,lons,lrptest,directoryoutput,'Testing',saveData)
+        netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
       
     ### Delete memory!!!
     if sis < len(datasetsingle):
