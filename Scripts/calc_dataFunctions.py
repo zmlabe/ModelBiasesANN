@@ -116,12 +116,12 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
         slicebaseRA = np.arange(1951,1980+1,1)
         sliceshapeRA = 4
         slicenanRA = 'nan'
+        numOfEnsRA = 16
         addclimoRA = True
         takeEnsMeanRA = False
-        lat1,lon1,data,ENSmean = RA.read_randomData_monthly(directorydataRA,variq,
-                                               monthlychoice,slicebaseRA,
-                                               sliceshapeRA,addclimoRA,
-                                               slicenanRA,takeEnsMeanRA)
+        ensYes = False
+        lat1,lon1,data,ENSmean = RA.read_randomData_monthly(directorydataRA,variq,monthlychoice,
+                                                            sliceshapeRA,slicenanRA,numOfEnsRA,ensYes)
     elif dataset == 'SMILE':
         import read_SMILE_historical as SM
         directorydataSM = '/Users/zlabe/Data/SMILE/'
@@ -252,4 +252,4 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
 # lensalso = True
 # ravelyearsbinary = False
 # ravelbinary = False
-# data,lat1,lon1 = readFiles('T2M','GPCP','annual',numOfEns,lensalso,ravelyearsbinary,ravelbinary)
+# data,lat1,lon1 = readFiles('T2M','RANDOM','annual',numOfEns,lensalso,ravelyearsbinary,ravelbinary)

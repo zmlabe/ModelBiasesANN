@@ -1,21 +1,21 @@
 """
 Function(s) reads in monthly data that is generated from random noise in the 
-shape of CESM-LENS
+shape of climate models and observations
  
 Notes
 -----
     Author : Zachary Labe
-    Date   : 19 October 2020
+    Date   : 5 March 2021
     
 Usage
 -----
-    [1] read_randomData_monthly(directorydataRA,variq,
-                                monthlychoice,slicebaseRA,
-                                sliceshapeRA,addclimoRA,
-                                slicenanRA,takeEnsMeanRA)
+    [1] read_randomData_monthly(directorydata,variq,sliceperiod,
+                               sliceshape,slicenan,numOfEns,ensYes)
+
 """
 
-def read_randomData_monthly(directory,vari,sliceperiod,slicebase,sliceshape,addclimo,slicenan,takeEnsMean):
+def read_randomData_monthly(directorydata,variq,sliceperiod,
+                            sliceshape,slicenan,numOfEns,ensYes):
     """
     Function generates RANDOM DATA
     
@@ -68,12 +68,9 @@ def read_randomData_monthly(directory,vari,sliceperiod,slicebase,sliceshape,addc
     
     ###########################################################################
     ### Parameters
-    time = np.arange(1920,2080+1,1)
+    time = np.arange(1950,2019+1,1)
     mon = 12
-    # ens1 = np.arange(1,35+1,1)
-    # ens2 = np.arange(101,105+1,1)
-    # allens = np.append(ens1,ens2)
-    allens = np.arange(1,20+1,1) # EDIT TO COMPARE WITH X(LENS)
+    allens = np.arange(1,numOfEns+1,1) 
     ens = list(map('{:03d}'.format, allens))
     
     ###########################################################################
@@ -82,110 +79,62 @@ def read_randomData_monthly(directory,vari,sliceperiod,slicebase,sliceshape,addc
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
     data.close()
-    
-    ensvar = np.random.randn(len(ens),time.shape[0],mon,lat1.shape[0],lon1.shape[0])
 
     print('Completed: read all members!\n')
-    
-    ###########################################################################
-    ### Calculate anomalies or not
-    if addclimo == True:
-        ensvalue = ensvar
-        print('Completed: calculated absolute variable!')
-    elif addclimo == False:
-        yearsq = np.where((time >= slicebase.min()) & (time <= slicebase.max()))[0]
-        yearssel = time[yearsq]
-        
-        mean = np.nanmean(ensvar[:,yearsq,:,:,:])
-        ensvalue = ensvar - mean
-        print('Completed: calculated anomalies from',
-              slicebase.min(),'to',slicebase.max())
         
     ###########################################################################
     ### Slice over months (currently = [ens,yr,mn,lat,lon])
     ### Shape of output array
-    if sliceperiod == 'annual':
-        ensvalue = np.nanmean(ensvalue,axis=2)
-        if sliceshape == 1:
-            ensshape = ensvalue.ravel()
-        elif sliceshape == 4:
-            ensshape = ensvalue
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: ANNUAL MEAN!')
-    elif sliceperiod == 'DJF':
-        ensshape = np.empty((ensvalue.shape[0],ensvalue.shape[1]-1,
-                             lat1.shape[0],lon1.shape[0]))
-        for i in range(ensvalue.shape[0]):                    
-            ensshape[i,:,:,:] = UT.calcDecJanFeb(ensvalue[i,:,:,:,:],
-                                                 lat1,lon1,'surface',1)
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: DJF MEAN!')
-    elif sliceperiod == 'MAM':
-        enstime = np.nanmean(ensvalue[:,:,2:5,:,:],axis=2)
-        if sliceshape == 1:
-            ensshape = enstime.ravel()
-        elif sliceshape == 4:
-            ensshape = enstime
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: MAM MEAN!')
-    elif sliceperiod == 'JJA':
-        enstime = np.nanmean(ensvalue[:,:,5:8,:,:],axis=2)
-        if sliceshape == 1:
-            ensshape = enstime.ravel()
-        elif sliceshape == 4:
-            ensshape = enstime
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: JJA MEAN!')
-    elif sliceperiod == 'SON':
-        enstime = np.nanmean(ensvalue[:,:,8:11,:,:],axis=2)
-        if sliceshape == 1:
-            ensshape = enstime.ravel()
-        elif sliceshape == 4:
-            ensshape = enstime
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: SON MEAN!')
-    elif sliceperiod == 'JFM':
-        enstime = np.nanmean(ensvalue[:,:,0:3,:,:],axis=2)
-        if sliceshape == 1:
-            ensshape = enstime.ravel()
-        elif sliceshape == 4:
-            ensshape = enstime
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: JFM MEAN!')
-    elif sliceperiod == 'AMJ':
-        enstime = np.nanmean(ensvalue[:,:,3:6,:,:],axis=2)
-        if sliceshape == 1:
-            ensshape = enstime.ravel()
-        elif sliceshape == 4:
-            ensshape = enstime
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: AMJ MEAN!')
-    elif sliceperiod == 'JAS':
-        enstime = np.nanmean(ensvalue[:,:,6:9,:,:],axis=2)
-        if sliceshape == 1:
-            ensshape = enstime.ravel()
-        elif sliceshape == 4:
-            ensshape = enstime
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: JAS MEAN!')
-    elif sliceperiod == 'OND':
-        enstime = np.nanmean(ensvalue[:,:,9:,:,:],axis=2)
-        if sliceshape == 1:
-            ensshape = enstime.ravel()
-        elif sliceshape == 4:
-            ensshape = enstime
-        print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-        print('Completed: OND MEAN!')
-    elif sliceperiod == 'none':
-        if sliceshape == 1:
-            ensshape = ensvalue.ravel()
-        elif sliceshape == 3:
-            ensshape= np.reshape(ensvalue,(ensvalue.shape[0]*ensvalue.shape[1],
-                                             ensvalue.shape[2],ensvalue.shape[3]))
-        elif sliceshape == 5:
-            ensshape = ensvalue
-        print('Shape of output =', ensshape.shape, [[ensshape.ndim]])
-        print('Completed: ALL MONTHS!')
+    if ensYes == True:
+        if sliceperiod == 'annual':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: ANNUAL MEAN!')
+        elif sliceperiod == 'DJF':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: DJF MEAN!')
+        elif sliceperiod == 'MAM':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: MAM MEAN!')
+        elif sliceperiod == 'JJA':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: JJA MEAN!')
+        elif sliceperiod == 'SON':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: SON MEAN!')
+        elif sliceperiod == 'JFM':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: JFM MEAN!')
+        elif sliceperiod == 'AMJ':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: AMJ MEAN!')
+        elif sliceperiod == 'JAS':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: JAS MEAN!')
+        elif sliceperiod == 'OND':
+            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+            print('Completed: OND MEAN!')
+        elif sliceperiod == 'none':
+            ensshape = np.random.randn(len(ens),time.shape[0],mon,lat1.shape[0],lon1.shape[0])
+            print('Shape of output =', ensshape.shape, [[ensshape.ndim]])
+            print('Completed: ALL MONTHS!')
+    elif ensYes == False:
+        if sliceperiod == 'none':
+            ensshape = np.random.randn(time.shape[0],mon,lat1.shape[0],lon1.shape[0])
+            print('Shape of output =', ensshape.shape, [[ensshape.ndim]])
+            print('Completed: ALL MONTHS-OBS!')
+        else:
+            ensshape = np.random.randn(time.shape[0],lat1.shape[0],lon1.shape[0])
+            print('Shape of output =', ensshape.shape, [[ensshape.ndim]])
+            print('Completed: ANNUAL MEAN-OBS!')
         
     ###########################################################################
     ### Change missing values
@@ -196,34 +145,23 @@ def read_randomData_monthly(directory,vari,sliceperiod,slicebase,sliceshape,addc
         ensshape[np.where(np.isnan(ensshape))] = slicenan
 
     ###########################################################################
-    ### Take ensemble mean
-    if takeEnsMean == True:
-        ENSmean = np.nanmean(ensshape,axis=0)
-        print('Ensemble mean AVAILABLE!')
-    elif takeEnsMean == False:
-        ENSmean = np.nan
-        print('Ensemble mean NOT available!')
-    else:
-        ValueError('WRONG OPTION!')
+    ENSmean = np.nan
+    print('Ensemble mean NOT available!')
         
-    print('>>>>>>>>>> ENDING read_randomData_monthly function!')
-        
+    print('>>>>>>>>>> ENDING read_randomData_monthly function!')    
     return lat1,lon1,ensshape,ENSmean
         
 
-### Test functions - do not use!
+# ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
 # directorydataRA = '/Users/zlabe/Data/'
 # variq = 'T2M'
 # monthlychoice = 'annual'
-# slicebaseRA = np.arange(1951,1980+1,1)
 # sliceshapeRA = 4
 # slicenanRA = 'nan'
-# addclimoRA = True
-# takeEnsMeanRA = False
-# lat1,lon1,data,ENSmean = read_randomData_monthly(directorydataRA,variq,
-#                                        monthlychoice,slicebaseRA,
-#                                        sliceshapeRA,addclimoRA,
-#                                        slicenanRA,takeEnsMeanRA)
+# numOfEnsRA = 16
+# ensYes = False
+# lat1,lon1,data,ENSmean = read_randomData_monthly(directorydataRA,variq,monthlychoice,
+#                                                  sliceshapeRA,slicenanRA,numOfEnsRA,ensYes)

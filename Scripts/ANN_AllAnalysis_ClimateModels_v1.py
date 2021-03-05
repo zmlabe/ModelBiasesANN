@@ -66,7 +66,7 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'P'
 reg_name = 'SMILEGlobe'
 ###############################################################################
 ###############################################################################
@@ -85,7 +85,7 @@ ocean_only = False
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = True
+rm_annual_mean =  True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -877,6 +877,27 @@ for sis,singlesimulation in enumerate(datasetsingle):
                             YpredObs = model.predict(XobsS)
                             YpredTrain = model.predict((Xtrain-Xmean)/Xstd)
                             YpredTest = model.predict((Xtest-Xmean)/Xstd)
+                        
+                        #######################################################
+                        #######################################################
+                        #######################################################
+                        ### Check null hypothesis of random data!
+                        randarray,latsra,lonsra = read_primary_dataset(variq,'RANDOM',
+                                                                       numOfEns,lensalso,
+                                                                       ravelyearsbinary,
+                                                                       ravelbinary,
+                                                                       lat_bounds,
+                                                                       lon_bounds)
+                        randarrayn = randarray.reshape(randarray.shape[0],randarray.shape[1]*randarray.shape[2])
+                        randarraymean = np.nanmean(randarrayn,axis=0)
+                        randarraystd = np.nanstd(randarrayn,axis=0)
+                        randarrayS = (randarrayn-randarraymean)/randarraystd
+                        
+                        ### Prediction on random data
+                        YpredRand = model.predict(randarrayS)
+                        #######################################################
+                        #######################################################
+                        #######################################################
         
         ### Get output from model
         trainingout = YpredTrain
@@ -888,6 +909,12 @@ for sis,singlesimulation in enumerate(datasetsingle):
         elif ensTypeExperi == 'GCM':
             classesltrain = classeslnew[:,:,trainIndices].ravel()
             classesltest = classeslnew[:,:,testIndices].ravel()
+            
+        ### Random data tests
+        randout = YpredRand
+        labelsrand = np.argmax(randout,axis=1)
+        uniquerand,countrand = np.unique(labelsrand,return_counts=True)
+        np.savetxt(directoryoutput + 'RandLabels_' + saveData + '.txt',labelsrand)
             
         ### Observations
         obsout = YpredObs
@@ -999,6 +1026,11 @@ for sis,singlesimulation in enumerate(datasetsingle):
         
         ### For observations data only
         lrpobservations = LRP.calc_LRPObs(model,XobsS,biasBool,annType,
+                                            num_of_class,yearsall,lrpRule,
+                                            normLRP,numLats,numLons,numDim)
+
+        ### For random data only
+        lrprandom = LRP.calc_LRPObs(model,randarrayS,biasBool,annType,
                                             num_of_class,yearsall,lrpRule,
                                             normLRP,numLats,numLons,numDim)
       
