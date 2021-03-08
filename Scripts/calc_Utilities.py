@@ -17,8 +17,8 @@ Usage
     [7] calc_RMSE(varx,vary,lats,lons,weight)
     [8] calc_spatialCorrHeight(varx,vary,lats,lons,weight)
     [9] calc_spatialCorrHeightLev(varx,vary,lats,lons,weight,levelq)
-    [10] detrendData(datavar,years,level,yearmn,yearmx)
-    [11] detrendDataR(datavar,years,level,yearmn,yearmx)
+    [10] linearTrend(datavar,years,level,yearmn,yearmx)
+    [11] linearTrendR(datavar,years,level,yearmn,yearmx)
     [12] mk_test(x, alpha)
     [13] regions(name)
 """
@@ -667,14 +667,14 @@ def calc_spatialCorrHeightLev(varx,vary,levs,lons,weight,levelq):
 ###############################################################################
 ###############################################################################
 
-def detrendData(datavar,years,level,yearmn,yearmx):
+def linearTrend(datavar,years,level,yearmn,yearmx):
     """
-    Function removes linear trend
+    Function calculates linear trend for a large ensemble
 
     Parameters
     ----------
-    datavar : 4d numpy array or 5d numpy array 
-        [ensemble,year,lat,lon] or [ensemble,year,level,lat,lon]
+    datavar : 4d numpy array  
+        [ensemble,year,lat,lon] 
     years : 1d numpy array
         [years]
     level : string
@@ -686,15 +686,15 @@ def detrendData(datavar,years,level,yearmn,yearmx):
     
     Returns
     -------
-    datavardt : 4d numpy array or 5d numpy array 
-        [ensemble,year,lat,lon] or [ensemble,year,level,lat,lon]
+    slopes : 4d numpy array 
+        [ensemble,lat,lon] 
         
 
     Usage
     -----
-    datavardt = detrendData(datavar,years,level,yearmn,yearmx)
+    slopes = linearTrend(datavar,years,level,yearmn,yearmx)
     """
-    print('\n>>> Using detrendData function! \n')
+    print('\n>>> Using linearTrend function! \n')
     ###########################################################################
     ###########################################################################
     ###########################################################################
@@ -714,7 +714,7 @@ def detrendData(datavar,years,level,yearmn,yearmx):
         intercepts = np.empty((datavar.shape[0],datavar.shape[2],
                                datavar.shape[3]))
         for ens in range(datavar.shape[0]):
-            print('-- Detrended data for ensemble member -- #%s!' % (ens+1))
+            print('-- Trend data for ensemble member -- #%s!' % (ens+1))
             for i in range(datavar.shape[2]):
                 for j in range(datavar.shape[3]):
                     mask = np.isfinite(datavar[ens,:,i,j])
@@ -733,23 +733,23 @@ def detrendData(datavar,years,level,yearmn,yearmx):
                     else:
                         slopes[ens,i,j] = np.nan
                         intercepts[ens,i,j] = np.nan
-        print('Completed: Detrended data for each grid point!')
+        print('Completed: Trend data for each grid point!')
                                 
-    print('\n>>> Completed: Finished detrendData function!')
+    print('\n>>> Completed: Finished linearTrend function!')
     return slopes
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 
-def detrendDataR(datavar,years,level,yearmn,yearmx):
+def linearTrendR(datavar,years,level,yearmn,yearmx):
     """
-    Function removes linear trend from reanalysis data
+    Function calculates linear trend for observations/reanalysis
 
     Parameters
     ----------
-    datavar : 4d numpy array or 5d numpy array 
-        [year,month,lat,lon] or [year,month,level,lat,lon]
+    datavar : 3d numpy array
+        [year,lat,lon]
     years : 1d numpy array
         [years]
     level : string
@@ -761,14 +761,14 @@ def detrendDataR(datavar,years,level,yearmn,yearmx):
     
     Returns
     -------
-    datavardt : 4d numpy array or 5d numpy array 
-        [year,month,lat,lon] or [year,month,level,lat,lon]
+    slopes : 4d numpy array
+        [lat,lon]
         
     Usage
     -----
-    datavardt = detrendDataR(datavar,years,level,yearmn,yearmx)
+    slopes = linearTrendR(datavar,years,level,yearmn,yearmx)
     """
-    print('\n>>> Using detrendData function! \n')
+    print('\n>>> Using linearTrendR function! \n')
     ###########################################################################
     ###########################################################################
     ###########################################################################
@@ -805,10 +805,10 @@ def detrendDataR(datavar,years,level,yearmn,yearmx):
                 else:
                     slopes[i,j] = np.nan
                     intercepts[i,j] = np.nan
-        print('Completed: Detrended data for each grid point!')
+        print('Completed: Trend data for each grid point!')
 
-    print('\n>>> Completed: Finished detrendDataR function!')
-    return slopes,std_err
+    print('\n>>> Completed: Finished linearTrendR function!')
+    return slopes
 
 ###############################################################################
 ###############################################################################
