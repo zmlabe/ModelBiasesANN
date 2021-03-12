@@ -378,7 +378,8 @@ def calc_spatialCorr(varx,vary,lats,lons,weight):
     ----------
     varx : 2d array
     vary : 2d array
-    lons : 1d array of latitude
+    lats : 1d array of latitude
+    lons : 1d array of longitude
     weight : string (yes or no)
     
     Returns
@@ -475,7 +476,7 @@ def calc_RMSE(varx,vary,lats,lons,weight):
         
         if weight == 'yes': # Computed weighted correlation coefficient   
             ### mask
-            mask = 'yes'
+            mask = 'no'
             if mask == 'yes':
                 latq = np.where(lats > 30)[0]
                 lats = lats[latq]

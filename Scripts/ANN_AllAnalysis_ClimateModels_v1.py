@@ -71,9 +71,9 @@ reg_name = 'SMILEGlobe'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
-# pickSMILE = ['MPI','lens']
+pickSMILE = ['CSIRO_MK3.6','lens']
 # pickSMILE = ['CSIRO_MK3.6','GFDL_CM3','lens']
-# pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] # create empty list for ALL 7 GCMs
+pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] # create empty list for ALL 7 GCMs
 if len(pickSMILE) >= 1:
     lenOfPicks = len(pickSMILE)
 else:
@@ -85,14 +85,14 @@ ocean_only = False
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean =  True
+rm_annual_mean =  False
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
-rm_observational_mean = False
+rm_observational_mean = True
 ###############################################################################
 ###############################################################################
-calculate_anomalies = False
+calculate_anomalies = True
 if calculate_anomalies == True:
     baseline = np.arange(1951,1980+1,1)
 ###############################################################################

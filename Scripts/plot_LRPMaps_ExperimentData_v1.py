@@ -25,10 +25,11 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 variablesall = ['T2M','P','SLP']
 pickSMILEall = [
                 [],
-                ['MPI','lens'],
+                ['CSIRO-MK3.6','lens'],
                 ['CSIRO-MK3.6','GFDL-CM3','LENS'],
                 ['CanESM2','CSIRO-MK3.6','GFDL-CM3','GFDL-ESM2M','LENS']
                 ] 
+# pickSMILEall = [[]]
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         ###############################################################################
@@ -36,7 +37,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Data preliminaries 
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2/'
         letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
         ###############################################################################
         ###############################################################################
@@ -65,7 +66,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
-        rm_observational_mean = False
+        rm_observational_mean = True
         ###############################################################################
         ###############################################################################
         calculate_anomalies = True
@@ -73,7 +74,7 @@ for va in range(len(variablesall)):
             baseline = np.arange(1951,1980+1,1)
         ###############################################################################
         ###############################################################################
-        window = 5
+        window = 0
         ensTypeExperi = 'ENS'
         ###############################################################################
         ###############################################################################
@@ -258,6 +259,11 @@ for va in range(len(variablesall)):
         percPickObs = np.nanmax(countobs)/len(obspred)*100.
         modelPickObs = modelGCMsNames[uniqueobs[np.argmax(countobs)]]
         
+        randpred = np.int_(np.genfromtxt(directorydata + 'RandLabels_' + saveData + '.txt'))
+        uniquerand,countrand = np.unique(randpred,return_counts=True)
+        percPickrand = np.nanmax(countrand)/len(randpred)*100.
+        modelPickrand= modelGCMsNames[uniquerand[np.argmax(countrand)]]
+        
         ### Read in LRP maps
         lrptraindata,lat1,lon1 = readData(directorydata,'Training',saveData)
         lrptestdata,lat1,lon1 = readData(directorydata,'Testing',saveData)
@@ -327,6 +333,9 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Plot subplot of LRP means training
         if typeOfAnalysis == 'Experiment-4':
+            limit = np.arange(0,1.00001,0.005)
+            barlim = np.round(np.arange(0,1.01,0.1),2)
+        elif typeOfAnalysis == 'Experiment-3':
             limit = np.arange(0,1.00001,0.005)
             barlim = np.round(np.arange(0,1.01,0.1),2)
         elif typeOfAnalysis == 'Experiment-7':
@@ -576,3 +585,68 @@ for va in range(len(variablesall)):
         
         plt.tight_layout()
         plt.savefig(directoryfigure + '%s/PredictedModels_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        
+        ###############################################################################
+        ###############################################################################
+        ###############################################################################
+        
+        fig = plt.figure(figsize=(10,5))
+        
+        ax = plt.subplot(121)
+        adjust_spines(ax, ['left', 'bottom'])
+        ax.spines['top'].set_color('none')
+        ax.spines['right'].set_color('none')
+        ax.spines['left'].set_color('dimgrey')
+        ax.spines['bottom'].set_color('dimgrey')
+        ax.spines['left'].set_linewidth(2)
+        ax.spines['bottom'].set_linewidth(2)
+        ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
+        ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
+        
+        x=np.arange(1950,2019+1,1)
+        plt.scatter(x,randpred,c=randpred,s=40,clip_on=False,cmap=cc.Antique_7.mpl_colormap,
+                    edgecolor='k',linewidth=0.4,zorder=10)
+        
+        plt.xticks(np.arange(1950,2021,5),map(str,np.arange(1950,2021,5)),size=6)
+        plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
+        plt.xlim([1950,2020])   
+        plt.ylim([0,lenOfPicks-1])
+        plt.xlabel(r'\textbf{Predictions - [ %s - RANDOMD DATA ] - %s}' % (variq,typeOfAnalysis))
+        
+        ###############################################################################
+        
+        ax = plt.subplot(122)
+        adjust_spines(ax, ['left', 'bottom'])
+        ax.spines['top'].set_color('none')
+        ax.spines['right'].set_color('none')
+        ax.spines['left'].set_color('dimgrey')
+        ax.spines['bottom'].set_color('dimgrey')
+        ax.spines['left'].set_linewidth(2)
+        ax.spines['bottom'].set_linewidth(0)
+        ax.tick_params('y',length=4,width=2,which='major',color='dimgrey')
+        ax.tick_params('x',length=0,width=0,which='major',color='dimgrey')
+        
+        rects = plt.bar(uniquetest,counttest, align='center')
+        plt.axhline(y=len(predtest)/lenOfPicks,linestyle='--',linewidth=2,color='k',
+                    clip_on=False,zorder=100,dashes=(1,0.3))
+        
+        ### Set color
+        colorlist = [cc.Antique_7.mpl_colormap(1/7),
+                     cc.Antique_7.mpl_colormap(0/7),
+                     cc.Antique_7.mpl_colormap(3/7),
+                     cc.Antique_7.mpl_colormap(5/7),
+                     cc.Antique_7.mpl_colormap(4/7),
+                     cc.Antique_7.mpl_colormap(6/7),
+                     cc.Antique_7.mpl_colormap(7/7)]
+        for i in range(lenOfPicks):
+            rects[i].set_color(colorlist[i])
+            rects[i].set_edgecolor(colorlist[i])
+        
+        plt.xticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
+        plt.yticks(np.arange(0,520,50),map(str,np.arange(0,520,50)),size=6)
+        plt.xlim([-0.5,lenOfPicks-1+0.5])   
+        plt.ylim([0,500])
+        plt.xlabel(r'\textbf{Frequency - [ %s - TESTING ] - %s}' % (variq,typeOfAnalysis))
+        
+        plt.tight_layout()
+        plt.savefig(directoryfigure + '%s/RandomModels_%s.png' % (typeOfAnalysis,saveData),dpi=300)
