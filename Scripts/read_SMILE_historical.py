@@ -11,6 +11,9 @@ Usage
 -----
     [1] read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,
                              slicenan,numOfEns)
+    [2] readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,
+                             slicenan,numOfEns,ravelbinary,lensalso,randomalso,
+                             ravelyearsbinary,shuffletype)
 """
 
 def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicenan,numOfEns):
@@ -35,6 +38,8 @@ def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicen
         Set missing values
     numOfEns : number of ensembles
         integer
+    shuffletype : string
+        how to generate random numbers
         
     Returns
     -------
@@ -242,7 +247,7 @@ def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicen
     print('>>>>>>>>>> ENDING read_SMILEhistorical function!')
     return lat1,lon1,histmodel
 
-def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicenan,numOfEns,ravelbinary,lensalso,ravelyearsbinary):
+def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicenan,numOfEns,ravelbinary,lensalso,randomalso,ravelyearsbinary,shuffletype):
     """
     Function reads in all models from the SMILE archive
     
@@ -268,6 +273,8 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
         binary
     lensalso : whether to include lens model
         binary
+    randomalso : whether to include a rnadom numbers model
+        binary
     ravelyearsbinary : whether to ravel years and ens/models together
         binary
         
@@ -282,8 +289,9 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
         
     Usage
     -----
-    read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,
-                         slicenan,numOfEns)
+    readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,
+                        slicenan,numOfEns,ravelbinary,lensalso,randomalso,
+                        ravelyearsbinary)
     """
     print('\n>>>>>>>>>> STARTING readAllSmileDataHist function!')
     
@@ -291,6 +299,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     import numpy as np
     import warnings
     import read_LENS_historical as LLL
+    import read_randomData_monthly as RAN
     
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.simplefilter(action='ignore', category=RuntimeWarning)    
@@ -316,16 +325,32 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
         print('Completed: added LENS')
     else:
         allmodelstest = allmodelstestq
+    print(randomalso)    
+    ###########################################################################
+    ### Add random numbers to the data     
+    if randomalso == True:
+        directorydataRA = '/Users/zlabe/Data/'
+        latr,lonr,datarand,ENSmeanr = RAN.read_randomData_monthly(directorydataRA,
+                                                              vari,sliceperiod,
+                                                              sliceshape,
+                                                              slicenan,
+                                                              numOfEns,
+                                                              True,shuffletype)
+        
+        allmodelstestadd = np.append(allmodelstest,datarand[np.newaxis,:,:,:,:],axis=0)
+        print('Completed: added RANDOM-%s' % shuffletype)
+    else:
+        allmodelstestadd = allmodelstest
      
     ###########################################################################
     ### Reshape the models and ensembles together
     if ravelbinary == True:
-        comb = np.reshape(allmodelstest,(allmodelstest.shape[0]*allmodelstest.shape[1],
-                                         allmodelstest.shape[2],allmodelstest.shape[3],
-                                         allmodelstest.shape[4]))
+        comb = np.reshape(allmodelstestadd,(allmodelstestadd.shape[0]*allmodelstestadd.shape[1],
+                                         allmodelstestadd.shape[2],allmodelstestadd.shape[3],
+                                         allmodelstestadd.shape[4]))
         print('Completed: combined models and ensembles')
     else:
-        comb = allmodelstest
+        comb = allmodelstestadd
         
     ###########################################################################
     ### Reshape the models and ensembles together
@@ -340,7 +365,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     return lat,lon,combyr
 
 
-# ### Test functions - do not use!
+### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
@@ -348,21 +373,22 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
 #               'GFDL_CM3','GFDL_ESM2M']
 # directory = '/Users/zlabe/Data/SMILE/'
 # simulation = modelGCMs[4]
-# vari = 'P'
+# vari = 'T2M'
 # sliceperiod = 'annual'
 # sliceshape = 4
 # slicenan = 'nan'
 # numOfEns = 16
 # lensalso = True
+# randomalso = True
 # ravelyearsbinary = False
 # ravelbinary = False
-# # lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
-# #                                             sliceperiod,sliceshape,
-# #                                             slicenan,numOfEns)
+# lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
+#                                             sliceperiod,sliceshape,
+#                                             slicenan,numOfEns)
 # lat,lon,comb = readAllSmileDataHist(directory,modelGCMs,
 #                                     vari,sliceperiod,sliceshape,
 #                                     slicenan,numOfEns,ravelbinary,
-#                                     lensalso,ravelyearsbinary)
+#                                     lensalso,randomalso,ravelyearsbinary)
 # lon2,lat2 = np.meshgrid(lon,lat)
 # ave = UT.calc_weightedAve(comb,lat2)
     

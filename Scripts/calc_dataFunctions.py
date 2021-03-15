@@ -8,11 +8,11 @@ Notes
     
 Usage
 -----
-    [1] readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary)
+    [1] readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype)
     [2] getRegion(data,lat1,lon1,lat_bounds,lon_bounds)
 """
 
-def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary):
+def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype):
     """
     Function reads in data for selected dataset
 
@@ -28,10 +28,14 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
         number of ensembles to include
     lensalso : whether to include lens model
         binary
+    randomalso : whether to include a random numbers model
+        binary
     ravelyearsbinary : whether to ravel years and ens/models together
         binary
     rivalbinary : whether to ravel the models together or not
         binary
+    shuffletype : string
+        type of shuffled numbers
         
     Returns
     -------
@@ -44,7 +48,7 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
 
     Usage
     -----
-    data,lat1,lon1 = readFiles(variq,dataset)
+    data,lat1,lon1 = readFiles(variq,dataset,monthlychoice,numOfEns,randomalso,lensalso,ravelyearsbinary,ravelbinary,shuffletype)
     """
     print('\n>>>>>>>>>> Using readFiles function!')
     
@@ -121,7 +125,7 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
         takeEnsMeanRA = False
         ensYes = False
         lat1,lon1,data,ENSmean = RA.read_randomData_monthly(directorydataRA,variq,monthlychoice,
-                                                            sliceshapeRA,slicenanRA,numOfEnsRA,ensYes)
+                                                            sliceshapeRA,slicenanRA,numOfEnsRA,ensYes,shuffletype)
     elif dataset == 'SMILE':
         import read_SMILE_historical as SM
         directorydataSM = '/Users/zlabe/Data/SMILE/'
@@ -134,7 +138,8 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,rav
         lat1,lon1,data = SM.readAllSmileDataHist(directorydataSM,modelGCMsSM,
                                                          variq,monthlychoice,sliceshapeSM,
                                                          slicenanSM,numOfEnsSM,ravelbinary,
-                                                         lensalso,ravelyearsbinary)    
+                                                         lensalso,randomalso,ravelyearsbinary,
+                                                         shuffletype)    
     elif any([dataset=='XGHG',dataset=='XAER',
               dataset=='XBMB',dataset=='XLULC']):
         import read_SINGLE_LENS as SI

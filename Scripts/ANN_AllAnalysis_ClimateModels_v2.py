@@ -4,8 +4,8 @@ explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 1 March 2021
-Version    : 1 
+Date       : 15 March 2021
+Version    : 2 - adds random number model for a total of 8 classes
 """
 
 ### Import packages
@@ -62,18 +62,19 @@ directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
 ###############################################################################
 ###############################################################################
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
-              'GFDL_CM3','GFDL_ESM2M','lens']
+              'GFDL_CM3','GFDL_ESM2M','lens','RANDOM']
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'P'
+variq = 'T2M'
 reg_name = 'SMILEGlobe'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
-pickSMILE = ['CSIRO_MK3.6','lens']
+# pickSMILE = ['CSIRO_MK3.6','lens']
 # pickSMILE = ['CSIRO_MK3.6','GFDL_CM3','lens']
-pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] # create empty list for ALL 7 GCMs
+# pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] 
+# pickSMILE = = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth','GFDL_CM3','GFDL_ESM2M','lens']
 if len(pickSMILE) >= 1:
     lenOfPicks = len(pickSMILE)
 else:
@@ -85,20 +86,23 @@ ocean_only = False
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean =  False
+rm_annual_mean = False
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
-rm_observational_mean = True
+rm_observational_mean = False
 ###############################################################################
 ###############################################################################
-calculate_anomalies = True
+calculate_anomalies = False
 if calculate_anomalies == True:
     baseline = np.arange(1951,1980+1,1)
 ###############################################################################
 ###############################################################################
 window = 0
 ensTypeExperi = 'ENS'
+shuffletype = 'TIMEENS'
+shuffletype = 'ALLENSRAND'
+shuffletype = 'ALLENSRANDrmmean'
 ###############################################################################
 ###############################################################################
 if ensTypeExperi == 'ENS':
@@ -126,12 +130,15 @@ elif ensTypeExperi == 'GCM':
 ###############################################################################
 ###############################################################################
 numOfEns = 16
-if len(modelGCMs) == 6:
-    lensalso = False
-elif len(modelGCMs) == 7:
-    lensalso = True
+lensalso = True
+if len(pickSMILE) == 0:
+    randomalso = True
+elif len(pickSMILE) != 0:
+    if pickSMILE[-1] == 'RANDOM':
+        randomalso = True
+else:
+    randomalso = False
 lentime = len(yearsall)
-randomalso = False
 ###############################################################################
 ###############################################################################
 ravelyearsbinary = False
@@ -318,14 +325,14 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ###############################################################################
         ### Read in model and observational/reanalysis data
         
-        def read_primary_dataset(variq,dataset,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
-            data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary)
+        def read_primary_dataset(variq,dataset,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
+            data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype)
             datar,lats,lons = df.getRegion(data,lats,lons,lat_bounds,lon_bounds)
             print('\nOur dataset: ',dataset,' is shaped',data.shape)
             return datar,lats,lons
           
-        def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
-            data_obs,lats_obs,lons_obs = df.readFiles(variq,dataset_obs,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary)
+        def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
+            data_obs,lats_obs,lons_obs = df.readFiles(variq,dataset_obs,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype)
             data_obs,lats_obs,lons_obs = df.getRegion(data_obs,lats_obs,lons_obs,
                                                     lat_bounds,lon_bounds)
             
@@ -727,6 +734,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                           randomalso,
                                                           ravelyearsbinary,
                                                           ravelbinary,
+                                                          shuffletype,
                                                           lat_bounds,
                                                           lon_bounds)
                 data_obs_all,lats_obs,lons_obs = read_obs_dataset(variq,
@@ -736,6 +744,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                                   randomalso,
                                                                   ravelyearsbinary,
                                                                   ravelbinary,
+                                                                  shuffletype,
                                                                   lat_bounds,
                                                                   lon_bounds)
 
@@ -887,8 +896,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         ### Check null hypothesis of random data!
                         randarray,latsra,lonsra = read_primary_dataset(variq,'RANDOM',
                                                                        numOfEns,lensalso,
+                                                                       randomalso,
                                                                        ravelyearsbinary,
                                                                        ravelbinary,
+                                                                       shuffletype,
                                                                        lat_bounds,
                                                                        lon_bounds)
                         randarrayn = randarray.reshape(randarray.shape[0],randarray.shape[1]*randarray.shape[2])

@@ -10,12 +10,14 @@ Notes
 Usage
 -----
     [1] read_randomData_monthly(directorydata,variq,sliceperiod,
-                               sliceshape,slicenan,numOfEns,ensYes)
+                               sliceshape,slicenan,numOfEns,ensYes,
+                               shuffletype)
 
 """
 
 def read_randomData_monthly(directorydata,variq,sliceperiod,
-                            sliceshape,slicenan,numOfEns,ensYes):
+                            sliceshape,slicenan,numOfEns,ensYes,
+                            shuffletype):
     """
     Function generates RANDOM DATA
     
@@ -37,6 +39,8 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
         Set missing values
     takeEnsMean : binary
         whether to take ensemble mean
+    shuffletype : string
+        type of shuffled numbers
         
     Returns
     -------
@@ -63,6 +67,7 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
     from netCDF4 import Dataset
     import warnings
     import calc_Utilities as UT
+    import read_LENS_historical as LL
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.simplefilter(action='ignore', category=RuntimeWarning)
     
@@ -86,46 +91,83 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
     ### Slice over months (currently = [ens,yr,mn,lat,lon])
     ### Shape of output array
     if ensYes == True:
-        if sliceperiod == 'annual':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: ANNUAL MEAN!')
-        elif sliceperiod == 'DJF':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: DJF MEAN!')
-        elif sliceperiod == 'MAM':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: MAM MEAN!')
-        elif sliceperiod == 'JJA':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: JJA MEAN!')
-        elif sliceperiod == 'SON':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: SON MEAN!')
-        elif sliceperiod == 'JFM':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: JFM MEAN!')
-        elif sliceperiod == 'AMJ':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: AMJ MEAN!')
-        elif sliceperiod == 'JAS':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: JAS MEAN!')
-        elif sliceperiod == 'OND':
-            ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
-            print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
-            print('Completed: OND MEAN!')
-        elif sliceperiod == 'none':
-            ensshape = np.random.randn(len(ens),time.shape[0],mon,lat1.shape[0],lon1.shape[0])
-            print('Shape of output =', ensshape.shape, [[ensshape.ndim]])
-            print('Completed: ALL MONTHS!')
+        if shuffletype == 'RANDGAUSS':
+            if sliceperiod == 'annual':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: ANNUAL MEAN!')
+            elif sliceperiod == 'DJF':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: DJF MEAN!')
+            elif sliceperiod == 'MAM':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: MAM MEAN!')
+            elif sliceperiod == 'JJA':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: JJA MEAN!')
+            elif sliceperiod == 'SON':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: SON MEAN!')
+            elif sliceperiod == 'JFM':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: JFM MEAN!')
+            elif sliceperiod == 'AMJ':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: AMJ MEAN!')
+            elif sliceperiod == 'JAS':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: JAS MEAN!')
+            elif sliceperiod == 'OND':
+                ensshape = np.random.randn(len(ens),time.shape[0],lat1.shape[0],lon1.shape[0])
+                print('Shape of output = ', ensshape.shape,[[ensshape.ndim]])
+                print('Completed: OND MEAN!')
+            elif sliceperiod == 'none':
+                ensshape = np.random.randn(len(ens),time.shape[0],mon,lat1.shape[0],lon1.shape[0])
+                print('Shape of output =', ensshape.shape, [[ensshape.ndim]])
+                print('Completed: ALL MONTHS!')
+            print('<<< %s >>>' % shuffletype)
+                
+        elif shuffletype == 'TIMEENS': # shuffle ensembles with years
+            if sliceperiod != 'none':
+                directorylens = '/Users/zlabe/Data/LENS/monthly/'
+                lat,lon,datall = LL.read_LENShistorical(directorylens,variq,sliceperiod,
+                                                        sliceshape,slicenan,numOfEns)
+                ensshape = np.empty((datall.shape))
+                for iil in range(datall.shape[2]):
+                    for jjl in range(datall.shape[3]):
+                        temp = datall[:,:,iil,jjl].ravel()
+                        np.random.shuffle(temp)
+                        tempq = np.reshape(temp,(datall.shape[0],datall.shape[1]))
+                        ensshape[:,:,iil,jjl] = tempq
+                print('<<< %s >>>' % shuffletype)
+        elif shuffletype == 'ALLENSRAND': # shuffle the entire 4d array
+            if sliceperiod != 'none':
+                directorylens = '/Users/zlabe/Data/LENS/monthly/'
+                lat,lon,datall = LL.read_LENShistorical(directorylens,variq,sliceperiod,
+                                                        sliceshape,slicenan,numOfEns)
+                temp = datall.ravel()
+                np.random.shuffle(temp)
+                ensshape = np.reshape(temp,(datall.shape[0],datall.shape[1],
+                                            datall.shape[2],datall.shape[3]))
+                print('<<< %s >>>' % shuffletype)
+        elif shuffletype == 'ALLENSRANDrmmean': # rm ensemble mean, then shuffle
+            if sliceperiod != 'none':
+                directorylens = '/Users/zlabe/Data/LENS/monthly/'
+                lat,lon,datall = LL.read_LENShistorical(directorylens,variq,sliceperiod,
+                                                        sliceshape,slicenan,numOfEns)
+                datallm = datall - np.nanmean(datall[:,:,:,:],axis=0)
+                temp = datallm.ravel()
+                np.random.shuffle(temp)
+                ensshape = np.reshape(temp,(datall.shape[0],datall.shape[1],
+                                            datall.shape[2],datall.shape[3]))
+                print('<<< %s >>>' % shuffletype)
     elif ensYes == False:
         if sliceperiod == 'none':
             ensshape = np.random.randn(time.shape[0],mon,lat1.shape[0],lon1.shape[0])
@@ -135,7 +177,8 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
             ensshape = np.random.randn(time.shape[0],lat1.shape[0],lon1.shape[0])
             print('Shape of output =', ensshape.shape, [[ensshape.ndim]])
             print('Completed: ANNUAL MEAN-OBS!')
-        
+            print('<<< %s >>>' % shuffletype)
+       
     ###########################################################################
     ### Change missing values
     if slicenan == 'nan':
@@ -148,7 +191,7 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
     ENSmean = np.nan
     print('Ensemble mean NOT available!')
         
-    print('>>>>>>>>>> ENDING read_randomData_monthly function!')    
+    print('>>>>>>>>>> ENDING read_randomData_monthly function!\n')    
     return lat1,lon1,ensshape,ENSmean
         
 
@@ -162,6 +205,10 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
 # sliceshapeRA = 4
 # slicenanRA = 'nan'
 # numOfEnsRA = 16
-# ensYes = False
+# ensYes = True
+# shuffletype = 'ALLENSRANDrmmean'
 # lat1,lon1,data,ENSmean = read_randomData_monthly(directorydataRA,variq,monthlychoice,
-#                                                  sliceshapeRA,slicenanRA,numOfEnsRA,ensYes)
+#                                                   sliceshapeRA,slicenanRA,numOfEnsRA,ensYes,
+#                                                   shuffletype)
+# lon2,lat2 = np.meshgrid(lon1,lat1)
+# ave = UT.calc_weightedAve(data,lat2).transpose()
