@@ -173,7 +173,7 @@ for vv in range(len(variables)):
         plt.tight_layout()
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'MultiModelBias-%s.png' % saveData,dpi=300)
+        plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL.png' % saveData,dpi=300)
         
 ###############################################################################
 ###############################################################################
@@ -283,5 +283,5 @@ for vv in range(len(variables)):
             plt.tight_layout()
             plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
             
-            plt.savefig(directoryfigure + 'MultiModelBias-%s_%s.png' % (saveData,modelGCMs[diff]),dpi=300)
+            plt.savefig(directoryfigure + 'InterBias-%s_%s.png' % (saveData,modelGCMs[diff]),dpi=300)
         

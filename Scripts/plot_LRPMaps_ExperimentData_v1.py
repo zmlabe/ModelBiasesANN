@@ -23,6 +23,7 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
+variablesall = ['T2M']
 pickSMILEall = [
                 [],
                 ['CSIRO-MK3.6','lens'],
@@ -66,7 +67,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
-        rm_observational_mean = True
+        rm_observational_mean = False
         ###############################################################################
         ###############################################################################
         calculate_anomalies = True
@@ -341,6 +342,9 @@ for va in range(len(variablesall)):
         elif typeOfAnalysis == 'Experiment-7':
             limit = np.arange(0,0.40001,0.005)
             barlim = np.round(np.arange(0,0.401,0.1),2)
+        elif typeOfAnalysis == 'Experiment-8':
+            limit = np.arange(0,0.40001,0.005)
+            barlim = np.round(np.arange(0,0.401,0.1),2)
         elif typeOfAnalysis == 'Experiment-9':
             limit = np.arange(0,0.40001,0.005)
             barlim = np.round(np.arange(0,0.401,0.1),2)
@@ -611,7 +615,7 @@ for va in range(len(variablesall)):
         plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
         plt.xlim([1950,2020])   
         plt.ylim([0,lenOfPicks-1])
-        plt.xlabel(r'\textbf{Predictions - [ %s - RANDOMD DATA ] - %s}' % (variq,typeOfAnalysis))
+        plt.xlabel(r'\textbf{Predictions - [ %s - RANDOM DATA ] - %s}' % (variq,typeOfAnalysis))
         
         ###############################################################################
         
