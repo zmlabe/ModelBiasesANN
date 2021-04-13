@@ -5,7 +5,7 @@ explainable AI
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
 Date       : 15 March 2021
-Version    : 2 - adds random number model for a total of 8 classes
+Version    : 1 - adds 8 class by using random noise for the other classes
 """
 
 ### Import packages
@@ -62,7 +62,7 @@ directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
 ###############################################################################
 ###############################################################################
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
-              'GFDL_CM3','GFDL_ESM2M','lens','RANDOM']
+              'GFDL_CM3','GFDL_ESM2M','lens']
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
@@ -71,10 +71,6 @@ reg_name = 'SMILEGlobe'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
-# pickSMILE = ['CSIRO_MK3.6','lens']
-# pickSMILE = ['CSIRO_MK3.6','GFDL_CM3','lens']
-# pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] 
-# pickSMILE = = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth','GFDL_CM3','GFDL_ESM2M','lens']
 if len(pickSMILE) >= 1:
     lenOfPicks = len(pickSMILE)
 else:
@@ -86,7 +82,7 @@ ocean_only = False
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = False
+rm_annual_mean = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -132,18 +128,21 @@ elif ensTypeExperi == 'GCM':
 numOfEns = 16
 lensalso = True
 if len(pickSMILE) == 0:
-    randomalso = True
+    if modelGCMs[-1] == 'RANDOM':
+        randomalso = True
+    else:
+        randomalso = False
 elif len(pickSMILE) != 0:
     if pickSMILE[-1] == 'RANDOM':
         randomalso = True
-else:
-    randomalso = False
+    else:
+        randomalso = False
 lentime = len(yearsall)
 ###############################################################################
 ###############################################################################
 ravelyearsbinary = False
 ravelbinary = False
-num_of_class = lenOfPicks
+num_of_class = lenOfPicks + 1
 ###############################################################################
 ###############################################################################
 lrpRule = 'z'
@@ -240,10 +239,15 @@ print('*Filename == < %s >' % saveData)
 ###############################################################################
 ###############################################################################
 ### Create sample class labels for each model for my own testing
+### Appends a twin set of classes for the random noise class 
 if seasons != 'none':
     classesl = np.empty((lenOfPicks,numOfEns,len(yearsall)))
     for i in range(lenOfPicks):
         classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
+        
+    ### Add random noise models
+    randomNoiseClass = np.full(classesl.shape,i+1)
+    classesl = np.append(classesl,randomNoiseClass,axis=0)
         
     if ensTypeExperi == 'ENS':
         classeslnew = np.swapaxes(classesl,0,1)
@@ -261,7 +265,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         simuqq = datasetsingle[0]
         monthlychoice = seasons[seas]
         lat_bounds,lon_bounds = UT.regions(reg_name)
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1-RandomNoise/'
         experiment_result = pd.DataFrame(columns=['actual iters','hiddens','cascade',
                                                   'RMSE Train','RMSE Test',
                                                   'ridge penalty','zero mean',
@@ -803,6 +807,16 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                           lat_bounds,
                                                           lon_bounds) 
                         print('\n*Removed land data*')       
+###############################################################################
+###############################################################################
+###############################################################################
+                    ### Adding random data
+                    # randomNoiseTwin = np.random.normal(-10,10, data.shape) 
+                    randomNoiseTwin = np.random.randint(low=-1,high=2, size=data.shape) 
+                    dataRandNoise = data.copy() + randomNoiseTwin
+                    data = np.append(data,dataRandNoise,axis=0)
+                    print('\n\nNEW SHAPE AFTER RANDOM NOISE MODELS == ',data.shape)
+                    
 ###############################################################################
 ###############################################################################
 ###############################################################################

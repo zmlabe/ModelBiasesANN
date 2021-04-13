@@ -325,7 +325,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
         print('Completed: added LENS')
     else:
         allmodelstest = allmodelstestq
-    print(randomalso)    
+ 
     ###########################################################################
     ### Add random numbers to the data     
     if randomalso == True:
