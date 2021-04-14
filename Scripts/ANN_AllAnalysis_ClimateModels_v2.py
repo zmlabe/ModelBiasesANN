@@ -68,6 +68,7 @@ dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
 reg_name = 'SMILEGlobe'
+timeper = 'historical'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
@@ -326,13 +327,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ### Read in model and observational/reanalysis data
         
         def read_primary_dataset(variq,dataset,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
-            data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype)
+            data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
             datar,lats,lons = df.getRegion(data,lats,lons,lat_bounds,lon_bounds)
             print('\nOur dataset: ',dataset,' is shaped',data.shape)
             return datar,lats,lons
           
         def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
-            data_obs,lats_obs,lons_obs = df.readFiles(variq,dataset_obs,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype)
+            data_obs,lats_obs,lons_obs = df.readFiles(variq,dataset_obs,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
             data_obs,lats_obs,lons_obs = df.getRegion(data_obs,lats_obs,lons_obs,
                                                     lat_bounds,lon_bounds)
             

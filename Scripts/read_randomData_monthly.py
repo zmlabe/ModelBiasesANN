@@ -11,13 +11,13 @@ Usage
 -----
     [1] read_randomData_monthly(directorydata,variq,sliceperiod,
                                sliceshape,slicenan,numOfEns,ensYes,
-                               shuffletype)
+                               shuffletype,timeper)
 
 """
 
 def read_randomData_monthly(directorydata,variq,sliceperiod,
                             sliceshape,slicenan,numOfEns,ensYes,
-                            shuffletype):
+                            shuffletype,timeper):
     """
     Function generates RANDOM DATA
     
@@ -41,6 +41,8 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
         whether to take ensemble mean
     shuffletype : string
         type of shuffled numbers
+    timeper : string
+        future or historical
         
     Returns
     -------
@@ -73,7 +75,12 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
     
     ###########################################################################
     ### Parameters
-    time = np.arange(1950,2019+1,1)
+    if timeper == 'historical':
+        time = np.arange(1950,2019+1,1)
+    elif timeper == 'future':
+        time = np.arange(2020,2099+1,1)
+    else:
+        print(ValueError('WRONG TIME PERIOD SELECTED FOR RANDOM DATA!'))
     mon = 12
     allens = np.arange(1,numOfEns+1,1) 
     ens = list(map('{:03d}'.format, allens))
@@ -209,6 +216,6 @@ def read_randomData_monthly(directorydata,variq,sliceperiod,
 # shuffletype = 'ALLENSRANDrmmean'
 # lat1,lon1,data,ENSmean = read_randomData_monthly(directorydataRA,variq,monthlychoice,
 #                                                   sliceshapeRA,slicenanRA,numOfEnsRA,ensYes,
-#                                                   shuffletype)
+#                                                   shuffletype,timeper)
 # lon2,lat2 = np.meshgrid(lon1,lat1)
 # ave = UT.calc_weightedAve(data,lat2).transpose()

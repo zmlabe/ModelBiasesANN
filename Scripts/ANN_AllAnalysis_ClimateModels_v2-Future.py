@@ -1,11 +1,11 @@
 """
 ANN for evaluating model biases, differences, and other thresholds using 
-explainable AI
+explainable AI for FUTURE (RCP 8.5 data - 2020-2099)
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 13 April 2021
-Version    : 1 - adds 8 class by using random noise for the other classes
+Date       : 14 April 2021
+Version    : 2 - adds random number model for a total of 8 classes
 """
 
 ### Import packages
@@ -66,12 +66,16 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'SLP'
 reg_name = 'SMILEGlobe'
-timeper = 'historical'
+timeper = 'future'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
+# pickSMILE = ['CSIRO_MK3.6','lens']
+# pickSMILE = ['CSIRO_MK3.6','GFDL_CM3','lens']
+# pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] 
+# pickSMILE = = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth','GFDL_CM3','GFDL_ESM2M','lens']
 if len(pickSMILE) >= 1:
     lenOfPicks = len(pickSMILE)
 else:
@@ -105,23 +109,23 @@ shuffletype = 'ALLENSRANDrmmean'
 if ensTypeExperi == 'ENS':
     if window == 0:
         rm_standard_dev = False
-        yearsall = np.arange(1950,2019+1,1)
+        yearsall = np.arange(2020,2099+1,1)
         ravel_modelens = False
         ravelmodeltime = False
     else:
         rm_standard_dev = True
-        yearsall = np.arange(1950+window,2019+1,1)
+        yearsall = np.arange(2020+window,2099+1,1)
         ravelmodeltime = False
         ravel_modelens = True
 elif ensTypeExperi == 'GCM':
     if window == 0:
         rm_standard_dev = False
-        yearsall = np.arange(1950,2019+1,1)
+        yearsall = np.arange(2020,2099+1,1)
         ravel_modelens = False
         ravelmodeltime = False
     else:
         rm_standard_dev = True
-        yearsall = np.arange(1950+window,2019+1,1)
+        yearsall = np.arange(2020+window,2099+1,1)
         ravelmodeltime = False
         ravel_modelens = True
 ###############################################################################
@@ -143,7 +147,7 @@ lentime = len(yearsall)
 ###############################################################################
 ravelyearsbinary = False
 ravelbinary = False
-num_of_class = lenOfPicks + 1
+num_of_class = lenOfPicks
 ###############################################################################
 ###############################################################################
 lrpRule = 'z'
@@ -228,27 +232,22 @@ if rm_ensemble_mean == False:
                     if rm_annual_mean == False:
                         typeOfAnalysis = 'Experiment-9'
                         
-print('\n<<<<<<<<<<<< Analysis == %s ! >>>>>>>>>>>>>>>\n' % typeOfAnalysis)
+print('\n<<<<<<<<<<<< Analysis == %s (%s) ! >>>>>>>>>>>>>>>\n' % (typeOfAnalysis,timeper))
 if typeOfAnalysis == 'issueWithExperiment':
     sys.exit('Wrong parameters selected to analyze')
     
 ### Select how to save files
-saveData = typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+saveData = timeper + '_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ### Create sample class labels for each model for my own testing
-### Appends a twin set of classes for the random noise class 
 if seasons != 'none':
     classesl = np.empty((lenOfPicks,numOfEns,len(yearsall)))
     for i in range(lenOfPicks):
         classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
-        
-    ### Add random noise models
-    randomNoiseClass = np.full(classesl.shape,i+1)
-    classesl = np.append(classesl,randomNoiseClass,axis=0)
         
     if ensTypeExperi == 'ENS':
         classeslnew = np.swapaxes(classesl,0,1)
@@ -266,7 +265,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         simuqq = datasetsingle[0]
         monthlychoice = seasons[seas]
         lat_bounds,lon_bounds = UT.regions(reg_name)
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1-RandomNoise/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
         experiment_result = pd.DataFrame(columns=['actual iters','hiddens','cascade',
                                                   'RMSE Train','RMSE Test',
                                                   'ridge penalty','zero mean',
@@ -811,16 +810,6 @@ for sis,singlesimulation in enumerate(datasetsingle):
 ###############################################################################
 ###############################################################################
 ###############################################################################
-                    ### Adding random data
-                    # randomNoiseTwin = np.random.normal(-10,10, data.shape) 
-                    randomNoiseTwin = np.random.randint(low=-1,high=2, size=data.shape) 
-                    dataRandNoise = data.copy() + randomNoiseTwin
-                    data = np.append(data,dataRandNoise,axis=0)
-                    print('\n\nNEW SHAPE AFTER RANDOM NOISE MODELS == ',data.shape)
-                    
-###############################################################################
-###############################################################################
-###############################################################################
                     ### Loop over folds
                     for loop in np.arange(0,foldsN): 
         
@@ -855,7 +844,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         
                         ################################################################################################################################################                
                         # save the model
-                        dirname = '/Users/zlabe/Desktop/ModelComparison_v1/'
+                        dirname = '/Users/zlabe/Desktop/ModelComparison_v1/v2/Future/'
                         savename = modelType+'_'+variq+'_kerasMultiClassBinaryOption4'+'_' + NNType + '_L2_'+ str(ridge_penalty[0])+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(iterations[0]) + '_' + str(hiddensList[0][0]) + 'x' + str(hiddensList[0][-1]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
                         savenameModelTestTrain = modelType+'_'+variq+'_modelTrainTest_SegSeed'+str(random_segment_seed)+'_NetSeed'+str(random_network_seed)
         

@@ -4,8 +4,8 @@ explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 13 April 2021
-Version    : 1 - adds 8 class by using random noise for the other classes
+Date       : 14 April 2021
+Version    : 2 - adds a class weight function
 """
 
 ### Import packages
@@ -83,7 +83,7 @@ ocean_only = False
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = True
+rm_annual_mean = False
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -100,6 +100,7 @@ ensTypeExperi = 'ENS'
 shuffletype = 'TIMEENS'
 shuffletype = 'ALLENSRAND'
 shuffletype = 'ALLENSRANDrmmean'
+shuffletype = 'RANDGAUSS'
 ###############################################################################
 ###############################################################################
 if ensTypeExperi == 'ENS':
@@ -448,6 +449,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
                 ### One-hot vectors
                 Ytrain = keras.utils.to_categorical(Ytrain)
                 Ytest = keras.utils.to_categorical(Ytest)  
+                
+                ### Class weights
+                class_weight = class_weight_creator(Ytrain)
 
 ###############################################################################
 ############################################################################### 
@@ -524,10 +528,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
                 ### One-hot vectors
                 Ytrain = keras.utils.to_categorical(Ytrain)
                 Ytest = keras.utils.to_categorical(Ytest) 
+                
+                ### Class weights
+                class_weight = class_weight_creator(Ytrain)
           
             else:
                 print(ValueError('WRONG EXPERIMENT!'))
-            return Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices
+            return Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices,class_weight
         
         ###############################################################################
         ###############################################################################
@@ -547,6 +554,17 @@ for sis,singlesimulation in enumerate(datasetsingle):
                 ax.xaxis.set_ticks_position('bottom')
             else:
                     ax.xaxis.set_ticks([]) 
+
+        ###############################################################################
+        ###############################################################################
+        ###############################################################################                    
+        ### Create a class weight dictionary to help if the classes are unbalanced
+        def class_weight_creator(Y):
+            class_dict = {}
+            weights = np.max(np.sum(Y, axis=0)) / np.sum(Y, axis=0)
+            for i in range( Y.shape[-1] ):
+                class_dict[i] = weights[i]               
+            return class_dict
                     
         ###############################################################################
         ###############################################################################
@@ -594,7 +612,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
             
             return model
         
-        def trainNN(model, Xtrain, Ytrain, niter=500, verbose=False):
+        def trainNN(model, Xtrain, Ytrain, niter, class_weight, verbose):
           
             global lr_here, batch_size
             lr_here = 0.001
@@ -611,12 +629,12 @@ for sis,singlesimulation in enumerate(datasetsingle):
             history = model.fit(Xtrain,Ytrain,batch_size=batch_size,epochs=niter,
                                 shuffle=True,verbose=verbose,
                                 callbacks=[time_callback],
-                                validation_split=0.)
+                                validation_split=0.,class_weight=class_weight)
             print('******** done training ***********')
         
             return model, history
         
-        def test_train_loopClass(Xtrain,Ytrain,Xtest,Ytest,iterations,ridge_penalty,hiddens,plot_in_train=True):
+        def test_train_loopClass(Xtrain,Ytrain,Xtest,Ytest,iterations,ridge_penalty,hiddens,class_weight,plot_in_train=True):
             """or loops to iterate through training iterations, ridge penalty, 
             and hidden layer list
             """
@@ -647,7 +665,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                        
                         ### Train the net
                         model, history = trainNN(model,Xtrain,
-                                                  Ytrain,niter=niter,verbose=0)
+                                                  Ytrain,niter,class_weight,verbose=0)
         
                         ### After training, use the network with training data to 
                         ### check that we don't have any errors and output RMSE
@@ -813,7 +831,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
 ###############################################################################
                     ### Adding random data
                     # randomNoiseTwin = np.random.normal(-10,10, data.shape) 
-                    randomNoiseTwin = np.random.randint(low=-1,high=2, size=data.shape) 
+                    randomNoiseTwin = np.random.randint(low=-5,high=5, size=data.shape) 
                     dataRandNoise = data.copy() + randomNoiseTwin
                     data = np.append(data,dataRandNoise,axis=0)
                     print('\n\nNEW SHAPE AFTER RANDOM NOISE MODELS == ',data.shape)
@@ -829,7 +847,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         # random_segment_seed = 34515
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
                         #---------------------------
-                        Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices = segment_data(data,classesl,ensTypeExperi,segment_data_factor)
+                        Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices,class_weight = segment_data(data,classesl,ensTypeExperi,segment_data_factor)
         
                         YtrainClassMulti = Ytrain  
                         YtestClassMulti = Ytest  
@@ -849,7 +867,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                                 YtestClassMulti,
                                                                 iterations=iterations,
                                                                 ridge_penalty=ridge_penalty,
-                                                                hiddens=hiddensList,
+                                                                hiddens=hiddensList,class_weight=class_weight,
                                                                 plot_in_train = True)
                         model.summary()  
                         

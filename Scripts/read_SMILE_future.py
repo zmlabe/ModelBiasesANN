@@ -1,22 +1,22 @@
 """
 Function(s) reads in monthly data from the MMLEA for selected
-variables over the historical period
+variables over the future period
  
 Notes
 -----
     Author : Zachary Labe
-    Date   : 11 February 2021
+    Date   : 14 April 2021
     
 Usage
 -----
-    [1] read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,
+    [1] read_SMILEfuture(directory,simulation,vari,sliceperiod,sliceshape,
                              slicenan,numOfEns)
-    [2] readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,
+    [2] readAllSmileDataFut(directory,simulation,vari,sliceperiod,sliceshape,
                              slicenan,numOfEns,ravelbinary,lensalso,randomalso,
                              ravelyearsbinary,shuffletype)
 """
 
-def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicenan,numOfEns):
+def read_SMILEfuture(directory,simulation,vari,sliceperiod,sliceshape,slicenan,numOfEns):
     """
     Function reads monthly data from the MMLEA
     
@@ -52,10 +52,10 @@ def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicen
         
     Usage
     -----
-    read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,
+    read_SMILEfuture(directory,simulation,vari,sliceperiod,sliceshape,
                          slicenan,numOfEns)
     """
-    print('\n>>>>>>>>>> STARTING read_SMILEhistorical function!')
+    print('\n>>>>>>>>>> STARTING read_SMILEfuture function!')
     
     ### Import modules
     import numpy as np
@@ -239,15 +239,15 @@ def read_SMILEhistorical(directory,simulation,vari,sliceperiod,sliceshape,slicen
     
     ###########################################################################
     ### Change years
-    yearhistq = np.where((time >= 1950) & (time <= 2019))[0]
-    print(time[yearhistq])
-    histmodel = ensshape[:,yearhistq,:,:]
+    yearfutq = np.where((time >= 2020) & (time <= 2099))[0]
+    print(time[yearfutq])
+    futmodel = ensshape[:,yearfutq,:,:]
 
-    print('Shape of output FINAL = ', histmodel.shape,[[histmodel.ndim]])
-    print('>>>>>>>>>> ENDING read_SMILEhistorical function!')
-    return lat1,lon1,histmodel
+    print('Shape of output FINAL = ', futmodel.shape,[[futmodel.ndim]])
+    print('>>>>>>>>>> ENDING read_SMILEfuture function!')
+    return lat1,lon1,futmodel
 
-def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicenan,numOfEns,ravelbinary,lensalso,randomalso,ravelyearsbinary,shuffletype):
+def readAllSmileDataFut(directory,simulation,vari,sliceperiod,sliceshape,slicenan,numOfEns,ravelbinary,lensalso,randomalso,ravelyearsbinary,shuffletype):
     """
     Function reads in all models from the SMILE archive
     
@@ -289,16 +289,16 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
         
     Usage
     -----
-    readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,
+    readAllSmileDataFut(directory,simulation,vari,sliceperiod,sliceshape,
                         slicenan,numOfEns,ravelbinary,lensalso,randomalso,
                         ravelyearsbinary)
     """
-    print('\n>>>>>>>>>> STARTING readAllSmileDataHist function!')
+    print('\n>>>>>>>>>> STARTING readAllSmileDataFut function!')
     
     ### Import modules
     import numpy as np
     import warnings
-    import read_LENS_historical as LLL
+    import read_LENS_future as LLL
     import read_randomData_monthly as RAN
     
     warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -306,10 +306,10 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     
     ###########################################################################
     ### Read in smile archive
-    yearshistorical = np.arange(1950,2019+1,1)
-    allmodelstestq = np.empty((len(simulation),numOfEns,len(yearshistorical),96,144))
+    yearsfuture = np.arange(2020,2099+1,1)
+    allmodelstestq = np.empty((len(simulation),numOfEns,len(yearsfuture),96,144))
     for i in range(len(simulation)):
-        lat,lon,allmodelstestq[i,:,:,:,:] = read_SMILEhistorical(directory,
+        lat,lon,allmodelstestq[i,:,:,:,:] = read_SMILEfuture(directory,
                                                                 simulation[i],vari,
                                                                 sliceperiod,sliceshape,
                                                                 slicenan,numOfEns)
@@ -318,7 +318,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
     ### Add LENS to the data      
     if lensalso == True:
         directorylens = '/Users/zlabe/Data/LENS/monthly/'
-        lat,lon,lens = LLL.read_LENShistorical(directorylens,vari,sliceperiod,
+        lat,lon,lens = LLL.read_LENSfuture(directorylens,vari,sliceperiod,
                                            sliceshape,slicenan,numOfEns)
         
         allmodelstest = np.append(allmodelstestq,lens[np.newaxis,:,:,:,:],axis=0)
@@ -335,7 +335,7 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
                                                               sliceshape,
                                                               slicenan,
                                                               numOfEns,
-                                                              True,shuffletype,'historical')
+                                                              True,shuffletype,'future')
         
         allmodelstestadd = np.append(allmodelstest,datarand[np.newaxis,:,:,:,:],axis=0)
         print('Completed: added RANDOM-%s' % shuffletype)
@@ -361,11 +361,11 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
         combyr = comb
 
     print('Shape of output = ', combyr.shape,[[combyr.ndim]])
-    print('>>>>>>>>>> ENDING readAllSmileDataHist function!')       
+    print('>>>>>>>>>> ENDING readAllSmileDataFut function!')       
     return lat,lon,combyr
 
 
-### Test functions - do not use!
+# ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
@@ -383,10 +383,10 @@ def readAllSmileDataHist(directory,simulation,vari,sliceperiod,sliceshape,slicen
 # ravelyearsbinary = False
 # ravelbinary = False
 # shuffletype = 'RANDGAUSS'
-# lat,lon,var = read_SMILEhistorical(directory,simulation,vari,
-#                                             sliceperiod,sliceshape,
-#                                             slicenan,numOfEns)
-# lat,lon,comb = readAllSmileDataHist(directory,modelGCMs,
+# # lat,lon,var = read_SMILEfuture(directory,simulation,vari,
+# #                                             sliceperiod,sliceshape,
+# #                                             slicenan,numOfEns)
+# lat,lon,comb = readAllSmileDataFut(directory,modelGCMs,
 #                                     vari,sliceperiod,sliceshape,
 #                                     slicenan,numOfEns,ravelbinary,
 #                                     lensalso,randomalso,ravelyearsbinary,shuffletype)

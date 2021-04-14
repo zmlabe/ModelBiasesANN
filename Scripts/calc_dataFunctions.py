@@ -8,11 +8,11 @@ Notes
     
 Usage
 -----
-    [1] readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype)
+    [1] readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
     [2] getRegion(data,lat1,lon1,lat_bounds,lon_bounds)
 """
 
-def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype):
+def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper):
     """
     Function reads in data for selected dataset
 
@@ -36,6 +36,8 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
         binary
     shuffletype : string
         type of shuffled numbers
+    timeper : string
+        historical or future
         
     Returns
     -------
@@ -54,6 +56,7 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
     
     ### Import modules
     import numpy as np
+    import sys
     
     if dataset == 'best':
         import read_BEST as BB
@@ -117,29 +120,44 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
     elif dataset == 'RANDOM':
         import read_randomData_monthly as RA
         directorydataRA = '/Users/zlabe/Data/'
-        slicebaseRA = np.arange(1951,1980+1,1)
         sliceshapeRA = 4
         slicenanRA = 'nan'
         numOfEnsRA = 16
-        addclimoRA = True
-        takeEnsMeanRA = False
         ensYes = False
         lat1,lon1,data,ENSmean = RA.read_randomData_monthly(directorydataRA,variq,monthlychoice,
-                                                            sliceshapeRA,slicenanRA,numOfEnsRA,ensYes,shuffletype)
+                                                            sliceshapeRA,slicenanRA,numOfEnsRA,ensYes,shuffletype,timeper)
     elif dataset == 'SMILE':
-        import read_SMILE_historical as SM
-        directorydataSM = '/Users/zlabe/Data/SMILE/'
-        modelGCMsSM = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
-                      'GFDL_CM3','GFDL_ESM2M']
-        sliceshapeSM = 4
-        slicenanSM = 'nan'
-        numOfEnsSM = 16
-        ENSmean = np.nan
-        lat1,lon1,data = SM.readAllSmileDataHist(directorydataSM,modelGCMsSM,
-                                                         variq,monthlychoice,sliceshapeSM,
-                                                         slicenanSM,numOfEnsSM,ravelbinary,
-                                                         lensalso,randomalso,ravelyearsbinary,
-                                                         shuffletype)    
+        if timeper == 'historical':
+            import read_SMILE_historical as SM
+            directorydataSM = '/Users/zlabe/Data/SMILE/'
+            modelGCMsSM = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
+                          'GFDL_CM3','GFDL_ESM2M']
+            sliceshapeSM = 4
+            slicenanSM = 'nan'
+            numOfEnsSM = 16
+            ENSmean = np.nan
+            lat1,lon1,data = SM.readAllSmileDataHist(directorydataSM,modelGCMsSM,
+                                                             variq,monthlychoice,sliceshapeSM,
+                                                             slicenanSM,numOfEnsSM,ravelbinary,
+                                                             lensalso,randomalso,ravelyearsbinary,
+                                                             shuffletype)    
+        elif timeper == 'future':
+            import read_SMILE_future as SM
+            directorydataSM = '/Users/zlabe/Data/SMILE/'
+            modelGCMsSM = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
+                          'GFDL_CM3','GFDL_ESM2M']
+            sliceshapeSM = 4
+            slicenanSM = 'nan'
+            numOfEnsSM = 16
+            ENSmean = np.nan
+            lat1,lon1,data = SM.readAllSmileDataFut(directorydataSM,modelGCMsSM,
+                                                             variq,monthlychoice,sliceshapeSM,
+                                                             slicenanSM,numOfEnsSM,ravelbinary,
+                                                             lensalso,randomalso,ravelyearsbinary,
+                                                             shuffletype)  
+        else:
+            print('WRONG TIME PERIOD SELECTED - CANT READ ANY MODEL DATA!')
+            sys.exit()
     elif any([dataset=='XGHG',dataset=='XAER',
               dataset=='XBMB',dataset=='XLULC']):
         import read_SINGLE_LENS as SI
@@ -155,6 +173,7 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
                                                 slicenanSI,takeEnsMeanSI)
     else:
         ValueError('WRONG DATA SET SELECTED!')
+        sys.exit()
         
     print('>>>>>>>>>> Completed: Finished readFiles function!')
     return data,lat1,lon1  
