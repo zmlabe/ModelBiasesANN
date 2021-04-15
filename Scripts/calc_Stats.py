@@ -139,6 +139,16 @@ def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
         ### Calculate anomalies
         modelanom = data[:,:,:,:,:] - meanmodel[:,:,np.newaxis,:,:]
         obsanom = data_obs[:,:,:] - meanobs[:,:]
+    else:
+        obsnew = data_obs[yearq,:,:]
+        
+        ### Average climatology
+        meanobs = np.nanmean(obsnew,axis=0)
+        
+        ### Calculate anomalies
+        obsanom = data_obs[:,:,:] - meanobs[:,:]
+        modelanom = np.nan
+        print('NO MODEL ANOMALIES DUE TO SHAPE SIZE!!!')
 
     return modelanom,obsanom
 

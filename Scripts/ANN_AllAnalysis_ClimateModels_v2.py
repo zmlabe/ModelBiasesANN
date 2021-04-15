@@ -62,7 +62,7 @@ directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
 ###############################################################################
 ###############################################################################
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
-              'GFDL_CM3','GFDL_ESM2M','lens','RANDOM']
+              'GFDL_CM3','GFDL_ESM2M','lens']
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
@@ -87,7 +87,7 @@ ocean_only = False
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = False
+rm_annual_mean = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -133,12 +133,15 @@ elif ensTypeExperi == 'GCM':
 numOfEns = 16
 lensalso = True
 if len(pickSMILE) == 0:
-    randomalso = True
+    if modelGCMs[-1] == 'RANDOM':
+        randomalso = True
+    else:
+        randomalso = False
 elif len(pickSMILE) != 0:
     if pickSMILE[-1] == 'RANDOM':
         randomalso = True
-else:
-    randomalso = False
+    else:
+        randomalso = False
 lentime = len(yearsall)
 ###############################################################################
 ###############################################################################
@@ -229,12 +232,12 @@ if rm_ensemble_mean == False:
                     if rm_annual_mean == False:
                         typeOfAnalysis = 'Experiment-9'
                         
-print('\n<<<<<<<<<<<< Analysis == %s ! >>>>>>>>>>>>>>>\n' % typeOfAnalysis)
+print('\n<<<<<<<<<<<< Analysis == %s (%s) ! >>>>>>>>>>>>>>>\n' % (typeOfAnalysis,timeper))
 if typeOfAnalysis == 'issueWithExperiment':
     sys.exit('Wrong parameters selected to analyze')
     
 ### Select how to save files
-saveData = typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+saveData = timeper + '_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
