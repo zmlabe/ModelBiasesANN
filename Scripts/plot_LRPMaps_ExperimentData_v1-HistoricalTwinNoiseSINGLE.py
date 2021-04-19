@@ -1,11 +1,10 @@
 """
 ANN for evaluating model biases, differences, and other thresholds using 
-explainable AI
+explainable AI for historical data
 
-Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 1 March 2021
-Version    : 1 
+Date       : 19 April 2021
+Version    : 1 (tries to subsample the random weight class (#8))
 """
 
 ### Import packages
@@ -17,20 +16,15 @@ from mpl_toolkits.basemap import Basemap, addcyclic, shiftgrid
 import palettable.cubehelix as cm
 import palettable.cartocolors.qualitative as cc
 from sklearn.metrics import accuracy_score
+import scipy.stats as sts
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
-variablesall = ['T2M','P','SLP']
-variablesall = ['P']
-pickSMILEall = [
-                [],
-                ['CSIRO-MK3.6','lens'],
-                ['CSIRO-MK3.6','GFDL-CM3','LENS'],
-                ['CanESM2','CSIRO-MK3.6','GFDL-CM3','GFDL-ESM2M','LENS']
-                ] 
-pickSMILEall = [[]]
+variablesall = ['T2M','P']
+variablesall = ['T2M']
+pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         ###############################################################################
@@ -38,7 +32,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Data preliminaries 
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-NoiseTwinSingle/'
         letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
         ###############################################################################
         ###############################################################################
@@ -54,9 +48,9 @@ for va in range(len(variablesall)):
         ###############################################################################
         pickSMILE = pickSMILEall[m]
         if len(pickSMILE) >= 1:
-            lenOfPicks = len(pickSMILE)
+            lenOfPicks = len(pickSMILE) + 1 # For random class
         else:
-            lenOfPicks = len(modelGCMs)
+            lenOfPicks = len(modelGCMs) + 1 # For random class
         ###############################################################################
         ###############################################################################
         land_only = False
@@ -78,6 +72,12 @@ for va in range(len(variablesall)):
         ###############################################################################
         window = 0
         ensTypeExperi = 'ENS'
+        # shuffletype = 'TIMEENS'
+        # shuffletype = 'ALLENSRAND'
+        # shuffletype = 'ALLENSRANDrmmean'
+        shuffletype = 'RANDGAUSS'
+        # integer = 5 # random noise value to add/subtract from each grid point
+        sizeOfTwin = 1 # number of classes to add to other models
         ###############################################################################
         ###############################################################################
         if ensTypeExperi == 'ENS':
@@ -120,11 +120,8 @@ for va in range(len(variablesall)):
         lrpRule = 'z'
         normLRP = True
         ###############################################################################
-        ###############################################################################
-        if lenOfPicks == 7:
-            modelGCMsNames = modelGCMs
-        else:
-            modelGCMsNames = pickSMILE 
+        modelGCMsNames = np.append(modelGCMs,['NOISE-MODELS'])
+
         ###############################################################################
         ###############################################################################
         ###############################################################################
@@ -210,7 +207,12 @@ for va in range(len(variablesall)):
             sys.exit('Wrong parameters selected to analyze')
             
         ### Select how to save files
-        saveData = timeper + '_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+        if land_only == True:
+            saveData = timeper + '_LAND' + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+        elif ocean_only == True:
+            saveData = timeper + '_OCEAN' + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+        else:
+            saveData = timeper + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
         ###############################################################################
@@ -220,11 +222,17 @@ for va in range(len(variablesall)):
         if seasons != 'none':
             classesl = np.empty((lenOfPicks,numOfEns,len(yearsall)))
             for i in range(lenOfPicks):
-                classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)         
+                classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
+                
+            ### Add random noise models
+            randomNoiseClass = np.full((sizeOfTwin,numOfEns,len(yearsall)),i+1)
+            classesl = np.append(classesl,randomNoiseClass,axis=0)
+                
             if ensTypeExperi == 'ENS':
                 classeslnew = np.swapaxes(classesl,0,1)
             elif ensTypeExperi == 'GCM':
                 classeslnew = classesl
+
         ###############################################################################
         ###############################################################################
         ###############################################################################
@@ -329,17 +337,17 @@ for va in range(len(variablesall)):
         acctest = accuracyTotalTime(predtest,classesltest)
         print('\n\nAccuracy Training == %s%%' % acctrain)
         print('Accuracy Testing == %s%%' % acctest)
-        
+
         ###############################################################################
         ###############################################################################
         ###############################################################################
         ### Plot subplot of LRP means training
         if typeOfAnalysis == 'Experiment-4':
-            limit = np.arange(0,0.50001,0.005)
-            barlim = np.round(np.arange(0,0.501,0.1),2)
+            limit = np.arange(0,0.40001,0.005)
+            barlim = np.round(np.arange(0,0.401,0.1),2)
         elif typeOfAnalysis == 'Experiment-3':
-            limit = np.arange(0,1.00001,0.005)
-            barlim = np.round(np.arange(0,1.01,0.1),2)
+            limit = np.arange(0,0.40001,0.005)
+            barlim = np.round(np.arange(0,0.401,0.1),2)
         elif typeOfAnalysis == 'Experiment-7':
             limit = np.arange(0,0.40001,0.005)
             barlim = np.round(np.arange(0,0.401,0.1),2)
@@ -351,7 +359,6 @@ for va in range(len(variablesall)):
             barlim = np.round(np.arange(0,0.401,0.1),2)
         cmap = cm.cubehelix2_16.mpl_colormap
         label = r'\textbf{Relevance - [ %s ] - %s}' % (variq,typeOfAnalysis)
-        # label = r'\textbf{Precipitation-LRP [Relevance]}'
         
         fig = plt.figure(figsize=(10,2))
         for r in range(lenOfPicks):
@@ -396,16 +403,10 @@ for va in range(len(variablesall)):
         else: 
             plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
          
-        if typeOfAnalysis == 'Experiment-4':
-            plt.text(-0.62,-0.2,r'\textbf{TRAINING ACCURACY = %s \%%}' % np.round(acctrain,1),color='k',
+        plt.text(-0.5,0.00,r'\textbf{TRAINING ACCURACY = %s \%%}' % np.round(acctrain,1),color='k',
+              fontsize=7)
+        plt.text(-0.5,-1,r'\textbf{TESTING ACCURACY = %s \%%}' % np.round(acctest,1),color='k',
                   fontsize=7)
-            plt.text(-0.62,-1.3,r'\textbf{TESTING ACCURACY = %s \%%}' % np.round(acctest,1),color='k',
-                      fontsize=7)
-        else:
-            plt.text(-0.3,0.00,r'\textbf{TRAINING ACCURACY = %s \%%}' % np.round(acctrain,1),color='k',
-                  fontsize=7)
-            plt.text(-0.3,-1,r'\textbf{TESTING ACCURACY = %s \%%}' % np.round(acctest,1),color='k',
-                      fontsize=7)
         
         plt.savefig(directoryfigure + '%s/LRPComposites_%s.png' % (typeOfAnalysis,saveData),dpi=300)
         
@@ -545,7 +546,7 @@ for va in range(len(variablesall)):
         ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
         
         x=np.arange(1950,2019+1,1)
-        plt.scatter(x,obspred,c=obspred,s=40,clip_on=False,cmap=cc.Antique_7.mpl_colormap,
+        plt.scatter(x,obspred,c=obspred,s=40,clip_on=False,cmap=cc.Antique_8.mpl_colormap,
                     edgecolor='k',linewidth=0.4,zorder=10)
         
         plt.xticks(np.arange(1950,2021,5),map(str,np.arange(1950,2021,5)),size=6)
@@ -567,92 +568,31 @@ for va in range(len(variablesall)):
         ax.tick_params('y',length=4,width=2,which='major',color='dimgrey')
         ax.tick_params('x',length=0,width=0,which='major',color='dimgrey')
         
-        rects = plt.bar(uniquetest,counttest, align='center')
-        plt.axhline(y=len(predtest)/lenOfPicks,linestyle='--',linewidth=2,color='k',
+        perfect = np.unique(classesltest,return_counts=True)[1]
+        newcounttest = counttest[:lenOfPicks-1]/sts.mode(perfect)[0][0]
+        newcounttest = np.append(newcounttest,[counttest[-1]/perfect[-1]])*100
+        rects = plt.bar(uniquetest,newcounttest, align='center')
+        plt.axhline(y=100,linestyle='--',linewidth=2,color='k',
                     clip_on=False,zorder=100,dashes=(1,0.3))
         
         ### Set color
-        colorlist = [cc.Antique_7.mpl_colormap(1/7),
-                     cc.Antique_7.mpl_colormap(0/7),
-                     cc.Antique_7.mpl_colormap(3/7),
-                     cc.Antique_7.mpl_colormap(5/7),
-                     cc.Antique_7.mpl_colormap(4/7),
-                     cc.Antique_7.mpl_colormap(6/7),
-                     cc.Antique_7.mpl_colormap(7/7)]
+        colorlist = [cc.Antique_8.mpl_colormap(1/8),
+                      cc.Antique_8.mpl_colormap(0/8),
+                      cc.Antique_8.mpl_colormap(3/8),
+                      cc.Antique_8.mpl_colormap(5/8),
+                      cc.Antique_8.mpl_colormap(4/8),
+                      cc.Antique_8.mpl_colormap(6/8),
+                      cc.Antique_8.mpl_colormap(7/8),
+                      cc.Antique_8.mpl_colormap(8/8)]
         for i in range(lenOfPicks):
             rects[i].set_color(colorlist[i])
             rects[i].set_edgecolor(colorlist[i])
         
         plt.xticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
-        plt.yticks(np.arange(0,520,50),map(str,np.arange(0,520,50)),size=6)
+        plt.yticks(np.arange(0,520,25),map(str,np.arange(0,520,25)),size=6)
         plt.xlim([-0.5,lenOfPicks-1+0.5])   
-        plt.ylim([0,500])
-        plt.xlabel(r'\textbf{Frequency - [ %s - TESTING ] - %s}' % (variq,typeOfAnalysis))
+        plt.ylim([0,150])
+        plt.xlabel(r'\textbf{Frequency [\%%] - [ %s - TESTING ] - %s}' % (variq,typeOfAnalysis))
         
         plt.tight_layout()
         plt.savefig(directoryfigure + '%s/PredictedModels_%s.png' % (typeOfAnalysis,saveData),dpi=300)
-        
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        
-        fig = plt.figure(figsize=(10,5))
-        
-        ax = plt.subplot(121)
-        adjust_spines(ax, ['left', 'bottom'])
-        ax.spines['top'].set_color('none')
-        ax.spines['right'].set_color('none')
-        ax.spines['left'].set_color('dimgrey')
-        ax.spines['bottom'].set_color('dimgrey')
-        ax.spines['left'].set_linewidth(2)
-        ax.spines['bottom'].set_linewidth(2)
-        ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-        ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
-        
-        x=np.arange(1950,2019+1,1)
-        plt.scatter(x,randpred,c=randpred,s=40,clip_on=False,cmap=cc.Antique_7.mpl_colormap,
-                    edgecolor='k',linewidth=0.4,zorder=10)
-        
-        plt.xticks(np.arange(1950,2021,5),map(str,np.arange(1950,2021,5)),size=6)
-        plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
-        plt.xlim([1950,2020])   
-        plt.ylim([0,lenOfPicks-1])
-        plt.xlabel(r'\textbf{Predictions - [ %s - RANDOM DATA ] - %s}' % (variq,typeOfAnalysis))
-        
-        ###############################################################################
-        
-        ax = plt.subplot(122)
-        adjust_spines(ax, ['left', 'bottom'])
-        ax.spines['top'].set_color('none')
-        ax.spines['right'].set_color('none')
-        ax.spines['left'].set_color('dimgrey')
-        ax.spines['bottom'].set_color('dimgrey')
-        ax.spines['left'].set_linewidth(2)
-        ax.spines['bottom'].set_linewidth(0)
-        ax.tick_params('y',length=4,width=2,which='major',color='dimgrey')
-        ax.tick_params('x',length=0,width=0,which='major',color='dimgrey')
-        
-        rects = plt.bar(uniquetest,counttest, align='center')
-        plt.axhline(y=len(predtest)/lenOfPicks,linestyle='--',linewidth=2,color='k',
-                    clip_on=False,zorder=100,dashes=(1,0.3))
-        
-        ### Set color
-        colorlist = [cc.Antique_7.mpl_colormap(1/7),
-                     cc.Antique_7.mpl_colormap(0/7),
-                     cc.Antique_7.mpl_colormap(3/7),
-                     cc.Antique_7.mpl_colormap(5/7),
-                     cc.Antique_7.mpl_colormap(4/7),
-                     cc.Antique_7.mpl_colormap(6/7),
-                     cc.Antique_7.mpl_colormap(7/7)]
-        for i in range(lenOfPicks):
-            rects[i].set_color(colorlist[i])
-            rects[i].set_edgecolor(colorlist[i])
-        
-        plt.xticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
-        plt.yticks(np.arange(0,520,50),map(str,np.arange(0,520,50)),size=6)
-        plt.xlim([-0.5,lenOfPicks-1+0.5])   
-        plt.ylim([0,500])
-        plt.xlabel(r'\textbf{Frequency - [ %s - TESTING ] - %s}' % (variq,typeOfAnalysis))
-        
-        plt.tight_layout()
-        plt.savefig(directoryfigure + '%s/RandomModels_%s.png' % (typeOfAnalysis,saveData),dpi=300)

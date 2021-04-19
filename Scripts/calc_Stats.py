@@ -20,6 +20,7 @@ Usage
     [10] standardize_data(Xtrain,Xtest)
     [11] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
     [12] rm_variance_dev(var,window)
+    [13] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
 """
 
 def rmse(a,b):
@@ -339,6 +340,73 @@ def rm_variance_dev(var,window,ravelmodeltime):
         newdata = newdataq
     print('-----------COMPLETED: Rolling vari!\n\n')     
     return newdata 
+
+###############################################################################
+
+def addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds):
+    """
+    Calculate an additional class of noise added to the original data
+    """
+    import numpy as np
+    import sys
+    
+    if sizeOfTwin == 1: 
+        # dataRandNoise = np.random.randint(low=-integer,high=integer+1,size=data.shape) 
+        dataRandNoise = np.random.uniform(low=-integer,high=integer,size=data.shape) 
+        randomNoiseTwinq = data.copy() + dataRandNoise
+        randomNoiseTwin = randomNoiseTwinq.reshape(randomNoiseTwinq.shape[0]*randomNoiseTwinq.shape[1],
+                                                  randomNoiseTwinq.shape[2],randomNoiseTwinq.shape[3],
+                                                  randomNoiseTwinq.shape[4])
+        print('\n--Size of noise twin --->',randomNoiseTwin.shape)
+        print('<<Added noise of +-%s at every grid point for twin!>>' % integer)
+        
+        ### Calculating random subsample
+        if random_segment_seed == None:
+            random_segment_seed = int(int(np.random.randint(1, 100000)))
+        np.random.seed(random_segment_seed)
+        
+        nrows = randomNoiseTwin.shape[0]
+        nens = randomNoiseTwinq.shape[1]
+    
+        ### Picking out random ensembles
+        i = 0
+        newIndices = list()
+        while i < nens:
+            line = np.random.randint(0, nrows)
+            if line not in newIndices:
+                newIndices.append(line)
+                i += 1
+            else:
+                pass
+        print('<<Subsampling noise on %s model-ensembels>>' % newIndices)
+        
+        ### Subsample the noisy data
+        noiseModel = randomNoiseTwin[newIndices,:,:,:]
+        noiseModelClass = noiseModel[np.newaxis,:,:,:,:]
+        
+        ### Mask land or ocean if necessary
+        if maskNoiseClass != 'none':
+            if maskNoiseClass == 'land':
+                emptyobs = np.full((noiseModelClass.shape[2],noiseModelClass.shape[3],noiseModelClass.shape[4]),np.nan)
+                noiseModelClass,wrong_obs = remove_ocean(noiseModelClass,emptyobs,lat_bounds,lon_bounds) 
+                print('\n*Removed land data - OCEAN TWIN*')
+            elif maskNoiseClass == 'ocean':
+                emptyobs = np.full((noiseModelClass.shape[2],noiseModelClass.shape[3],noiseModelClass.shape[4]),np.nan)
+                noiseModelClass,wrong_obs = remove_land(noiseModelClass,emptyobs,lat_bounds,lon_bounds)                 
+                print('\n*Removed land data - NOISE TWIN*')  
+            else:
+                print(ValueError('SOMETHING IS WRONG WITH MASKING NOISE TWIN!'))
+                sys.exit()
+        
+        ### Make new class of noisy twin subsample
+        dataclass = np.append(data,noiseModelClass,axis=0)
+        
+    else:
+        print(ValueError('Double check the size of the twin class!'))
+        sys.exit()
+    
+    print('--NEW Size of noise twin class--->',dataclass.shape)
+    return dataclass
 
 ###############################################################################
 ###############################################################################

@@ -4,8 +4,8 @@ explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 15 March 2021
-Version    : 2 - adds random number model for a total of 8 classes
+Date       : 19 April 2021
+Version    : 3 - tries to subsample the random weight class (#8)
 """
 
 ### Import packages
@@ -72,10 +72,6 @@ timeper = 'historical'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
-# pickSMILE = ['CSIRO_MK3.6','lens']
-# pickSMILE = ['CSIRO_MK3.6','GFDL_CM3','lens']
-# pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','GFDL_CM3','GFDL_ESM2M','lens'] 
-# pickSMILE = = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth','GFDL_CM3','GFDL_ESM2M','lens']
 if len(pickSMILE) >= 1:
     lenOfPicks = len(pickSMILE)
 else:
@@ -84,10 +80,17 @@ else:
 ###############################################################################
 land_only = False
 ocean_only = False
+if land_only == True:
+    maskNoiseClass = 'land'
+elif ocean_only == True:
+    maskNoiseClass = 'ocean'
+else:
+    maskNoiseClass = 'none'
+maskNoiseClass = 'none' ### masking is NOT working yet
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = False
+rm_annual_mean = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -101,9 +104,12 @@ if calculate_anomalies == True:
 ###############################################################################
 window = 0
 ensTypeExperi = 'ENS'
-shuffletype = 'TIMEENS'
-shuffletype = 'ALLENSRAND'
-shuffletype = 'ALLENSRANDrmmean'
+# shuffletype = 'TIMEENS'
+# shuffletype = 'ALLENSRAND'
+# shuffletype = 'ALLENSRANDrmmean'
+shuffletype = 'RANDGAUSS'
+integer = 1 # random noise value to add/subtract from each grid point
+sizeOfTwin = 1 # number of classes to add to other models
 ###############################################################################
 ###############################################################################
 if ensTypeExperi == 'ENS':
@@ -147,7 +153,7 @@ lentime = len(yearsall)
 ###############################################################################
 ravelyearsbinary = False
 ravelbinary = False
-num_of_class = lenOfPicks
+num_of_class = lenOfPicks + sizeOfTwin
 ###############################################################################
 ###############################################################################
 lrpRule = 'z'
@@ -183,6 +189,12 @@ if rm_ensemble_mean == False:
                 if rm_observational_mean == False:
                     if rm_annual_mean == False:
                         typeOfAnalysis = 'Experiment-3'
+                        if variq == 'T2M':
+                            integer = 20 # random noise value to add/subtract from each grid point
+                        elif variq == 'P':
+                            integer = 5 # random noise value to add/subtract from each grid point
+                        elif variq == 'SLP':
+                            integer = 5 # random noise value to add/subtract from each grid point
 # Experiment #4
 if rm_ensemble_mean == False:
     if window == 0:
@@ -191,6 +203,12 @@ if rm_ensemble_mean == False:
                 if rm_observational_mean == False:
                     if rm_annual_mean == True:
                         typeOfAnalysis = 'Experiment-4'
+                        if variq == 'T2M':
+                            integer = 20 # random noise value to add/subtract from each grid point
+                        elif variq == 'P':
+                            integer = 10 # random noise value to add/subtract from each grid point
+                        elif variq == 'SLP':
+                            integer = 5 # random noise value to add/subtract from each grid point
 # Experiment #5
 if rm_ensemble_mean == False:
     if window == 0:
@@ -237,23 +255,33 @@ if typeOfAnalysis == 'issueWithExperiment':
     sys.exit('Wrong parameters selected to analyze')
     
 ### Select how to save files
-saveData = timeper + '_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+if land_only == True:
+    saveData = timeper + '_LAND' + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+elif ocean_only == True:
+    saveData = timeper + '_OCEAN' + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+else:
+    saveData = timeper + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ### Create sample class labels for each model for my own testing
+### Appends a twin set of classes for the random noise class 
 if seasons != 'none':
     classesl = np.empty((lenOfPicks,numOfEns,len(yearsall)))
     for i in range(lenOfPicks):
         classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
         
+    ### Add random noise models
+    randomNoiseClass = np.full((sizeOfTwin,numOfEns,len(yearsall)),i+1)
+    classesl = np.append(classesl,randomNoiseClass,axis=0)
+        
     if ensTypeExperi == 'ENS':
         classeslnew = np.swapaxes(classesl,0,1)
     elif ensTypeExperi == 'GCM':
         classeslnew = classesl
-        
+      
 ### Begin ANN and the entire script
 for sis,singlesimulation in enumerate(datasetsingle):
     lrpsns = []
@@ -447,6 +475,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
                 ### One-hot vectors
                 Ytrain = keras.utils.to_categorical(Ytrain)
                 Ytest = keras.utils.to_categorical(Ytest)  
+                
+                ### Class weights
+                class_weight = class_weight_creator(Ytrain)
 
 ###############################################################################
 ############################################################################### 
@@ -523,10 +554,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
                 ### One-hot vectors
                 Ytrain = keras.utils.to_categorical(Ytrain)
                 Ytest = keras.utils.to_categorical(Ytest) 
+                
+                ### Class weights
+                class_weight = class_weight_creator(Ytrain)
           
             else:
                 print(ValueError('WRONG EXPERIMENT!'))
-            return Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices
+            return Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices,class_weight
         
         ###############################################################################
         ###############################################################################
@@ -546,6 +580,17 @@ for sis,singlesimulation in enumerate(datasetsingle):
                 ax.xaxis.set_ticks_position('bottom')
             else:
                     ax.xaxis.set_ticks([]) 
+
+        ###############################################################################
+        ###############################################################################
+        ###############################################################################                    
+        ### Create a class weight dictionary to help if the classes are unbalanced
+        def class_weight_creator(Y):
+            class_dict = {}
+            weights = np.max(np.sum(Y, axis=0)) / np.sum(Y, axis=0)
+            for i in range( Y.shape[-1] ):
+                class_dict[i] = weights[i]               
+            return class_dict
                     
         ###############################################################################
         ###############################################################################
@@ -593,7 +638,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
             
             return model
         
-        def trainNN(model, Xtrain, Ytrain, niter=500, verbose=False):
+        def trainNN(model, Xtrain, Ytrain, niter, class_weight, verbose):
           
             global lr_here, batch_size
             lr_here = 0.001
@@ -615,7 +660,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         
             return model, history
         
-        def test_train_loopClass(Xtrain,Ytrain,Xtest,Ytest,iterations,ridge_penalty,hiddens,plot_in_train=True):
+        def test_train_loopClass(Xtrain,Ytrain,Xtest,Ytest,iterations,ridge_penalty,hiddens,class_weight,plot_in_train=True):
             """or loops to iterate through training iterations, ridge penalty, 
             and hidden layer list
             """
@@ -646,7 +691,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                        
                         ### Train the net
                         model, history = trainNN(model,Xtrain,
-                                                  Ytrain,niter=niter,verbose=0)
+                                                  Ytrain,niter,class_weight,verbose=0)
         
                         ### After training, use the network with training data to 
                         ### check that we don't have any errors and output RMSE
@@ -719,7 +764,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         expList = [(0)] # (0,1)
         expN = np.size(expList)
         
-        iterations = [100] 
+        iterations = [50] 
         random_segment = True
         foldsN = 1
         
@@ -808,6 +853,12 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                           lon_bounds) 
                         print('\n*Removed land data*')       
 ###############################################################################
+                    ### Adding random data
+                    if sizeOfTwin > 0:
+                        random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
+                        data = dSS.addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+
+###############################################################################
 ###############################################################################
 ###############################################################################
                     ### Loop over folds
@@ -818,7 +869,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         # random_segment_seed = 34515
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
                         #---------------------------
-                        Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices = segment_data(data,classesl,ensTypeExperi,segment_data_factor)
+                        Xtrain,Ytrain,Xtest,Ytest,Xtest_shape,Xtrain_shape,data_train_shape,data_test_shape,testIndices,trainIndices,class_weight = segment_data(data,classesl,ensTypeExperi,segment_data_factor)
         
                         YtrainClassMulti = Ytrain  
                         YtestClassMulti = Ytest  
@@ -838,7 +889,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                                                                 YtestClassMulti,
                                                                 iterations=iterations,
                                                                 ridge_penalty=ridge_penalty,
-                                                                hiddens=hiddensList,
+                                                                hiddens=hiddensList,class_weight=class_weight,
                                                                 plot_in_train = True)
                         model.summary()  
                         
@@ -1100,5 +1151,5 @@ for sis,singlesimulation in enumerate(datasetsingle):
     ### Delete memory!!!
     if sis < len(datasetsingle):
         del model 
-        del data
-        del data_obs
+        # del data
+        # del data_obs
