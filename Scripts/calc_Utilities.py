@@ -931,7 +931,7 @@ def regions(name):
         lat_bounds = (-87.,87.)
         lon_bounds = (0., 360.)
     elif name == 'GlobeNoSP':
-        lat_bounds = (-64.,89.)
+        lat_bounds = (-64.,87.)
         lon_bounds = (0., 360.)
     elif name == 'GlobeNoPoles':
         lat_bounds = (-66.,66.)
@@ -940,10 +940,10 @@ def regions(name):
         lat_bounds = (-53.,66.)
         lon_bounds = (0., 360.)
     elif name == 'NH':
-        lat_bounds = (0.,89.)
+        lat_bounds = (0.,87.)
         lon_bounds = (0., 360.)
     elif name == 'SH':
-        lat_bounds = (-89.,0.)
+        lat_bounds = (-87.,0.)
         lon_bounds = (0., 360.)
     elif name == 'Tropics':
         lat_bounds = (-30., 30.)
@@ -955,19 +955,19 @@ def regions(name):
         lat_bounds = (-50., 50.)
         lon_bounds = (0., 360.)  
     elif name == 'wideNH':
-        lat_bounds = (20., 89.)
+        lat_bounds = (20., 87.)
         lon_bounds = (0., 360.)  
     elif name == 'wideSH':
         lat_bounds = (-89., -20.)
         lon_bounds = (0., 360.)  
     elif name == 'Arctic':
-        lat_bounds = (65.,89.)
+        lat_bounds = (65.,87.)
         lon_bounds = (0., 360.)  
     elif name == 'LowerArctic':
-        lat_bounds = (60.,89.)
+        lat_bounds = (60.,87.)
         lon_bounds = (0., 360.)  
     elif name == 'VortexNorth':
-        lat_bounds = (50.,89.)
+        lat_bounds = (50.,87.)
         lon_bounds = (0., 360.)  
     elif name == 'VortexSouth':
         lat_bounds = (-90.,-50.)

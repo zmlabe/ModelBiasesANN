@@ -27,8 +27,8 @@ import cmocean
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
-variablesall = ['T2M','P']
-variablesall = ['T2M']
+variablesall = ['T2M','P','SLP']
+variablesall = ['P']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -70,7 +70,7 @@ for va in range(len(variablesall)):
         rm_observational_mean = False
         ###############################################################################
         ###############################################################################
-        calculate_anomalies = False
+        calculate_anomalies = True
         if calculate_anomalies == True:
             baseline = np.arange(1951,1980+1,1)
         ###############################################################################
@@ -426,274 +426,274 @@ for va in range(len(variablesall)):
         
         plt.savefig(directoryfigure + '%s/LRPCompositesOBSERVATIONS_%s.png' % (typeOfAnalysis,saveData),dpi=300)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Plot subplot of observations
-        if variq == 'T2M':
-            limit = np.arange(-2,2.01,0.01)
-            barlim = np.round(np.arange(-2,3,1),2)
-            cmap = cmocean.cm.balance
-            label = r'\textbf{OBS - [T2M : $^{\circ}$C]}'
-        elif variq == 'P':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,4,1),2)
-            cmap = cmocean.cm.tarn
-            label = r'\textbf{OBS - [P : mm/day]}'
-        elif variq == 'P':
-            limit = np.arange(-2,2.01,0.01)
-            barlim = np.round(np.arange(-2,3,1),2)
-            cmap = cmocean.cm.diff
-            label = r'\textbf{OBS - [SLP : hPa]}'
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # ### Plot subplot of observations
+        # if variq == 'T2M':
+        #     limit = np.arange(-2,2.01,0.01)
+        #     barlim = np.round(np.arange(-2,3,1),2)
+        #     cmap = cmocean.cm.balance
+        #     label = r'\textbf{OBS - [T2M : $^{\circ}$C]}'
+        # elif variq == 'P':
+        #     limit = np.arange(-3,3.01,0.01)
+        #     barlim = np.round(np.arange(-3,4,1),2)
+        #     cmap = cmocean.cm.tarn
+        #     label = r'\textbf{OBS - [P : mm/day]}'
+        # elif variq == 'SLP':
+        #     limit = np.arange(-2,2.01,0.01)
+        #     barlim = np.round(np.arange(-2,3,1),2)
+        #     cmap = cmocean.cm.diff
+        #     label = r'\textbf{OBS - [SLP : hPa]}'
         
-        fig = plt.figure(figsize=(10,2))
-        for r in range(lenOfPicks):
-            var = dataanomsobstest[r]
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(lenOfPicks):
+        #     var = dataanomsobstest[r]
             
-            ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,lenOfPicks,r+1)
+        #     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lon1)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lon1)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='both')
+        #     cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
-                          textcoords='axes fraction',color=cmap(0.4),fontsize=6,
-                          rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
+        #                   textcoords='axes fraction',color=cmap(0.4),fontsize=6,
+        #                   rotation=0,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='max',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        if lenOfPicks == 3:
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
-        else: 
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # if lenOfPicks == 3:
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
+        # else: 
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        # plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_%s.png' % (typeOfAnalysis,saveData),dpi=300)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Plot subplot of observations (dt)
-        if variq == 'T2M':
-            limit = np.arange(-1,1.01,0.01)
-            barlim = np.round(np.arange(-1,2,1),2)
-            cmap = cmocean.cm.balance
-            label = r'\textbf{OBSdt - [T2M : $^{\circ}$C]}'
-        elif variq == 'P':
-            limit = np.arange(-2,2.01,0.01)
-            barlim = np.round(np.arange(-2,3,1),2)
-            cmap = cmocean.cm.tarn
-            label = r'\textbf{OBSdt - [P : mm/day]}'
-        elif variq == 'P':
-            limit = np.arange(-2,2.01,0.01)
-            barlim = np.round(np.arange(-2,3,1),2)
-            cmap = cmocean.cm.diff
-            label = r'\textbf{OBSdt - [SLP : hPa]}'
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # ### Plot subplot of observations (dt)
+        # if variq == 'T2M':
+        #     limit = np.arange(-1,1.01,0.01)
+        #     barlim = np.round(np.arange(-1,2,1),2)
+        #     cmap = cmocean.cm.balance
+        #     label = r'\textbf{OBSdt - [T2M : $^{\circ}$C]}'
+        # elif variq == 'P':
+        #     limit = np.arange(-2,2.01,0.01)
+        #     barlim = np.round(np.arange(-2,3,1),2)
+        #     cmap = cmocean.cm.tarn
+        #     label = r'\textbf{OBSdt - [P : mm/day]}'
+        # elif variq == 'P':
+        #     limit = np.arange(-2,2.01,0.01)
+        #     barlim = np.round(np.arange(-2,3,1),2)
+        #     cmap = cmocean.cm.diff
+        #     label = r'\textbf{OBSdt - [SLP : hPa]}'
         
-        fig = plt.figure(figsize=(10,2))
-        for r in range(lenOfPicks):
-            var = dataanomsobstestdt[r]
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(lenOfPicks):
+        #     var = dataanomsobstestdt[r]
             
-            ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,lenOfPicks,r+1)
+        #     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lon1)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lon1)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='both')
+        #     cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
-                          textcoords='axes fraction',color=cmap(0.4),fontsize=6,
-                          rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
+        #                   textcoords='axes fraction',color=cmap(0.4),fontsize=6,
+        #                   rotation=0,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='max',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        if lenOfPicks == 3:
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
-        else: 
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # if lenOfPicks == 3:
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
+        # else: 
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_dt_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        # plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_dt_%s.png' % (typeOfAnalysis,saveData),dpi=300)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Plot subplot of observations (glo)
-        if variq == 'T2M':
-            limit = np.arange(-1,1.01,0.01)
-            barlim = np.round(np.arange(-1,2,1),2)
-            cmap = cmocean.cm.balance
-            label = r'\textbf{OBSglo - [T2M : $^{\circ}$C]}'
-        elif variq == 'P':
-            limit = np.arange(-2,2.01,0.01)
-            barlim = np.round(np.arange(-2,3,1),2)
-            cmap = cmocean.cm.tarn
-            label = r'\textbf{OBSglo - [P : mm/day]}'
-        elif variq == 'P':
-            limit = np.arange(-2,2.01,0.01)
-            barlim = np.round(np.arange(-2,3,1),2)
-            cmap = cmocean.cm.diff
-            label = r'\textbf{OBSglo - [SLP : hPa]}'
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # ### Plot subplot of observations (glo)
+        # if variq == 'T2M':
+        #     limit = np.arange(-1,1.01,0.01)
+        #     barlim = np.round(np.arange(-1,2,1),2)
+        #     cmap = cmocean.cm.balance
+        #     label = r'\textbf{OBSglo - [T2M : $^{\circ}$C]}'
+        # elif variq == 'P':
+        #     limit = np.arange(-2,2.01,0.01)
+        #     barlim = np.round(np.arange(-2,3,1),2)
+        #     cmap = cmocean.cm.tarn
+        #     label = r'\textbf{OBSglo - [P : mm/day]}'
+        # elif variq == 'P':
+        #     limit = np.arange(-2,2.01,0.01)
+        #     barlim = np.round(np.arange(-2,3,1),2)
+        #     cmap = cmocean.cm.diff
+        #     label = r'\textbf{OBSglo - [SLP : hPa]}'
         
-        fig = plt.figure(figsize=(10,2))
-        for r in range(lenOfPicks):
-            var = dataanomsobstestglo[r]
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(lenOfPicks):
+        #     var = dataanomsobstestglo[r]
             
-            ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,lenOfPicks,r+1)
+        #     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lon1)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lon1)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='both')
+        #     cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
-                          textcoords='axes fraction',color=cmap(0.4),fontsize=6,
-                          rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
+        #                   textcoords='axes fraction',color=cmap(0.4),fontsize=6,
+        #                   rotation=0,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='max',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        if lenOfPicks == 3:
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
-        else: 
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # if lenOfPicks == 3:
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
+        # else: 
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_glo_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        # plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_glo_%s.png' % (typeOfAnalysis,saveData),dpi=300)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Plot subplot of observations (z)
-        if variq == 'T2M':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,4,1),2)
-            cmap = cmocean.cm.balance
-            label = r'\textbf{OBSz - [T2M : $^{\circ}$C]}'
-        elif variq == 'P':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,4,1),2)
-            cmap = cmocean.cm.tarn
-            label = r'\textbf{OBSz - [P : mm/day]}'
-        elif variq == 'P':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,4,1),2)
-            cmap = cmocean.cm.diff
-            label = r'\textbf{OBSz - [SLP : hPa]}'
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # ### Plot subplot of observations (z)
+        # if variq == 'T2M':
+        #     limit = np.arange(-3,3.01,0.01)
+        #     barlim = np.round(np.arange(-3,4,1),2)
+        #     cmap = cmocean.cm.balance
+        #     label = r'\textbf{OBSz - [T2M : $^{\circ}$C]}'
+        # elif variq == 'P':
+        #     limit = np.arange(-3,3.01,0.01)
+        #     barlim = np.round(np.arange(-3,4,1),2)
+        #     cmap = cmocean.cm.tarn
+        #     label = r'\textbf{OBSz - [P : mm/day]}'
+        # elif variq == 'P':
+        #     limit = np.arange(-3,3.01,0.01)
+        #     barlim = np.round(np.arange(-3,4,1),2)
+        #     cmap = cmocean.cm.diff
+        #     label = r'\textbf{OBSz - [SLP : hPa]}'
         
-        fig = plt.figure(figsize=(10,2))
-        for r in range(lenOfPicks):
-            var = dataanomsobstestz[r]
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(lenOfPicks):
+        #     var = dataanomsobstestz[r]
             
-            ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,lenOfPicks,r+1)
+        #     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lon1)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lon1)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='both')
+        #     cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
-                          textcoords='axes fraction',color=cmap(0.4),fontsize=6,
-                          rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
+        #                   textcoords='axes fraction',color=cmap(0.4),fontsize=6,
+        #                   rotation=0,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='max',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        if lenOfPicks == 3:
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
-        else: 
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # if lenOfPicks == 3:
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
+        # else: 
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_z_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        # plt.savefig(directoryfigure + '%s/ActualOBSERVATIONS_z_%s.png' % (typeOfAnalysis,saveData),dpi=300)
