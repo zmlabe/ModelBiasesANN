@@ -3,8 +3,8 @@ ANN for evaluating model biases, differences, and other thresholds using
 explainable AI for historical data with a focus on observational predictions
 
 Author     : Zachary M. Labe
-Date       : 19 April 2021
-Version    : 1 (tries to subsample the random weight class (#8) - OBS ONLY)
+Date       : 26 April 2021
+Version    : 1 - subsamples random weight class (#8), but tries different noise
 """
 
 ### Import packages
@@ -28,7 +28,7 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-# variablesall = ['T2M']
+variablesall = ['P']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -48,7 +48,7 @@ for va in range(len(variablesall)):
         seasons = ['annual']
         variq = variablesall[va]
         reg_name = 'SMILEGlobe'
-        timeper = 'future'
+        timeper = 'historical'
         ###############################################################################
         ###############################################################################
         pickSMILE = pickSMILEall[m]
@@ -213,11 +213,11 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_LAND' + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         elif ocean_only == True:
-            saveData = timeper + '_OCEAN' + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         else:
-            saveData = timeper + '_NoiseTwinSingle_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
         ###############################################################################
@@ -313,7 +313,6 @@ for va in range(len(variablesall)):
         ###############################################################################
         ############################################################################### 
         ### Find which model
-        print('\nPrinting *length* of predicted labels for training and testing!')
         obs_test = []
         for i in range(lenOfPicks):
             obsloc = np.where((obspred == int(i)))[0]

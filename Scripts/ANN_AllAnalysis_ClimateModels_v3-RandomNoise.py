@@ -79,14 +79,14 @@ else:
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = False
+ocean_only = True
 if land_only == True:
     maskNoiseClass = 'land'
 elif ocean_only == True:
     maskNoiseClass = 'ocean'
 else:
     maskNoiseClass = 'none'
-maskNoiseClass = 'none' ### masking is NOT working yet
+# maskNoiseClass = 'none' ### masking is NOT working yet
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
@@ -99,7 +99,12 @@ rm_observational_mean = False
 ###############################################################################
 calculate_anomalies = False
 if calculate_anomalies == True:
-    baseline = np.arange(1951,1980+1,1)
+    if timeper == 'historical': 
+        baseline = np.arange(1951,1980+1,1)
+    elif timeper == 'future':
+        baseline = np.arange(2021,2050+1,1)
+    else:
+        print(ValueError('WRONG TIMEPER!'))
 ###############################################################################
 ###############################################################################
 window = 0
@@ -645,7 +650,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
             for layer in hidden[1:]:
                 model.add(Dense(layer,activation=actFun,
                                 use_bias=True,
-                                kernel_regularizer=regularizers.l1_l2(l1=0.00, l2=0.00),
+                                kernel_regularizer=regularizers.l1_l2(l1=0.00,l2=0.00),
                                 bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
                                 kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
                     
@@ -653,7 +658,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         
             #### Initialize output layer
             model.add(Dense(output_shape,activation=None,use_bias=True,
-                            kernel_regularizer=regularizers.l1_l2(l1=0.00, l2=0.0),
+                            kernel_regularizer=regularizers.l1_l2(l1=0.00, l2=0.00),
                             bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
                             kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
         
@@ -675,7 +680,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
             #               metrics=[metrics.categorical_accuracy])
         
             ### Declare the relevant model parameters
-            batch_size = 32 # This doesn't seem to affect much in this case
+            batch_size = 24 
         
             print('----ANN Training: learning rate = '+str(lr_here)+'; activation = '+actFun+'; batch = '+str(batch_size) + '----')    
             
@@ -795,6 +800,16 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ridge_penalty = [0.10]
         actFun = 'relu'
         
+        if any([maskNoiseClass=='land',maskNoiseClass=='ocean']):
+            debug = True
+            NNType = 'ANN'
+            avgHalfChunk = 0
+            option4 = True
+            biasBool = False
+            hiddensList = [[8,8]]
+            ridge_penalty = [0.10]
+            actFun = 'relu'
+        
         expList = [(0)] # (0,1)
         expN = np.size(expList)
         
@@ -885,7 +900,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         data, data_obs = dSS.remove_land(data,data_obs,
                                                           lat_bounds,
                                                           lon_bounds) 
-                        print('\n*Removed land data*')       
+                        print('\n*Removed land data*')     
 ###############################################################################
                     ### Adding random data
                     if sizeOfTwin > 0:
@@ -974,10 +989,15 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         XobsS = (Xobs-Xmeanobs)/Xstdobs
                         XobsS[np.isnan(XobsS)] = 0
                         
+                        xtrainpred = (Xtrain-Xmean)/Xstd
+                        xtrainpred[np.isnan(xtrainpred)] = 0
+                        xtestpred = (Xtest-Xmean)/Xstd
+                        xtestpred[np.isnan(xtestpred)] = 0
+                        
                         if(annType=='class'):
                             YpredObs = model.predict(XobsS)
-                            YpredTrain = model.predict((Xtrain-Xmean)/Xstd)
-                            YpredTest = model.predict((Xtest-Xmean)/Xstd)
+                            YpredTrain = model.predict(xtrainpred)
+                            YpredTest = model.predict(xtestpred)
                         
                         #######################################################
                         #######################################################

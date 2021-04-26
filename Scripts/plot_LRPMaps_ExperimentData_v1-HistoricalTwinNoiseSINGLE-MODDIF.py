@@ -3,8 +3,8 @@ ANN for evaluating model biases, differences, and other thresholds using
 explainable AI for historical data
 
 Author     : Zachary M. Labe
-Date       : 15 April 2021
-Version    : 1 (Historical data using twin random noise models)
+Date       : 26 April 2021
+Version    : 1 - subsamples random weight class (#8), but tries different noise
 """
 
 ### Import packages
@@ -22,8 +22,8 @@ import scipy.stats as sts
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
-variablesall = ['T2M','P']
-variablesall = ['T2M']
+variablesall = ['T2M','P','SLP']
+variablesall = ['P']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -32,7 +32,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Data preliminaries 
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-NoiseTwin/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-NoiseTwinSingle/'
         letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
         ###############################################################################
         ###############################################################################
@@ -72,6 +72,12 @@ for va in range(len(variablesall)):
         ###############################################################################
         window = 0
         ensTypeExperi = 'ENS'
+        # shuffletype = 'TIMEENS'
+        # shuffletype = 'ALLENSRAND'
+        # shuffletype = 'ALLENSRANDrmmean'
+        shuffletype = 'RANDGAUSS'
+        # integer = 5 # random noise value to add/subtract from each grid point
+        sizeOfTwin = 1 # number of classes to add to other models
         ###############################################################################
         ###############################################################################
         if ensTypeExperi == 'ENS':
@@ -201,7 +207,12 @@ for va in range(len(variablesall)):
             sys.exit('Wrong parameters selected to analyze')
             
         ### Select how to save files
-        saveData = timeper + '_NoiseTwin_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+        if land_only == True:
+            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+        elif ocean_only == True:
+            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+        else:
+            saveData = timeper + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
         ###############################################################################
@@ -214,7 +225,7 @@ for va in range(len(variablesall)):
                 classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
                 
             ### Add random noise models
-            randomNoiseClass = np.full(classesl.shape,i+1)
+            randomNoiseClass = np.full((sizeOfTwin,numOfEns,len(yearsall)),i+1)
             classesl = np.append(classesl,randomNoiseClass,axis=0)
                 
             if ensTypeExperi == 'ENS':

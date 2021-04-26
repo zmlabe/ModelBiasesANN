@@ -4,8 +4,8 @@ explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 14 April 2021
-Version    : 2 - adds a class weight function
+Date       : 26 April 2021
+Version    : 4 - subsamples random weight class (#8), but tries different noise
 """
 
 ### Import packages
@@ -80,6 +80,13 @@ else:
 ###############################################################################
 land_only = False
 ocean_only = False
+if land_only == True:
+    maskNoiseClass = 'land'
+elif ocean_only == True:
+    maskNoiseClass = 'ocean'
+else:
+    maskNoiseClass = 'none'
+
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
@@ -92,26 +99,48 @@ rm_observational_mean = False
 ###############################################################################
 calculate_anomalies = False
 if calculate_anomalies == True:
-    baseline = np.arange(1951,1980+1,1)
+    if timeper == 'historical': 
+        baseline = np.arange(1951,1980+1,1)
+    elif timeper == 'future':
+        baseline = np.arange(2021,2050+1,1)
+    else:
+        print(ValueError('WRONG TIMEPER!'))
 ###############################################################################
 ###############################################################################
 window = 0
 ensTypeExperi = 'ENS'
-shuffletype = 'TIMEENS'
-shuffletype = 'ALLENSRAND'
-shuffletype = 'ALLENSRANDrmmean'
+# shuffletype = 'TIMEENS'
+# shuffletype = 'ALLENSRAND'
+# shuffletype = 'ALLENSRANDrmmean'
 shuffletype = 'RANDGAUSS'
+sizeOfTwin = 2 # name of experiment for adding noise class #8
+if sizeOfTwin > 0:
+    sizeOfTwinq = 1
+else:
+    sizeOfTwinq = sizeOfTwin
 ###############################################################################
 ###############################################################################
 if ensTypeExperi == 'ENS':
     if window == 0:
         rm_standard_dev = False
-        yearsall = np.arange(1950,2019+1,1)
+        if timeper == 'historical': 
+            yearsall = np.arange(1950,2019+1,1)
+        elif timeper == 'future':
+            yearsall = np.arange(2020,2099+1,1)
+        else:
+            print(ValueError('WRONG TIMEPER!'))
+            sys.exit()
         ravel_modelens = False
         ravelmodeltime = False
     else:
         rm_standard_dev = True
-        yearsall = np.arange(1950+window,2019+1,1)
+        if timeper == 'historical': 
+            yearsall = np.arange(1950+window,2019+1,1)
+        elif timeper == 'future':
+            yearsall = np.arange(2020+window,2099+1,1)
+        else:
+            print(ValueError('WRONG TIMEPER!'))
+            sys.exit()
         ravelmodeltime = False
         ravel_modelens = True
 elif ensTypeExperi == 'GCM':
@@ -122,7 +151,13 @@ elif ensTypeExperi == 'GCM':
         ravelmodeltime = False
     else:
         rm_standard_dev = True
-        yearsall = np.arange(1950+window,2019+1,1)
+        if timeper == 'historical': 
+            yearsall = np.arange(1950,2019+1,1)
+        elif timeper == 'future':
+            yearsall = np.arange(2020,2099+1,1)
+        else:
+            print(ValueError('WRONG TIMEPER!'))
+            sys.exit()
         ravelmodeltime = False
         ravel_modelens = True
 ###############################################################################
@@ -144,7 +179,7 @@ lentime = len(yearsall)
 ###############################################################################
 ravelyearsbinary = False
 ravelbinary = False
-num_of_class = lenOfPicks + 1
+num_of_class = lenOfPicks + sizeOfTwinq
 ###############################################################################
 ###############################################################################
 lrpRule = 'z'
@@ -180,6 +215,12 @@ if rm_ensemble_mean == False:
                 if rm_observational_mean == False:
                     if rm_annual_mean == False:
                         typeOfAnalysis = 'Experiment-3'
+                        if variq == 'T2M':
+                            integer = 20 # random noise value to add/subtract from each grid point
+                        elif variq == 'P':
+                            integer = 20 # random noise value to add/subtract from each grid point
+                        elif variq == 'SLP':
+                            integer = 20 # random noise value to add/subtract from each grid point
 # Experiment #4
 if rm_ensemble_mean == False:
     if window == 0:
@@ -188,6 +229,12 @@ if rm_ensemble_mean == False:
                 if rm_observational_mean == False:
                     if rm_annual_mean == True:
                         typeOfAnalysis = 'Experiment-4'
+                        if variq == 'T2M':
+                            integer = 25 # random noise value to add/subtract from each grid point
+                        elif variq == 'P':
+                            integer = 15 # random noise value to add/subtract from each grid point
+                        elif variq == 'SLP':
+                            integer = 5 # random noise value to add/subtract from each grid point
 # Experiment #5
 if rm_ensemble_mean == False:
     if window == 0:
@@ -220,6 +267,12 @@ if rm_ensemble_mean == False:
                 if rm_observational_mean == False:
                     if rm_annual_mean == False:
                         typeOfAnalysis = 'Experiment-8'
+                        if variq == 'T2M':
+                            integer = 1 # random noise value to add/subtract from each grid point
+                        elif variq == 'P':
+                            integer = 1 # random noise value to add/subtract from each grid point
+                        elif variq == 'SLP':
+                            integer = 5 # random noise value to add/subtract from each grid point
 # Experiment #9
 if rm_ensemble_mean == False:
     if window > 1:
@@ -234,7 +287,12 @@ if typeOfAnalysis == 'issueWithExperiment':
     sys.exit('Wrong parameters selected to analyze')
     
 ### Select how to save files
-saveData = timeper + '_NoiseTwin_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+if land_only == True:
+    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+elif ocean_only == True:
+    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+else:
+    saveData = timeper + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
@@ -248,14 +306,14 @@ if seasons != 'none':
         classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
         
     ### Add random noise models
-    randomNoiseClass = np.full(classesl.shape,i+1)
+    randomNoiseClass = np.full((sizeOfTwinq,numOfEns,len(yearsall)),i+1)
     classesl = np.append(classesl,randomNoiseClass,axis=0)
         
     if ensTypeExperi == 'ENS':
         classeslnew = np.swapaxes(classesl,0,1)
     elif ensTypeExperi == 'GCM':
         classeslnew = classesl
-        
+      
 ### Begin ANN and the entire script
 for sis,singlesimulation in enumerate(datasetsingle):
     lrpsns = []
@@ -267,7 +325,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         simuqq = datasetsingle[0]
         monthlychoice = seasons[seas]
         lat_bounds,lon_bounds = UT.regions(reg_name)
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1-RandomNoise/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
         experiment_result = pd.DataFrame(columns=['actual iters','hiddens','cascade',
                                                   'RMSE Train','RMSE Test',
                                                   'ridge penalty','zero mean',
@@ -595,15 +653,15 @@ for sis,singlesimulation in enumerate(datasetsingle):
             for layer in hidden[1:]:
                 model.add(Dense(layer,activation=actFun,
                                 use_bias=True,
-                                kernel_regularizer=regularizers.l1_l2(l1=0.00, l2=0.00),
+                                kernel_regularizer=regularizers.l1_l2(l1=0.00,l2=0.00),
                                 bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
                                 kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
                     
-                print('\nTHIS IS A ANN!\n')
+                print('\nTHIS IS AN ANN!\n')
         
             #### Initialize output layer
             model.add(Dense(output_shape,activation=None,use_bias=True,
-                            kernel_regularizer=regularizers.l1_l2(l1=0.00, l2=0.0),
+                            kernel_regularizer=regularizers.l1_l2(l1=0.00, l2=0.00),
                             bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
                             kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
         
@@ -619,17 +677,27 @@ for sis,singlesimulation in enumerate(datasetsingle):
             model.compile(optimizer=optimizers.SGD(lr=lr_here,
                           momentum=0.9,nesterov=True),  
                           loss = 'categorical_crossentropy',
-                          metrics=[metrics.categorical_accuracy],)
+                          metrics=[metrics.categorical_accuracy])
+            # model.compile(optimizer=optimizers.Nadam(lr=lr_here),  
+            #               loss = 'categorical_crossentropy',
+            #               metrics=[metrics.categorical_accuracy])
         
             ### Declare the relevant model parameters
-            batch_size = 32 # This doesn't seem to affect much in this case
+            batch_size = 24 
         
             print('----ANN Training: learning rate = '+str(lr_here)+'; activation = '+actFun+'; batch = '+str(batch_size) + '----')    
+            
+            ### Callbacks
             time_callback = TimeHistory()
+            early_stopping = keras.callbacks.EarlyStopping(monitor='loss',
+                                                           patience=2,
+                                                           verbose=1,
+                                                           mode='auto')
+            
             history = model.fit(Xtrain,Ytrain,batch_size=batch_size,epochs=niter,
                                 shuffle=True,verbose=verbose,
-                                callbacks=[time_callback],
-                                validation_split=0.,class_weight=class_weight)
+                                callbacks=[time_callback,early_stopping],
+                                validation_split=0.)
             print('******** done training ***********')
         
             return model, history
@@ -665,7 +733,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                        
                         ### Train the net
                         model, history = trainNN(model,Xtrain,
-                                                  Ytrain,niter,class_weight,verbose=0)
+                                                  Ytrain,niter,class_weight,verbose=1)
         
                         ### After training, use the network with training data to 
                         ### check that we don't have any errors and output RMSE
@@ -731,9 +799,19 @@ for sis,singlesimulation in enumerate(datasetsingle):
         avgHalfChunk = 0
         option4 = True
         biasBool = False
-        hiddensList = [[8,8]]
-        ridge_penalty = [0.2]
+        hiddensList = [[10,10]]
+        ridge_penalty = [0.10]
         actFun = 'relu'
+        
+        if any([maskNoiseClass=='land',maskNoiseClass=='ocean']):
+            debug = True
+            NNType = 'ANN'
+            avgHalfChunk = 0
+            option4 = True
+            biasBool = False
+            hiddensList = [[8,8]]
+            ridge_penalty = [0.10]
+            actFun = 'relu'
         
         expList = [(0)] # (0,1)
         expN = np.size(expList)
@@ -825,17 +903,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         data, data_obs = dSS.remove_land(data,data_obs,
                                                           lat_bounds,
                                                           lon_bounds) 
-                        print('\n*Removed land data*')       
-###############################################################################
-###############################################################################
+                        print('\n*Removed land data*')     
 ###############################################################################
                     ### Adding random data
-                    # randomNoiseTwin = np.random.normal(-10,10, data.shape) 
-                    randomNoiseTwin = np.random.randint(low=-5,high=5, size=data.shape) 
-                    dataRandNoise = data.copy() + randomNoiseTwin
-                    data = np.append(data,dataRandNoise,axis=0)
-                    print('\n\nNEW SHAPE AFTER RANDOM NOISE MODELS == ',data.shape)
-                    
+                    if sizeOfTwin > 0:
+                        random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
+                        data = dSS.addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+                    sys.exit()
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -890,8 +964,8 @@ for sis,singlesimulation in enumerate(datasetsingle):
                             savenameModelTestTrain = savenameModelTestTrain + '_EnsembleMeanRemoved'
         
                         savename = savename + regSave    
-                        model.save(dirname + savename + '.h5')
-                        np.savez(dirname + savenameModelTestTrain + '.npz',trainModels=trainIndices,testModels=testIndices,Xtrain=Xtrain,Ytrain=Ytrain,Xtest=Xtest,Ytest=Ytest,Xmean=Xmean,Xstd=Xstd,lats=lats,lons=lons)
+                        # model.save(dirname + savename + '.h5')
+                        # np.savez(dirname + savenameModelTestTrain + '.npz',trainModels=trainIndices,testModels=testIndices,Xtrain=Xtrain,Ytrain=Ytrain,Xtest=Xtest,Ytest=Ytest,Xmean=Xmean,Xstd=Xstd,lats=lats,lons=lons)
         
                         print('saving ' + savename)
                         
@@ -918,10 +992,15 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         XobsS = (Xobs-Xmeanobs)/Xstdobs
                         XobsS[np.isnan(XobsS)] = 0
                         
+                        xtrainpred = (Xtrain-Xmean)/Xstd
+                        xtrainpred[np.isnan(xtrainpred)] = 0
+                        xtestpred = (Xtest-Xmean)/Xstd
+                        xtestpred[np.isnan(xtestpred)] = 0
+                        
                         if(annType=='class'):
                             YpredObs = model.predict(XobsS)
-                            YpredTrain = model.predict((Xtrain-Xmean)/Xstd)
-                            YpredTest = model.predict((Xtest-Xmean)/Xstd)
+                            YpredTrain = model.predict(xtrainpred)
+                            YpredTest = model.predict(xtestpred)
                         
                         #######################################################
                         #######################################################
@@ -1125,9 +1204,3 @@ for sis,singlesimulation in enumerate(datasetsingle):
         netcdfLRP(lats,lons,lrptrain,directoryoutput,'Training',saveData)
         netcdfLRP(lats,lons,lrptest,directoryoutput,'Testing',saveData)
         netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
-      
-    ### Delete memory!!!
-    if sis < len(datasetsingle):
-        del model 
-        del data
-        del data_obs
