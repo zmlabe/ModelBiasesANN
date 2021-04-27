@@ -20,7 +20,7 @@ def detrendData(datavar,level,timeperiod):
     Parameters
     ----------
     datavar : 5d numpy array or 6d numpy array 
-        [year,month,lat,lon] or [year,month,level,lat,lon]
+        [model,ensemble,year,lat,lon] or [model,ensemble,year,level,lat,lon]
     level : string
         Height of variable (surface or profile)
     timeperiod : string
@@ -29,7 +29,7 @@ def detrendData(datavar,level,timeperiod):
     Returns
     -------
     datavardt : 5d numpy array or 6d numpy array 
-        [ensemble,year,month,lat,lon] or [ensemble,year,month,level,lat,lon]
+        [model,ensemble,year,lat,lon] or [model,ensemble,year,level,lat,lon]
 
     Usage
     -----
@@ -45,19 +45,19 @@ def detrendData(datavar,level,timeperiod):
     
     ### Detrend data array
     if level == 'surface':
-        x = np.arange(datavar.shape[1])
+        x = np.arange(datavar.shape[2])
         
-        slopes = np.empty((datavar.shape[0],datavar.shape[2],datavar.shape[3],
+        slopes = np.empty((datavar.shape[0],datavar.shape[1],datavar.shape[3],
                           datavar.shape[4]))
-        intercepts = np.empty((datavar.shape[0],datavar.shape[2],datavar.shape[3],
+        intercepts = np.empty((datavar.shape[0],datavar.shape[1],datavar.shape[3],
                       datavar.shape[4]))
         for ens in range(datavar.shape[0]):
-            print('-- Detrended data for ensemble member -- #%s!' % (ens+1))
-            for mo in range(datavar.shape[2]):
+            print('-- Detrended data for model -- #%s!' % (ens+1))
+            for mo in range(datavar.shape[1]):
                 for i in range(datavar.shape[3]):
                     for j in range(datavar.shape[4]):
-                        mask = np.isfinite(datavar[ens,:,mo,i,j])
-                        y = datavar[ens,:,mo,i,j]
+                        mask = np.isfinite(datavar[ens,mo,:,i,j])
+                        y = datavar[ens,mo,:,i,j]
                         
                         if np.sum(mask) == y.shape[0]:
                             xx = x
@@ -79,8 +79,8 @@ def detrendData(datavar,level,timeperiod):
             for yr in range(datavar.shape[1]):
                 for mo in range(datavar.shape[2]):
                     datavardt[ens,yr,mo,:,:] = datavar[ens,yr,mo,:,:] - \
-                                        (slopes[ens,mo,:,:]*x[yr] + \
-                                         intercepts[ens,mo,:,:])
+                                        (slopes[ens,yr,:,:]*x[mo] + \
+                                         intercepts[ens,yr,:,:])
                                 
     elif level == 'profile':
         x = np.arange(datavar.shape[1])

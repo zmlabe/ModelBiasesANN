@@ -23,7 +23,7 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-variablesall = ['P']
+variablesall = ['T2M']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -58,7 +58,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = False
+        rm_annual_mean = True
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False

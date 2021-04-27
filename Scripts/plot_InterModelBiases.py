@@ -39,6 +39,9 @@ monthlychoiceq = ['JFM','AMJ','JAS','OND','annual']
 variables = ['T2M','P','SLP']
 reg_name = 'SMILEGlobe'
 level = 'surface'
+monthlychoiceq = ['annual']
+variables = ['T2M']
+timeper = 'historical'
 ###############################################################################
 ###############################################################################
 land_only = False
@@ -70,8 +73,8 @@ shuffletype = 'none'
 ###############################################################################
 ###############################################################################
 ### Read in model data
-def read_primary_dataset(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
-    data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype)
+def read_primary_dataset(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
+    data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
     datar,lats,lons = df.getRegion(data,lats,lons,lat_bounds,lon_bounds)
     print('\nOur dataset: ',dataset,' is shaped',data.shape)
     return datar,lats,lons
@@ -88,7 +91,7 @@ for vv in range(len(variables)):
         ### Read data
         models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
                                                 lensalso,randomalso,ravelyearsbinary,
-                                                ravelbinary,shuffletype,
+                                                ravelbinary,shuffletype,timeper,
                                                 lat_bounds,lon_bounds)
         
         ### Calculate ensemble mean

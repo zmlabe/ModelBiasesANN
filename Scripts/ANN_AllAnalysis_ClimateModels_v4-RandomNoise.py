@@ -66,7 +66,7 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'P'
 reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################
@@ -90,7 +90,7 @@ else:
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = False
+rm_annual_mean = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -113,7 +113,7 @@ ensTypeExperi = 'ENS'
 # shuffletype = 'ALLENSRAND'
 # shuffletype = 'ALLENSRANDrmmean'
 shuffletype = 'RANDGAUSS'
-sizeOfTwin = 2 # name of experiment for adding noise class #8
+sizeOfTwin = 4 # name of experiment for adding noise class #8
 if sizeOfTwin > 0:
     sizeOfTwinq = 1
 else:
@@ -908,8 +908,8 @@ for sis,singlesimulation in enumerate(datasetsingle):
                     ### Adding random data
                     if sizeOfTwin > 0:
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
-                        data = dSS.addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
-                    sys.exit()
+                        data = dSS.addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
