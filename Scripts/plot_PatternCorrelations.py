@@ -1,5 +1,5 @@
 """
-Script for plotting pattern correlations between models and observations
+Script for calculating pattern correlations between models and observations
 
 Author     : Zachary M. Labe
 Date       : 27 April 2021
@@ -8,16 +8,8 @@ Version    : 1
 
 ### Import packages
 import sys
-import math
-import time
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import scipy.stats as stats
-from mpl_toolkits.basemap import Basemap, addcyclic, shiftgrid
-import palettable.cubehelix as cm
-import palettable.scientific.sequential as sss
-import cmocean as cmocean
 import calc_Utilities as UT
 import calc_dataFunctions as df
 import calc_Stats as dSS
@@ -36,11 +28,11 @@ modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
-monthlychoiceq = ['JFM','AMJ','JAS','OND','annual']
-variables = ['T2M','P','SLP']
+monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
+variables = ['T2M']
 reg_name = 'SMILEGlobe'
 level = 'surface'
-timeper = 'historical'
+timeper = 'future'
 ###############################################################################
 ###############################################################################
 land_only = False
@@ -118,7 +110,7 @@ for vv in range(len(variables)):
         monthlychoice = monthlychoiceq[mo]
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
         directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/patternCorr/%s/' % variq
-        saveData =  monthlychoice + '_' + variq + '_' + reg_name
+        saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + timeper
         print('*Filename == < %s >' % saveData) 
         
         ### Read data
@@ -130,6 +122,12 @@ for vv in range(len(variables)):
                                                       lensalso,randomalso,ravelyearsbinary,
                                                       ravelbinary,shuffletype,lat_bounds,
                                                       lon_bounds)
+        
+        ### Only 70 years so through 2090 if future (2020-2089)
+        if timeper == 'future':
+            models = models[:,:,:70,:,:]
+            print('ITS THE FUTURE!')
+        sys.exit()
         
         ### Add on additional "model" which is a multi-model mean
         modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
