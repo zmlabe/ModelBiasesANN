@@ -31,7 +31,7 @@ variables = ['T2M','P','SLP']
 reg_name = 'SMILEGlobe'
 level = 'surface'
 timeper = 'future'
-option = 8
+option = 2
 
 ### Read in data
 for vv in range(len(variables)):
@@ -113,7 +113,7 @@ for vv in range(len(variables)):
             
             plt.xticks(np.arange(2020,2091,5),map(str,np.arange(2020,2091,5)),size=6)
             plt.yticks(np.arange(0,12+1,1),modelGCMs,size=6)
-            plt.xlim([2020,2020])   
+            plt.xlim([2020,2090])   
             plt.ylim([0,option-1])
             
             plt.title(r'\textbf{FUTURE PATTERN CORRELATIONS FOR [ %s ]}' % variables[vv],color='k',fontsize=15)
@@ -121,7 +121,7 @@ for vv in range(len(variables)):
                         color='dimgrey',fontsize=8)
             
             for te in range(len(uni)):
-                plt.text(2022,uni[te],r'\textbf{\#%s}' % cou[te],fontsize=7,color='k',
+                plt.text(2092,uni[te],r'\textbf{\#%s}' % cou[te],fontsize=7,color='k',
                           ha='center',va='center')
             
 ###############################################################################

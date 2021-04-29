@@ -4,8 +4,8 @@ explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 26 April 2021
-Version    : 4 - subsamples random weight class (#8), but tries different noise
+Date       : 29 April 2021
+Version    : 4.1 - uses 9 classes (MMean + random noise)
 """
 
 ### Import packages
@@ -90,7 +90,7 @@ else:
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = False
+rm_annual_mean = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -113,11 +113,8 @@ ensTypeExperi = 'ENS'
 # shuffletype = 'ALLENSRAND'
 # shuffletype = 'ALLENSRANDrmmean'
 shuffletype = 'RANDGAUSS'
-sizeOfTwin = 4 # name of experiment for adding noise class #8
-if sizeOfTwin > 0:
-    sizeOfTwinq = 1
-else:
-    sizeOfTwinq = sizeOfTwin
+sizeOfTwinq = 2 # Name of experiment for adding noise classs #8 & #9
+    
 ###############################################################################
 ###############################################################################
 if ensTypeExperi == 'ENS':
@@ -216,7 +213,7 @@ if rm_ensemble_mean == False:
                     if rm_annual_mean == False:
                         typeOfAnalysis = 'Experiment-3'
                         if variq == 'T2M':
-                            integer = 20 # random noise value to add/subtract from each grid point
+                            integer = 2 # random noise value to add/subtract from each grid point
                         elif variq == 'P':
                             integer = 20 # random noise value to add/subtract from each grid point
                         elif variq == 'SLP':
@@ -230,7 +227,7 @@ if rm_ensemble_mean == False:
                     if rm_annual_mean == True:
                         typeOfAnalysis = 'Experiment-4'
                         if variq == 'T2M':
-                            integer = 25 # random noise value to add/subtract from each grid point
+                            integer = 2 # random noise value to add/subtract from each grid point
                         elif variq == 'P':
                             integer = 15 # random noise value to add/subtract from each grid point
                         elif variq == 'SLP':
@@ -288,11 +285,11 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIFrand_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIFrand_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_NoiseTwinSingleMODDIFrand_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
@@ -307,6 +304,8 @@ if seasons != 'none':
         
     ### Add random noise models
     randomNoiseClass = np.full((sizeOfTwinq,numOfEns,len(yearsall)),i+1)
+    if sizeOfTwinq > 1:
+        randomNoiseClass[sizeOfTwinq-1,:,:] = i+sizeOfTwinq    
     classesl = np.append(classesl,randomNoiseClass,axis=0)
         
     if ensTypeExperi == 'ENS':
@@ -906,10 +905,12 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         print('\n*Removed land data*')     
 ###############################################################################
                     ### Adding random data
-                    if sizeOfTwin > 0:
+                    if sizeOfTwinq > 0:
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
-                        data = dSS.addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
-
+                        data = dSS.addNoiseTwinSingle(data,data_obs,integer,4,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+                        
+                        random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
+                        data = dSS.addNoiseTwinSingle(data,data_obs,integer,1,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
 ###############################################################################
 ###############################################################################
 ###############################################################################

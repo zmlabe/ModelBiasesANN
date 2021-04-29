@@ -3,8 +3,8 @@ ANN for evaluating model biases, differences, and other thresholds using
 explainable AI for historical data with a focus on observational predictions
 
 Author     : Zachary M. Labe
-Date       : 26 April 2021
-Version    : 1 - subsamples random weight class (#8), but tries different noise
+Date       : 29 April 2021
+Version    : 1 - adds extra class (#8), but tries the MMean
 """
 
 ### Import packages
@@ -28,7 +28,6 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-variablesall = ['T2M']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -37,7 +36,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Data preliminaries 
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-NoiseTwinSingle/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-Mmean/'
         letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
         ###############################################################################
         ###############################################################################
@@ -125,7 +124,7 @@ for va in range(len(variablesall)):
         lrpRule = 'z'
         normLRP = True
         ###############################################################################
-        modelGCMsNames = np.append(modelGCMs,['NOISE-MODELS'])
+        modelGCMsNames = np.append(modelGCMs,['MMean'])
 
         ###############################################################################
         ###############################################################################
@@ -372,8 +371,8 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         ### Plot subplot of LRP means training
-        limit = np.arange(0,0.60001,0.005)
-        barlim = np.round(np.arange(0,0.601,0.1),2)
+        limit = np.arange(0,0.80001,0.005)
+        barlim = np.round(np.arange(0,0.801,0.1),2)
         cmap = cm.cubehelix2_16.mpl_colormap
         label = r'\textbf{Relevance - [ %s - OBS ] - %s}' % (variq,typeOfAnalysis)
         

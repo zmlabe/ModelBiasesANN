@@ -23,7 +23,7 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-# variablesall = ['T2M']
+variablesall = ['T2M']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -48,17 +48,17 @@ for va in range(len(variablesall)):
         ###############################################################################
         pickSMILE = pickSMILEall[m]
         if len(pickSMILE) >= 1:
-            lenOfPicks = len(pickSMILE) + 1 # For random class
+            lenOfPicks = len(pickSMILE) 
         else:
-            lenOfPicks = len(modelGCMs) + 1 # For random class
+            lenOfPicks = len(modelGCMs)
         ###############################################################################
         ###############################################################################
         land_only = False
-        ocean_only = True
+        ocean_only = False
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = False
+        rm_annual_mean = True
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -77,7 +77,7 @@ for va in range(len(variablesall)):
         # shuffletype = 'ALLENSRANDrmmean'
         shuffletype = 'RANDGAUSS'
         # integer = 5 # random noise value to add/subtract from each grid point
-        sizeOfTwin = 1 # number of classes to add to other models
+        sizeOfTwinq = 2 # Name of experiment for adding noise classs #8 & #9
         ###############################################################################
         ###############################################################################
         if ensTypeExperi == 'ENS':
@@ -114,13 +114,14 @@ for va in range(len(variablesall)):
         ###############################################################################
         ravelyearsbinary = False
         ravelbinary = False
-        num_of_class = lenOfPicks
+        num_of_class = lenOfPicks + sizeOfTwinq
         ###############################################################################
         ###############################################################################
         lrpRule = 'z'
         normLRP = True
         ###############################################################################
-        modelGCMsNames = np.append(modelGCMs,['MMean'])
+        modelGCMsNamesq = np.append(modelGCMs,['MMean'])
+        modelGCMsNames = np.append(modelGCMsNamesq,['NOISE'])
 
         ###############################################################################
         ###############################################################################
@@ -208,11 +209,11 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIFrand_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         elif ocean_only == True:
-            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIFrand_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         else:
-            saveData = timeper + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_NoiseTwinSingleMODDIFrand_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
         ###############################################################################
@@ -225,7 +226,9 @@ for va in range(len(variablesall)):
                 classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
                 
             ### Add random noise models
-            randomNoiseClass = np.full((sizeOfTwin,numOfEns,len(yearsall)),i+1)
+            randomNoiseClass = np.full((sizeOfTwinq,numOfEns,len(yearsall)),i+1)
+            if sizeOfTwinq > 1:
+                randomNoiseClass[sizeOfTwinq-1,:,:] = i+sizeOfTwinq    
             classesl = np.append(classesl,randomNoiseClass,axis=0)
                 
             if ensTypeExperi == 'ENS':
@@ -550,9 +553,9 @@ for va in range(len(variablesall)):
                     edgecolor='k',linewidth=0.4,zorder=10)
         
         plt.xticks(np.arange(1950,2021,5),map(str,np.arange(1950,2021,5)),size=6)
-        plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
+        plt.yticks(np.arange(0,num_of_class+1,1),modelGCMsNames,size=6)
         plt.xlim([1950,2020])   
-        plt.ylim([0,lenOfPicks-1])
+        plt.ylim([0,num_of_class-1])
         plt.xlabel(r'\textbf{Predictions - [ %s - OBSERVATIONS ] - %s}' % (variq,typeOfAnalysis))
         
         ###############################################################################
@@ -569,28 +572,29 @@ for va in range(len(variablesall)):
         ax.tick_params('x',length=0,width=0,which='major',color='dimgrey')
         
         perfect = np.unique(classesltest,return_counts=True)[1]
-        newcounttest = counttest[:lenOfPicks-1]/sts.mode(perfect)[0][0]
+        newcounttest = counttest[:num_of_class-1]/sts.mode(perfect)[0][0]
         newcounttest = np.append(newcounttest,[counttest[-1]/perfect[-1]])*100
         rects = plt.bar(uniquetest,newcounttest, align='center')
         plt.axhline(y=100,linestyle='--',linewidth=2,color='k',
                     clip_on=False,zorder=100,dashes=(1,0.3))
         
         ### Set color
-        colorlist = [cc.Antique_8.mpl_colormap(1/8),
-                      cc.Antique_8.mpl_colormap(0/8),
-                      cc.Antique_8.mpl_colormap(3/8),
-                      cc.Antique_8.mpl_colormap(5/8),
-                      cc.Antique_8.mpl_colormap(4/8),
-                      cc.Antique_8.mpl_colormap(6/8),
-                      cc.Antique_8.mpl_colormap(7/8),
-                      cc.Antique_8.mpl_colormap(8/8)]
-        for i in range(lenOfPicks):
+        colorlist = [cc.Antique_8.mpl_colormap(1/9),
+                      cc.Antique_8.mpl_colormap(0/9),
+                      cc.Antique_8.mpl_colormap(3/9),
+                      cc.Antique_8.mpl_colormap(5/9),
+                      cc.Antique_8.mpl_colormap(4/9),
+                      cc.Antique_8.mpl_colormap(6/9),
+                      cc.Antique_8.mpl_colormap(7/9),
+                      cc.Antique_8.mpl_colormap(8/9),
+                      cc.Antique_8.mpl_colormap(9/9)]
+        for i in range(num_of_class):
             rects[i].set_color(colorlist[i])
             rects[i].set_edgecolor(colorlist[i])
         
-        plt.xticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=6)
+        plt.xticks(np.arange(0,num_of_class+1,1),modelGCMsNames,size=6)
         plt.yticks(np.arange(0,520,25),map(str,np.arange(0,520,25)),size=6)
-        plt.xlim([-0.5,lenOfPicks-1+0.5])   
+        plt.xlim([-0.5,num_of_class-1+0.5])   
         plt.ylim([0,150])
         plt.xlabel(r'\textbf{Frequency [\%%] - [ %s - TESTING ] - %s}' % (variq,typeOfAnalysis))
         

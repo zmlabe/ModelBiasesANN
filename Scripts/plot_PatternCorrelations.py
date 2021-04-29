@@ -29,7 +29,7 @@ letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
-variables = ['T2M']
+variables = ['T2M','P','SLP']
 reg_name = 'SMILEGlobe'
 level = 'surface'
 timeper = 'future'
@@ -126,8 +126,8 @@ for vv in range(len(variables)):
         ### Only 70 years so through 2090 if future (2020-2089)
         if timeper == 'future':
             models = models[:,:,:70,:,:]
-            print('ITS THE FUTURE!')
-        sys.exit()
+            yearsall = np.arange(2020,2089+1,1)
+            baseline = np.arange(2021,2050+1,1)
         
         ### Add on additional "model" which is a multi-model mean
         modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
