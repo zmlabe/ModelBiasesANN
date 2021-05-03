@@ -363,6 +363,7 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
     """
     import numpy as np
     import sys
+    print('\n----------- USING EXPERIMENT CLASS #%s -----------' % sizeOfTwin)
     
     if sizeOfTwin == 1: 
         """
@@ -378,7 +379,7 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
         randomNoiseTwin = randomNoiseTwinq.reshape(randomNoiseTwinq.shape[0]*randomNoiseTwinq.shape[1],
                                                   randomNoiseTwinq.shape[2],randomNoiseTwinq.shape[3],
                                                   randomNoiseTwinq.shape[4])
-        print('\n--Size of noise twin --->',randomNoiseTwin.shape)
+        print('--Size of noise twin --->',randomNoiseTwin.shape)
         print('<<Added noise of +-%s at every grid point for twin!>>' % integer)
         
         ### Calculating random subsample
@@ -437,7 +438,7 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
         randomNoiseTwin = randomNoiseTwinq.reshape(randomNoiseTwinq.shape[0]*randomNoiseTwinq.shape[1],
                                                   randomNoiseTwinq.shape[2],randomNoiseTwinq.shape[3],
                                                   randomNoiseTwinq.shape[4])
-        print('\n--Size of noise twin --->',randomNoiseTwin.shape)
+        print('--Size of noise twin --->',randomNoiseTwin.shape)
         print('<<Added noise of multimodel bias>>')
         
         ### Calculating random subsample
@@ -494,7 +495,7 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
         randomNoiseTwin = randomNoiseTwinq.reshape(randomNoiseTwinq.shape[0]*randomNoiseTwinq.shape[1],
                                                   randomNoiseTwinq.shape[2],randomNoiseTwinq.shape[3],
                                                   randomNoiseTwinq.shape[4])
-        print('\n--Size of noise twin --->',randomNoiseTwin.shape)
+        print('--Size of noise twin --->',randomNoiseTwin.shape)
         print('<<Added noise of observational bias>>')
         
         ### Calculating random subsample
@@ -545,7 +546,7 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
         newmodels = data.copy()
         multimodelmean = np.nanmean(newmodels,axis=0)
         randomNoiseTwin = multimodelmean
-        print('\n--Size of noise twin --->',randomNoiseTwin.shape)
+        print('--Size of noise twin --->',randomNoiseTwin.shape)
         print('<<Added noise of multimodel mean class>>')
         
         ### Add new class
@@ -577,7 +578,7 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
         
         ### Add new class
         noiseModelClass = randomNoiseTwin[np.newaxis,:,:,:,:]
-        print('\n--Size of noise twin --->',randomNoiseTwin.shape)
+        print('--Size of noise twin --->',randomNoiseTwin.shape)
         print('<<Added noise of random numbers class for +-%s>>' % integer)
         
         ### Mask land or ocean if necessary
@@ -597,11 +598,48 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
         ### Make new class of noisy twin subsample
         dataclass = np.append(data,noiseModelClass,axis=0)
         
+    elif sizeOfTwin == 6:
+        """ 
+        Adds random noise numbers
+        """
+        newmodels = data.copy()
+        testens = newmodels[6,:,:,:,:] # 6 for LENS
+
+        newmodeltest = np.empty(testens.shape)
+        for sh in range(testens.shape[0]):
+            ensnum = np.arange(data.shape[1])
+            slices = np.random.choice(ensnum,size=data.shape[0],replace=False)
+            slicenewmodel = np.nanmean(testens[slices,:,:,:],axis=0)
+            newmodeltest[sh,:,:,:] = slicenewmodel
+        
+        ### Add new class
+        noiseModelClass = newmodeltest[np.newaxis,:,:,:,:]
+        print('--Size of noise twin --->',newmodeltest.shape)
+        print('<<Added noise of shuffled model 7x for 16 ensembles>>')
+        
+        ### Mask land or ocean if necessary
+        if maskNoiseClass != 'none':
+            if maskNoiseClass == 'land':
+                emptyobs = np.full((noiseModelClass.shape[2],noiseModelClass.shape[3],noiseModelClass.shape[4]),np.nan)
+                noiseModelClass,wrong_obs = remove_ocean(noiseModelClass,emptyobs,lat_bounds,lon_bounds) 
+                print('\n*Removed land data - OCEAN TWIN*')
+            elif maskNoiseClass == 'ocean':
+                emptyobs = np.full((noiseModelClass.shape[2],noiseModelClass.shape[3],noiseModelClass.shape[4]),np.nan)
+                noiseModelClass,wrong_obs = remove_land(noiseModelClass,emptyobs,lat_bounds,lon_bounds)                 
+                print('\n*Removed land data - NOISE TWIN*')  
+            else:
+                print(ValueError('SOMETHING IS WRONG WITH MASKING NOISE TWIN!'))
+                sys.exit()
+        
+        ### Make new class of noisy twin subsample
+        dataclass = np.append(data,noiseModelClass,axis=0)
+        
     else:
-        print(ValueError('Double check the size of the twin class!'))
+        print(ValueError('Double check experiment for random class!'))
         sys.exit()
     
-    print('--NEW Size of noise twin class--->',dataclass.shape)
+    print('--NEW Size of noise class--->',dataclass.shape)
+    print('----------- ENDING EXPERIMENT CLASS #%s -----------' % sizeOfTwin)
     return dataclass
 
 ###############################################################################

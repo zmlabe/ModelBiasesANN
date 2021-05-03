@@ -66,7 +66,7 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'P'
 reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################
@@ -215,9 +215,9 @@ if rm_ensemble_mean == False:
                         if variq == 'T2M':
                             integer = 2 # random noise value to add/subtract from each grid point
                         elif variq == 'P':
-                            integer = 20 # random noise value to add/subtract from each grid point
+                            integer = 2 # random noise value to add/subtract from each grid point
                         elif variq == 'SLP':
-                            integer = 20 # random noise value to add/subtract from each grid point
+                            integer = 2 # random noise value to add/subtract from each grid point
 # Experiment #4
 if rm_ensemble_mean == False:
     if window == 0:
@@ -229,9 +229,9 @@ if rm_ensemble_mean == False:
                         if variq == 'T2M':
                             integer = 2 # random noise value to add/subtract from each grid point
                         elif variq == 'P':
-                            integer = 15 # random noise value to add/subtract from each grid point
+                            integer = 2 # random noise value to add/subtract from each grid point
                         elif variq == 'SLP':
-                            integer = 5 # random noise value to add/subtract from each grid point
+                            integer = 2 # random noise value to add/subtract from each grid point
 # Experiment #5
 if rm_ensemble_mean == False:
     if window == 0:
@@ -312,7 +312,10 @@ if seasons != 'none':
         classeslnew = np.swapaxes(classesl,0,1)
     elif ensTypeExperi == 'GCM':
         classeslnew = classesl
-      
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################    
 ### Begin ANN and the entire script
 for sis,singlesimulation in enumerate(datasetsingle):
     lrpsns = []
@@ -910,7 +913,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         data = dSS.addNoiseTwinSingle(data,data_obs,integer,4,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
                         
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
-                        data = dSS.addNoiseTwinSingle(data,data_obs,integer,1,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+                        data = dSS.addNoiseTwinSingle(data,data_obs,integer,6,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
 ###############################################################################
 ###############################################################################
 ###############################################################################
