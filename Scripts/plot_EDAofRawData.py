@@ -32,7 +32,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 ###############################################################################
 ### Data preliminaries 
 modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS']
-modelGCMsMM = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS','LENSsubtest']
+modelGCMsMM = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS','MMean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
@@ -40,7 +40,7 @@ monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
 reg_name = 'SMILEGlobe'
 level = 'surface'
-timeper = 'historical'
+timeper = 'future'
 directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/interModel/%s/' % variables[0]
 ###############################################################################
 ###############################################################################
@@ -48,11 +48,17 @@ land_only = False
 ocean_only = False
 ###############################################################################
 ###############################################################################
-baseline = np.arange(1951,1980+1,1)
+if timeper == 'historical': 
+    baseline = np.arange(1951,1980+1,1)
+elif timeper == 'future':
+    baseline = np.arange(2021,2050+1,1)
 ###############################################################################
 ###############################################################################
 window = 0
-yearsall = np.arange(1950+window,2019+1,1)
+if timeper == 'historical': 
+    yearsall = np.arange(1950+window,2019+1,1)
+elif timeper == 'future':
+    yearsall = np.arange(2020+window,2099+1,1)
 ###############################################################################
 ###############################################################################
 numOfEns = 16
@@ -108,41 +114,41 @@ def calcTrend(data):
     print('Completed: Finished calculating trends!')      
     return dectrend
 
-# ###############################################################################
-# ###############################################################################
-# ###############################################################################
-# ###############################################################################
-# ### Call functions
-# variq = variables[0]
-# monthlychoice = monthlychoiceq[0]
-# directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
-# directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/patternCorr/%s/' % variq
-# saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + timeper
-# print('*Filename == < %s >' % saveData) 
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+### Call functions
+variq = variables[0]
+monthlychoice = monthlychoiceq[0]
+directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
+directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/patternCorr/%s/' % variq
+saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + timeper
+print('*Filename == < %s >' % saveData) 
 
-# ### Read data
-# models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
-#                                         lensalso,randomalso,ravelyearsbinary,
-#                                         ravelbinary,shuffletype,timeper,
-#                                         lat_bounds,lon_bounds)
-# data_obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,
-#                                               lensalso,randomalso,ravelyearsbinary,
-#                                               ravelbinary,shuffletype,lat_bounds,
-#                                               lon_bounds)
+### Read data
+models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
+                                        lensalso,randomalso,ravelyearsbinary,
+                                        ravelbinary,shuffletype,timeper,
+                                        lat_bounds,lon_bounds)
+data_obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,
+                                              lensalso,randomalso,ravelyearsbinary,
+                                              ravelbinary,shuffletype,lat_bounds,
+                                              lon_bounds)
 
-# ### Only 70 years so through 2090 if future (2020-2089)
-# if timeper == 'future':
-#     models = models[:,:,:70,:,:]
-#     yearsall = np.arange(2020,2089+1,1)
-#     baseline = np.arange(2021,2050+1,1)
+### Only 70 years so through 2090 if future (2020-2089)
+if timeper == 'future':
+    models = models[:,:,:70,:,:]
+    yearsall = np.arange(2020,2089+1,1)
+    baseline = np.arange(2021,2050+1,1)
 
-# ### Add on additional "model" which is a multi-model mean
-# modelmean = np.nanmean(models,axis=0)
-# modelmeanq = modelmean[np.newaxis,:,:,:,:]
-# modelsall = np.append(models,modelmeanq,axis=0)
+### Add on additional "model" which is a multi-model mean
+modelmean = np.nanmean(models,axis=0)
+modelmeanq = modelmean[np.newaxis,:,:,:,:]
+modelsall = np.append(models,modelmeanq,axis=0)
 
-# ### Meshgrid of lat/lon
-# lon2,lat2 = np.meshgrid(lons,lats)
+### Meshgrid of lat/lon
+lon2,lat2 = np.meshgrid(lons,lats)
 
 ### Additional subsample of a model for testing
 newmodels = models.copy()
@@ -196,18 +202,26 @@ if variq == 'T2M':
     limit = np.arange(-0.75,0.76,0.01)
     barlim = np.round(np.arange(-0.75,0.76,0.25),2)
     cmap = cmocean.cm.balance
-    label = r'\textbf{STD-%s -- [$^{\circ}$C MMmean difference] -- 1950-2019}' % variq
+    if timeper == 'historical':
+        label = r'\textbf{STD-%s -- [$^{\circ}$C MMmean difference] -- 1950-2019}' % variq
+    elif timeper == 'future':
+        label = r'\textbf{STD-%s -- [$^{\circ}$C MMmean difference] -- 2020-2089}' % variq
 elif variq == 'P':
     limit = np.arange(-3,3.01,0.01)
     barlim = np.round(np.arange(-3,3.1,1),2)
-    cmap = cmocean.cm.tarn                                                                                                                                  
-    label = r'\textbf{STD-%s -- [mm/day MMmean difference] -- 1950-2019}' % variq
+    cmap = cmocean.cm.tarn   
+    if timeper == 'historical':                                                                                                                               
+        label = r'\textbf{STD-%s -- [mm/day MMmean difference] -- 1950-2019}' % variq
+    elif timeper == 'future':
+        label = r'\textbf{STD-%s -- [mm/day MMmean difference] -- 2020-2089}' % variq
 elif variq == 'SLP':
     limit = np.arange(-5,5.1,0.25)
     barlim = np.round(np.arange(-5,6,1),2)
     cmap = cmocean.cm.diff
-    label = r'\textbf{STD-%s -- [hPa MMmean difference] -- 1950-2019}' % variq
-
+    if timeper == 'historical':
+        label = r'\textbf{STD-%s -- [hPa MMmean difference] -- 1950-2019}' % variq
+    elif timeper == 'future':
+        label = r'\textbf{STD-%s -- [hPa MMmean difference] -- 2020-2089}' % variq
 fig = plt.figure(figsize=(8,4))
 for r in range(len(alstdyr)):
     var = alstdyr[r] - mmstdyr
@@ -260,19 +274,28 @@ if variq == 'T2M':
     limit = np.arange(-0.75,0.76,0.01)
     barlim = np.round(np.arange(-0.75,0.76,0.25),2)
     cmap = cmocean.cm.balance
-    label = r'\textbf{STD-%s -- [$^{\circ}$C OBS difference] -- 1950-2019}' % variq
+    if timeper == 'historical':
+        label = r'\textbf{STD-%s -- [$^{\circ}$C OBS difference] -- 1950-2019}' % variq
+    elif timeper == 'future':
+        label = r'\textbf{STD-%s -- [$^{\circ}$C OBS difference] -- 2020-2089}' % variq
 elif variq == 'P':
     limit = np.arange(-3,3.01,0.01)
     barlim = np.round(np.arange(-3,3.1,1),2)
-    cmap = cmocean.cm.tarn                                                                                                                                  
-    label = r'\textbf{STD-%s -- [mm/day OBS difference] -- 1950-2019}' % variq
+    cmap = cmocean.cm.tarn              
+    if timeper == 'historical':                                                                                                                    
+        label = r'\textbf{STD-%s -- [mm/day OBS difference] -- 1950-2019}' % variq
+    elif timeper == 'future':
+        label = r'\textbf{STD-%s -- [mm/day OBS difference] -- 2020-2089}' % variq
 elif variq == 'SLP':
     limit = np.arange(-5,5.1,0.25)
     barlim = np.round(np.arange(-5,6,1),2)
     cmap = cmocean.cm.diff
-    label = r'\textbf{STD-%s -- [hPa OBS difference] -- 1950-2019}' % variq
+    if timeper == 'historical':
+        label = r'\textbf{STD-%s -- [hPa OBS difference] -- 1950-2019}' % variq
+    elif timeper == 'future':
+        label = r'\textbf{STD-%s -- [hPa OBS difference] -- 2020-2089}' % variq
 
-totallstdyr = np.append(alstdyr,enstdyr[np.newaxis,:,:],axis=0)
+totallstdyr = np.append(alstdyr,mmstdyr[np.newaxis,:,:],axis=0)
 
 fig = plt.figure(figsize=(8,4))
 for r in range(len(totallstdyr)):
@@ -313,4 +336,4 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
 
-plt.savefig(directoryfigure + 'STD-MultiModelOBSBias-%s_ALL_subenstest.png' % saveData,dpi=300)
+plt.savefig(directoryfigure + 'STD-MultiModelOBSBias-%s_ALL.png' % saveData,dpi=300)

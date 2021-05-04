@@ -79,7 +79,7 @@ else:
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = False
+ocean_only = True
 if land_only == True:
     maskNoiseClass = 'land'
 elif ocean_only == True:
