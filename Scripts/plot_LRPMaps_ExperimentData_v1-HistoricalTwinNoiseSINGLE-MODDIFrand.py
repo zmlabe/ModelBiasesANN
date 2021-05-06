@@ -58,7 +58,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = True
+        rm_annual_mean = False
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -120,8 +120,8 @@ for va in range(len(variablesall)):
         lrpRule = 'z'
         normLRP = True
         ###############################################################################
-        modelGCMsNamesq = np.append(modelGCMs,['MMean'])
-        modelGCMsNames = np.append(modelGCMsNamesq,['NOISE'])
+        modelGCMsNamesq = np.append(modelGCMs,['MMmean'])
+        modelGCMsNames = np.append(modelGCMsNamesq,['LENSmean'])
 
         ###############################################################################
         ###############################################################################
@@ -235,7 +235,7 @@ for va in range(len(variablesall)):
                 classeslnew = np.swapaxes(classesl,0,1)
             elif ensTypeExperi == 'GCM':
                 classeslnew = classesl
-
+        lenOfPicks = num_of_class
         ###############################################################################
         ###############################################################################
         ###############################################################################

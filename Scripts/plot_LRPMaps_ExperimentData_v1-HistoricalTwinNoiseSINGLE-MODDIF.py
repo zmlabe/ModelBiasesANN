@@ -53,7 +53,7 @@ for va in range(len(variablesall)):
             lenOfPicks = len(modelGCMs) + 1 # For random class
         ###############################################################################
         ###############################################################################
-        land_only = False
+        land_only = True
         ocean_only = False
         ###############################################################################
         ###############################################################################
@@ -208,11 +208,11 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         elif ocean_only == True:
-            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         else:
-            saveData = timeper + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
         ###############################################################################
@@ -379,6 +379,11 @@ for va in range(len(variablesall)):
             
             cs1 = m.contourf(x,y,var,limit,extend='max')
             cs1.set_cmap(cmap) 
+            
+            if ocean_only == True:
+                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+            elif land_only == True:
+                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
                     
             ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
                           textcoords='axes fraction',color='dimgrey',fontsize=8,
@@ -437,6 +442,11 @@ for va in range(len(variablesall)):
         cs1 = m.contourf(x,y,var,limit,extend='max')
         cs1.set_cmap(cmap) 
         
+        if ocean_only == True:
+            m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+        elif land_only == True:
+            m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+        
         ax1.annotate(r'\textbf{1950--2019}' ,xy=(0,0),xytext=(0.01,0.90),
                       textcoords='axes fraction',color='k',fontsize=11,
                       rotation=0,ha='center',va='center')        
@@ -461,6 +471,11 @@ for va in range(len(variablesall)):
         
         cs2 = m.contourf(x,y,var,limit,extend='max')
         cs2.set_cmap(cmap) 
+
+        if ocean_only == True:
+            m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+        elif land_only == True:
+            m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
         
         ax2.annotate(r'\textbf{%s}' % modelPickObs,xy=(0,0),xytext=(0.01,0.90),
                       textcoords='axes fraction',color='k',fontsize=11,
@@ -489,6 +504,11 @@ for va in range(len(variablesall)):
         
         cs3 = m.contourf(x,y,var,limit,extend='max')
         cs3.set_cmap(cmap) 
+        
+        if ocean_only == True:
+            m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+        elif land_only == True:
+            m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
         
         ax3.annotate(r'\textbf{OTHER}',xy=(0,0),xytext=(0.01,0.90),
                       textcoords='axes fraction',color='k',fontsize=11,

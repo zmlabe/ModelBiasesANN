@@ -68,7 +68,7 @@ dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
 reg_name = 'SMILEGlobe'
-timeper = 'future'
+timeper = 'historical'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
@@ -79,7 +79,7 @@ else:
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = True
+ocean_only = False
 if land_only == True:
     maskNoiseClass = 'land'
 elif ocean_only == True:
@@ -288,11 +288,11 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_NoiseTwinSingleMODDIF_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
@@ -304,16 +304,20 @@ if seasons != 'none':
     classesl = np.empty((lenOfPicks,numOfEns,len(yearsall)))
     for i in range(lenOfPicks):
         classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
-        
-    ### Add random noise models
-    randomNoiseClass = np.full((sizeOfTwinq,numOfEns,len(yearsall)),i+1)
-    classesl = np.append(classesl,randomNoiseClass,axis=0)
+    
+    if sizeOfTwin > 0:    
+        ### Add random noise models
+        randomNoiseClass = np.full((sizeOfTwinq,numOfEns,len(yearsall)),i+1)
+        classesl = np.append(classesl,randomNoiseClass,axis=0)
         
     if ensTypeExperi == 'ENS':
         classeslnew = np.swapaxes(classesl,0,1)
     elif ensTypeExperi == 'GCM':
         classeslnew = classesl
-      
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################     
 ### Begin ANN and the entire script
 for sis,singlesimulation in enumerate(datasetsingle):
     lrpsns = []
@@ -801,6 +805,8 @@ for sis,singlesimulation in enumerate(datasetsingle):
         biasBool = False
         hiddensList = [[10,10]]
         ridge_penalty = [0.10]
+        # hiddensList = [[8,8]]
+        # ridge_penalty = [0.2]
         actFun = 'relu'
         
         if any([maskNoiseClass=='land',maskNoiseClass=='ocean']):

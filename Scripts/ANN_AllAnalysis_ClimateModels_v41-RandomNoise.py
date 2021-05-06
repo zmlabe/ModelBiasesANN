@@ -66,9 +66,9 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'P'
 reg_name = 'SMILEGlobe'
-timeper = 'future'
+timeper = 'historical'
 ###############################################################################
 ###############################################################################
 pickSMILE = []
@@ -78,7 +78,7 @@ else:
     lenOfPicks = len(modelGCMs)
 ###############################################################################
 ###############################################################################
-land_only = True
+land_only = False
 ocean_only = False
 if land_only == True:
     maskNoiseClass = 'land'

@@ -1,20 +1,21 @@
 """
-Script for calculating point by point correlations between models and observations
+Script for calculating pattern correlations between models and observations
 
 Author     : Zachary M. Labe
-Date       : 4 May 2021
+Date       : 6 May 2021
 Version    : 1
 """
 
 ### Import packages
 import sys
 import matplotlib.pyplot as plt
-import cmocean
 import numpy as np
 import calc_Utilities as UT
 import calc_dataFunctions as df
 import calc_Stats as dSS
 import scipy.stats as sts
+import calc_DetrendData as DET
+from netCDF4 import Dataset
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
@@ -99,6 +100,22 @@ def calcTrend(data):
     print('Completed: Finished calculating trends!')      
     return dectrend
 
+def readControl(monthlychoice,lat_bounds,lon_bounds):
+    directorydata2 = '/Users/zlabe/Data/CMIP6/CESM2/picontrol/monthly/'
+    data = Dataset(directorydata2 + 'T2M_000101-120012.nc')
+    tempcc = data.variables['T2M'][:12000,:,:] # 1000 year control
+    latc = data.variables['latitude'][:]
+    lonc = data.variables['longitude'][:]
+    data.close()
+    
+    tempc,latc,lonc = df.getRegion(tempcc,latc,lonc,lat_bounds,lon_bounds)
+    datan = np.reshape(tempc,(tempc.shape[0]//12,12,tempc.shape[1],tempc.shape[2]))
+    if monthlychoice == 'annual':
+        datanq = np.nanmean(datan[:,:,:,:],axis=1)
+    else:
+        datanq = datan
+    return datanq
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -137,30 +154,42 @@ for vv in range(1):
         
         ### Meshgrid of lat/lon
         lon2,lat2 = np.meshgrid(lons,lats)
-
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Begin point by point correlations
         
-        ### Begin function to correlate observations with model, ensemble, year
-        corr = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[3],modelsall.shape[4]))
-        for mo in range(modelsall.shape[0]):
-            for ens in range(modelsall.shape[1]):
-                for i in range(modelsall.shape[3]):
-                    for j in range(modelsall.shape[4]):
-                        varx = data_obs[:,i,j]
-                        vary = modelsall[mo,ens,:,i,j]
-                        corr[mo,ens,i,j] = sts.pearsonr(varx,vary)[0]
-            print('Model #%s done!' % (mo+1))
-                    
+        ### Read in control
+        con = readControl(monthlychoice,lat_bounds,lon_bounds)
+        trendcon = np.empty((len(con)//30,con.shape[1],con.shape[2]))
+        for count,i in enumerate(range(0,len(con)-30,30)):
+            trendcon[count,:,:,] = calcTrend(con[i:i+30,:,:])
+
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
+        ### Process trends
+        obstrend = calcTrend(data_obs)
+        modeltrends = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[3],modelsall.shape[4]))
+        for i in range(modeltrends.shape[0]):
+            for e in range(modeltrends.shape[1]):
+                modeltrends[i,e,:,:] = calcTrend(modelsall[i,e,:,:,:])
+                
+        ## Calculate SNR
+        constd = np.nanstd(trendcon,axis=0)
+        
+        SNRobs = obstrend/constd
+        SNRmodels = modeltrends/constd
+                
+        ### Begin function to correlate observations with model, ensemble
+        corrsnr = np.empty((SNRmodels.shape[0],SNRmodels.shape[1]))
+        for mo in range(SNRmodels.shape[0]):
+            for ens in range(SNRmodels.shape[1]):
+                varxsnr = SNRobs[:,:]
+                varysnr = SNRmodels[mo,ens,:,:]
+                corrsnr[mo,ens] = UT.calc_spatialCorr(varxsnr,varysnr,lats,lons,'yes')
+        
         ### Average correlations across ensemble members
-        meancorr = np.nanmean(corr,axis=1)
+        meancorrsnr= np.nanmean(corrsnr,axis=1)      
         
         ##############################################################################
         ##############################################################################
         ##############################################################################
         ### Save correlations
-        np.savez(directorydata + saveData + '_PointByPoint_corrs.npz',meancorr)
-        np.savez(directorydata + saveData + '_PointByPoint_lats.npz',lats)
-        np.savez(directorydata + saveData + '_PointByPoint_lons.npz',lons)
+        np.savez(directorydata + saveData + '_corrsSNR.npz',corrsnr)
