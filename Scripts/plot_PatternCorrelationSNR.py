@@ -100,10 +100,10 @@ def calcTrend(data):
     print('Completed: Finished calculating trends!')      
     return dectrend
 
-def readControl(monthlychoice,lat_bounds,lon_bounds):
+def readControl(monthlychoice,lat_bounds,lon_bounds,variq):
     directorydata2 = '/Users/zlabe/Data/CMIP6/CESM2/picontrol/monthly/'
-    data = Dataset(directorydata2 + 'T2M_000101-120012.nc')
-    tempcc = data.variables['T2M'][:12000,:,:] # 1000 year control
+    data = Dataset(directorydata2 + '%s_000101-120012.nc' % variq)
+    tempcc = data.variables['%s' % variq][:12000,:,:] # 1000 year control
     latc = data.variables['latitude'][:]
     lonc = data.variables['longitude'][:]
     data.close()
@@ -112,8 +112,28 @@ def readControl(monthlychoice,lat_bounds,lon_bounds):
     datan = np.reshape(tempc,(tempc.shape[0]//12,12,tempc.shape[1],tempc.shape[2]))
     if monthlychoice == 'annual':
         datanq = np.nanmean(datan[:,:,:,:],axis=1)
+    elif monthlychoice == 'JFM':
+        datanq = np.nanmean(datan[:,0:3,:,:],axis=1)
+    elif monthlychoice == 'AMJ':
+        datanq = np.nanmean(datan[:,3:6,:,:],axis=1)
+    elif monthlychoice == 'JAS':
+        datanq = np.nanmean(datan[:,6:9,:,:],axis=1)
+    elif monthlychoice == 'OND':
+        datanq = np.nanmean(datan[:,9:,:,:],axis=1)
     else:
         datanq = datan
+        
+    if variq == 'SLP':
+        datanq = datanq/100 # Pa to hPa
+        print('Completed: Changed units (Pa to hPa)!')
+    elif variq == 'T2M':
+        datanq = datanq - 273.15 # K to C
+        print('Completed: Changed units (K to C)!')
+    elif variq == 'P':
+        datanq = datanq * 86400 # kg/m2/s to mm/day
+        ### "Average Monthly Rate of Precipitation"
+        print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
+        
     return datanq
 
 ###############################################################################
@@ -121,10 +141,8 @@ def readControl(monthlychoice,lat_bounds,lon_bounds):
 ###############################################################################
 ###############################################################################
 ### Call functions
-# for vv in range(len(variables)):
-#     for mo in range(len(monthlychoiceq)):
-for vv in range(1):
-    for mo in range(1):
+for vv in range(len(variables)):
+    for mo in range(len(monthlychoiceq)):
         variq = variables[vv]
         monthlychoice = monthlychoiceq[mo]
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
@@ -156,7 +174,7 @@ for vv in range(1):
         lon2,lat2 = np.meshgrid(lons,lats)
         
         ### Read in control
-        con = readControl(monthlychoice,lat_bounds,lon_bounds)
+        con = readControl(monthlychoice,lat_bounds,lon_bounds,variq)
         trendcon = np.empty((len(con)//30,con.shape[1],con.shape[2]))
         for count,i in enumerate(range(0,len(con)-30,30)):
             trendcon[count,:,:,] = calcTrend(con[i:i+30,:,:])
@@ -174,8 +192,8 @@ for vv in range(1):
         ## Calculate SNR
         constd = np.nanstd(trendcon,axis=0)
         
-        SNRobs = obstrend/constd
-        SNRmodels = modeltrends/constd
+        SNRobs = abs(obstrend)/constd
+        SNRmodels = abs(modeltrends)/constd
                 
         ### Begin function to correlate observations with model, ensemble
         corrsnr = np.empty((SNRmodels.shape[0],SNRmodels.shape[1]))
@@ -193,3 +211,5 @@ for vv in range(1):
         ##############################################################################
         ### Save correlations
         np.savez(directorydata + saveData + '_corrsSNR.npz',corrsnr)
+        np.savez(directorydata + saveData + '_obsSNR.npz',SNRobs)
+        np.savez(directorydata + saveData + '_modelsSNR.npz',SNRmodels)
