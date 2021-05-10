@@ -434,6 +434,37 @@ def calc_spatialCorr(varx,vary,lats,lons,weight):
         
         corrcoef = corr(varx,vary,gw)
         
+    elif weight == 'yesnan': # Computed weighted correlation coefficient   
+        
+        ### Create 2d meshgrid for weights 
+        lon2,lat2 = np.meshgrid(lons,lats)
+        
+        ### Create 2d array of weights based on latitude
+        gw = np.cos(np.deg2rad(lat2))
+        
+        def m(x, w):
+            """Weighted Mean"""
+    
+            wave = np.nansum(x * w) / np.nansum(w)
+            print('NANs -- Completed: Computed weighted average!') 
+            return wave
+        
+        def cov(x, y, w):
+            """Weighted Covariance"""
+            
+            wcov = np.nansum(w * (x - m(x, w)) * (y - m(y, w))) / np.nansum(w)
+            print('NANs -- Completed: Computed weighted covariance!')
+            return wcov
+        
+        def corr(x, y, w):
+            """Weighted Correlation"""
+            
+            wcor = cov(x, y, w) / np.sqrt(cov(x, x, w) * cov(y, y, w))
+            print('NANs -- Completed: Computed weighted correlation!')
+            return wcor
+        
+        corrcoef = corr(varx,vary,gw)
+        
     elif weight == 'no':   
         ### Correlation coefficient from numpy function (not weighted)
         corrcoef= np.corrcoef(varx.ravel(),vary.ravel())[0][1]

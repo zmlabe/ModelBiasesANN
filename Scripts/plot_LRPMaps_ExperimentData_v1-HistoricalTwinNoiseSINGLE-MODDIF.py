@@ -23,7 +23,7 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-variablesall = ['T2M']
+variablesall = ['P']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -53,7 +53,7 @@ for va in range(len(variablesall)):
             lenOfPicks = len(modelGCMs) + 1 # For random class
         ###############################################################################
         ###############################################################################
-        land_only = True
+        land_only = False
         ocean_only = False
         ###############################################################################
         ###############################################################################

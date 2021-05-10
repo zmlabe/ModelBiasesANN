@@ -34,14 +34,14 @@ timeper = 'historical'
 option = 8
 
 ### Read in data
-# for vv in range(len(variables)):
-#     for mo in range(len(monthlychoiceq)):
-for vv in range(1):
-    for mo in range(1):
+for vv in range(len(variables)):
+    for mo in range(len(monthlychoiceq)):
+# for vv in range(1):
+#     for mo in range(1):
         variq = variables[vv]
         monthlychoice = monthlychoiceq[mo]
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/patternCorr/%s/%s/' % (variq,option)
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/SNR/'
         saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + timeper
         print('*Filename == < %s >' % saveData) 
         
@@ -104,7 +104,7 @@ for vv in range(1):
         plt.xlim([-0.5,option-1+0.5])   
         plt.ylim([-0.1,1])
         
-        plt.xlabel(r'\textbf{highest R - [climate model data] - %s}' % (monthlychoice),color='dimgrey',fontsize=8,labelpad=8)
+        plt.xlabel(r'\textbf{Average SNR-R - [climate model data] - %s for %s}' % (monthlychoice,variq),color='dimgrey',fontsize=8,labelpad=8)
         plt.title(r'\textbf{...AND FOR SNR}',color='k',fontsize=15)
         
         plt.tight_layout()

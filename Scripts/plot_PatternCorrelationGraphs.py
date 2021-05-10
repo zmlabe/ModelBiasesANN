@@ -14,6 +14,7 @@ import palettable.cubehelix as cm
 import palettable.scientific.sequential as sss
 import palettable.cartocolors.qualitative as cc
 import cmocean as cmocean
+import cmasher as cmr
 import calc_Utilities as UT
 import scipy.stats as sts
 
@@ -31,11 +32,15 @@ variables = ['T2M','P','SLP']
 reg_name = 'SMILEGlobe'
 level = 'surface'
 timeper = 'historical'
-option = 2
+option = 8
+if timeper == 'historical':
+    years = np.arange(1950,2019+1,1)
 
 ### Read in data
 for vv in range(len(variables)):
     for mo in range(len(monthlychoiceq)):
+# for vv in range(1):
+#      for mo in range(1):
         variq = variables[vv]
         monthlychoice = monthlychoiceq[mo]
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
@@ -162,3 +167,56 @@ for vv in range(len(variables)):
             
             plt.tight_layout()
             plt.savefig(directoryfigure + saveData + '_%s_RawClimateModel_PatternCorrelations_%sclasses.png' % (typeOfCorr[ii],len(corr)),dpi=300)
+        
+        if option == 8:
+            fig = plt.figure()
+            ax = plt.subplot(111)
+            adjust_spines(ax, ['left', 'bottom'])
+            ax.spines['top'].set_color('none')
+            ax.spines['right'].set_color('none')
+            ax.spines['left'].set_color('dimgrey')
+            ax.spines['bottom'].set_color('dimgrey')
+            ax.spines['left'].set_linewidth(2)
+            ax.spines['bottom'].set_linewidth(2)
+            ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
+            ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
+            
+            color = cmr.infinity(np.linspace(0.00,1,len(modelGCMs)))
+            for i,c in zip(range(len(modelGCMs)),color):
+                if i == 7:
+                    c = 'k'
+                else:
+                    c = c
+                plt.plot(years,correns[i],color=c,linewidth=2.3,
+                            label=r'\textbf{%s}' % modelGCMs[i],zorder=11,
+                            clip_on=False,alpha=1)
+            
+            if variq == 'T2M':
+                leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                              bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
+                              handlelength=0,handletextpad=0)
+                for line,text in zip(leg.get_lines(), leg.get_texts()):
+                    text.set_color(line.get_color())
+                
+                plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                plt.yticks(np.arange(0.98,1.01,0.005),map(str,np.round(np.arange(0.98,1.01,0.005),3)),size=6)
+                plt.xlim([1950,2020])   
+                plt.ylim([0.98,1.0])
+            else:
+                leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                                  bbox_to_anchor=(0.5,0.15),fancybox=True,ncol=4,frameon=False,
+                                  handlelength=0,handletextpad=0)
+                for line,text in zip(leg.get_lines(), leg.get_texts()):
+                    text.set_color(line.get_color())
+                    
+                plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
+                plt.xlim([1950,2020])   
+                plt.ylim([0.4,1.0])                
+        
+            plt.xlabel(r'\textbf{Average R - [climate model data] - %s for %s}' % (monthlychoice,variq),color='dimgrey',fontsize=8,labelpad=8)
+            plt.title(r'\textbf{PATTERN CORRELATIONS PER YEAR}',color='k',fontsize=15)
+        
+            plt.tight_layout()
+            
+            plt.savefig(directoryfigure + saveData + '_RawClimateModel_ActualPatternCorrs.png',dpi=300)
