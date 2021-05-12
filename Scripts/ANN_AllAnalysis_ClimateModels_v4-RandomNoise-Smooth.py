@@ -4,8 +4,9 @@ explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 26 April 2021
-Version    : 4 - subsamples random weight class (#8), but tries different noise
+Date       : 11 May 2021
+Version    : 4-smooth - subsamples random weight class (#8) using MMmean but
+             compares to smoothed ensembles
 """
 
 ### Import packages
@@ -91,6 +92,9 @@ else:
 ###############################################################################
 rm_merid_mean = False
 rm_annual_mean = False
+###############################################################################
+###############################################################################
+smoother = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -288,11 +292,11 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
@@ -314,6 +318,7 @@ if seasons != 'none':
         classeslnew = np.swapaxes(classesl,0,1)
     elif ensTypeExperi == 'GCM':
         classeslnew = classesl
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -915,6 +920,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
                     if sizeOfTwin > 0:
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
                         data = dSS.addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+###############################################################################
+                    ### Smooth other ensembles
+                    if smoother == True:
+                        data = dSS.smoothedEnsembles(data,lat_bounds,lon_bounds)
 
 ###############################################################################
 ###############################################################################
@@ -1047,14 +1056,12 @@ for sis,singlesimulation in enumerate(datasetsingle):
         labelsrand = np.argmax(randout,axis=1)
         uniquerand,countrand = np.unique(labelsrand,return_counts=True)
         np.savetxt(directoryoutput + 'RandLabels_' + saveData + '.txt',labelsrand)
-        np.savetxt(directoryoutput + 'RandConfid_' + saveData + '.txt',randout)
             
         ### Observations
         obsout = YpredObs
         labelsobs = np.argmax(obsout,axis=1)
         uniqueobs,countobs = np.unique(labelsobs,return_counts=True)
         np.savetxt(directoryoutput + 'obsLabels_' + saveData + '.txt',labelsobs)
-        np.savetxt(directoryoutput + 'obsConfid_' + saveData + '.txt',obsout)
         
         def truelabel(data):
             """

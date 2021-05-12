@@ -21,6 +21,7 @@ Usage
     [11] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
     [12] rm_variance_dev(var,window)
     [13] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+    [14] smoothedEnsembles(data,lat_bounds,lon_bounds)
 """
 
 def rmse(a,b):
@@ -600,7 +601,7 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
         
     elif sizeOfTwin == 6:
         """ 
-        Adds random noise numbers
+        Smoothes data
         """
         newmodels = data.copy()
         testens = newmodels[6,:,:,:,:] # 6 for LENS
@@ -641,6 +642,39 @@ def addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,mask
     print('--NEW Size of noise class--->',dataclass.shape)
     print('----------- ENDING EXPERIMENT CLASS #%s -----------' % sizeOfTwin)
     return dataclass
+
+###############################################################################
+
+def smoothedEnsembles(data,lat_bounds,lon_bounds):
+    """ 
+    Smoothes all ensembles by taking subsamples
+    """
+    ### Import modules
+    import numpy as np
+    import sys
+    print('\n------- Beginning of smoothing the ensembles per model -------')
+       
+    ### Save MM
+    newmodels = data.copy()
+    mmean = newmodels[-1,:,:,:,:] # 7 for MMmean
+    otherens = newmodels[:7,:,:,:,:]
+
+    newmodeltest = np.empty(otherens.shape)
+    for modi in range(otherens.shape[0]):
+        for sh in range(otherens.shape[1]):
+            ensnum = np.arange(otherens.shape[1])
+            slices = np.random.choice(ensnum,size=otherens.shape[0],replace=False)
+            modelsmooth = otherens[modi]
+            slicenewmodel = np.nanmean(modelsmooth[slices,:,:,:],axis=0)
+            newmodeltest[modi,sh,:,:,:] = slicenewmodel
+    
+    ### Add new class
+    smoothClass = np.append(newmodeltest,mmean[np.newaxis,:,:,:],axis=0)
+    print('--Size of smooth twin --->',newmodeltest.shape)
+    
+    print('--NEW Size of smoothedclass--->',smoothClass.shape)
+    print('------- Ending of smoothing the ensembles per model -------')
+    return smoothClass
 
 ###############################################################################
 ###############################################################################

@@ -36,8 +36,8 @@ level = 'surface'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
-land_only = False
-ocean_only = True
+land_only = True
+ocean_only = False
 ###############################################################################
 ###############################################################################
 baseline = np.arange(1951,1980+1,1)
@@ -107,6 +107,8 @@ def calcTrend(data):
 ### Call functions
 for vv in range(len(variables)):
     for mo in range(len(monthlychoiceq)):
+# for vv in range(1):
+#     for mo in range(1):
         variq = variables[vv]
         monthlychoice = monthlychoiceq[mo]
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
@@ -199,7 +201,7 @@ for vv in range(len(variables)):
                 for yr in range(modelsalldt.shape[2]):
                     varxdt = data_obsdt[yr,:,:]
                     varydt = modelsalldt[mo,ens,yr,:,:]
-                    corrdt[mo,ens,yr] = UT.calc_spatialCorr(varxdt,varydt,lats,lons,'yes')
+                    corrdt[mo,ens,yr] = UT.calc_spatialCorr(varxdt,varydt,lats,lons,'yesnan')
                     
         ### Average correlations across ensemble members
         meancorrdt = np.nanmean(corrdt,axis=1)
@@ -224,7 +226,7 @@ for vv in range(len(variables)):
                 for yr in range(modelsallglo.shape[2]):
                     varxglo = data_obsglo[yr,:,:]
                     varyglo = modelsallglo[mo,ens,yr,:,:]
-                    corrglo[mo,ens,yr] = UT.calc_spatialCorr(varxglo,varyglo,lats,lons,'yes')
+                    corrglo[mo,ens,yr] = UT.calc_spatialCorr(varxglo,varyglo,lats,lons,'yesnan')
                     
         ### Average correlations across ensemble members
         meancorrglo = np.nanmean(corrglo,axis=1)
@@ -252,7 +254,7 @@ for vv in range(len(variables)):
             for ens in range(modeltrends.shape[1]):
                 varxtrends = obstrend[:,:]
                 varytrends = modeltrends[mo,ens,:,:]
-                corrtrends[mo,ens] = UT.calc_spatialCorr(varxtrends,varytrends,lats,lons,'yes')
+                corrtrends[mo,ens] = UT.calc_spatialCorr(varxtrends,varytrends,lats,lons,'yesnan')
         
         ### Average correlations across ensemble members
         meancorrtrends = np.nanmean(corrtrends,axis=1)      
