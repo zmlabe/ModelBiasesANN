@@ -66,7 +66,7 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'SLP'
+variq = 'T2M'
 reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################

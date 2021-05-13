@@ -1,12 +1,11 @@
 """
-ANN for evaluating model biases, differences, and other thresholds using 
+ANN-LINEAR for evaluating model biases, differences, and other thresholds using 
 explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 11 May 2021
-Version    : 4-smooth - subsamples random weight class (#8) using MMmean but
-             compares to smoothed ensembles
+Date       : 13 May 2021
+Version    : 4 -LINEAR
 """
 
 ### Import packages
@@ -67,7 +66,7 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'P'
+variq = 'T2M'
 reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################
@@ -92,9 +91,6 @@ else:
 ###############################################################################
 rm_merid_mean = False
 rm_annual_mean = False
-###############################################################################
-###############################################################################
-smoother = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -286,18 +282,19 @@ if rm_ensemble_mean == False:
                     if rm_annual_mean == False:
                         typeOfAnalysis = 'Experiment-9'
                         
-print('\n<<<<<<<<<<<< Analysis == %s (%s) ! >>>>>>>>>>>>>>>\n' % (typeOfAnalysis,timeper))
+print('\n<<<<<<<<<<<< Linear-Analysis == %s (%s) ! >>>>>>>>>>>>>>>\n' % (typeOfAnalysis,timeper))
 if typeOfAnalysis == 'issueWithExperiment':
     sys.exit('Wrong parameters selected to analyze')
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_LAND' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_OCEAN' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -318,7 +315,6 @@ if seasons != 'none':
         classeslnew = np.swapaxes(classesl,0,1)
     elif ensTypeExperi == 'GCM':
         classeslnew = classesl
-
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -650,23 +646,34 @@ for sis,singlesimulation in enumerate(datasetsingle):
         def defineNN(hidden, input_shape, output_shape, ridgePenalty):        
            
             model = Sequential()
+            
             ### Initialize first layer
-            ### Model is a single node with activation function
-            model.add(Dense(hidden[0],input_shape=(input_shape,),
-                            activation=actFun, use_bias=True,
-                            kernel_regularizer=regularizers.l1_l2(l1=0.00,l2=ridgePenalty),
-                            bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
-                            kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
-    
-            ### Initialize other layers
-            for layer in hidden[1:]:
-                model.add(Dense(layer,activation=actFun,
-                                use_bias=True,
-                                kernel_regularizer=regularizers.l1_l2(l1=0.00,l2=0.00),
+            if hidden[0]==0:
+                ### Model is linear
+                model.add(Dense(1,input_shape=(input_shape,),
+                                activation='linear',use_bias=True,
+                                kernel_regularizer=regularizers.l1_l2(l1=0.00,l2=ridgePenalty),
                                 bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
                                 kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
-                    
-                print('\nTHIS IS AN ANN!\n')
+                print('\nTHIS IS A LINEAR NN!\n')
+            else:
+                ### Initialize first layer
+                ### Model is a single node with activation function
+                model.add(Dense(hidden[0],input_shape=(input_shape,),
+                                activation=actFun, use_bias=True,
+                                kernel_regularizer=regularizers.l1_l2(l1=0.00,l2=ridgePenalty),
+                                bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
+                                kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
+        
+                ### Initialize other layers
+                for layer in hidden[1:]:
+                    model.add(Dense(layer,activation=actFun,
+                                    use_bias=True,
+                                    kernel_regularizer=regularizers.l1_l2(l1=0.00,l2=0.00),
+                                    bias_initializer=keras.initializers.RandomNormal(seed=random_network_seed),
+                                    kernel_initializer=keras.initializers.RandomNormal(seed=random_network_seed)))
+                        
+                    print('\nTHIS IS AN ANN!\n')
         
             #### Initialize output layer
             model.add(Dense(output_shape,activation=None,use_bias=True,
@@ -804,25 +811,23 @@ for sis,singlesimulation in enumerate(datasetsingle):
         
         ### Parameters
         debug = True
-        NNType = 'ANN'
+        NNType = 'linear'
         avgHalfChunk = 0
         option4 = True
         biasBool = False
-        hiddensList = [[10,10]]
-        ridge_penalty = [0.10]
-        # hiddensList = [[8,8]]
-        # ridge_penalty = [0.2]
-        actFun = 'relu'
+        hiddensList = [[0]]
+        ridge_penalty = [0.1]
+        actFun = 'linear'
         
         if any([maskNoiseClass=='land',maskNoiseClass=='ocean']):
             debug = True
-            NNType = 'ANN'
+            NNType = 'linear'
             avgHalfChunk = 0
             option4 = True
             biasBool = False
-            hiddensList = [[8,8]]
+            hiddensList = [[0]]
             ridge_penalty = [0.10]
-            actFun = 'relu'
+            actFun = 'linear'
         
         expList = [(0)] # (0,1)
         expN = np.size(expList)
@@ -920,10 +925,6 @@ for sis,singlesimulation in enumerate(datasetsingle):
                     if sizeOfTwin > 0:
                         random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/SelectedSegmentSeed.txt',unpack=True))
                         data = dSS.addNoiseTwinSingle(data,data_obs,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
-###############################################################################
-                    ### Smooth other ensembles
-                    if smoother == True:
-                        data = dSS.smoothedEnsembles(data,lat_bounds,lon_bounds)
 
 ###############################################################################
 ###############################################################################
