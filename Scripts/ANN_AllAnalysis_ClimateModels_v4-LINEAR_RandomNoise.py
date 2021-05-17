@@ -697,6 +697,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
             # model.compile(optimizer=optimizers.Nadam(lr=lr_here),  
             #               loss = 'categorical_crossentropy',
             #               metrics=[metrics.categorical_accuracy])
+            # model.compile(optimizer=optimizers.Adam(lr=lr_here),  
+            #               loss = 'categorical_crossentropy',
+            #               metrics=[metrics.categorical_accuracy])
         
             ### Declare the relevant model parameters
             batch_size = 24 
@@ -818,16 +821,6 @@ for sis,singlesimulation in enumerate(datasetsingle):
         hiddensList = [[0]]
         ridge_penalty = [0.1]
         actFun = 'linear'
-        
-        if any([maskNoiseClass=='land',maskNoiseClass=='ocean']):
-            debug = True
-            NNType = 'linear'
-            avgHalfChunk = 0
-            option4 = True
-            biasBool = False
-            hiddensList = [[0]]
-            ridge_penalty = [0.10]
-            actFun = 'linear'
         
         expList = [(0)] # (0,1)
         expN = np.size(expList)
@@ -1050,8 +1043,20 @@ for sis,singlesimulation in enumerate(datasetsingle):
             classesltest = classeslnew[testIndices,:,:].ravel()
         elif ensTypeExperi == 'GCM':
             classesltrain = classeslnew[:,:,trainIndices].ravel()
-            classesltest = classeslnew[:,:,testIndices].ravel()
-            
+            classesltest = classeslnew[:,:,testIndices].ravel() 
+        
+        ### Adding new file name for linear model
+        saveData = saveData + '_L2-%s' % ridge_penalty[0]
+        print('\n>>>NEW FILE NAME = %s\n' % saveData)
+        
+        ### Looking at linear model weights and biases
+        weights = model.layers[0].get_weights()[0][:,0].reshape(lats.shape[0],lons.shape[0])
+        biases = model.layers[0].get_weights()[1]
+        np.savetxt(directoryoutput + 'weights_' + saveData + '.txt',weights)
+        np.savetxt(directoryoutput + 'biases_' + saveData + '.txt',biases)
+        fig=plt.figure()
+        plt.contourf(weights,300,cmap=cmocean.cm.thermal)
+        
         ### Random data tests
         randout = YpredRand
         labelsrand = np.argmax(randout,axis=1)

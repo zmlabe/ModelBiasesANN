@@ -804,7 +804,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         option4 = True
         biasBool = False
         hiddensList = [[10,10]]
-        ridge_penalty = [0.10]
+        ridge_penalty = [0.1]
         # hiddensList = [[8,8]]
         # ridge_penalty = [0.2]
         actFun = 'relu'
