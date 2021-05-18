@@ -66,7 +66,7 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'T2M'
+variq = 'P'
 reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################
@@ -819,7 +819,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         option4 = True
         biasBool = False
         hiddensList = [[0]]
-        ridge_penalty = [0.1]
+        ridge_penalty = [0.01]
         actFun = 'linear'
         
         expList = [(0)] # (0,1)
