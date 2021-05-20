@@ -992,7 +992,7 @@ def regions(name):
         lat_bounds = (-89., -20.)
         lon_bounds = (0., 360.)  
     elif name == 'Arctic':
-        lat_bounds = (65.,87.)
+        lat_bounds = (67.,87.)
         lon_bounds = (0., 360.)  
     elif name == 'LowerArctic':
         lat_bounds = (60.,87.)
@@ -1001,13 +1001,13 @@ def regions(name):
         lat_bounds = (50.,87.)
         lon_bounds = (0., 360.)  
     elif name == 'VortexSouth':
-        lat_bounds = (-90.,-50.)
+        lat_bounds = (-87.,-50.)
         lon_bounds = (0., 360.)  
     elif name == 'Antarctic':
-        lat_bounds = (-89.,-65.)
+        lat_bounds = (-87.,-67.)
         lon_bounds = (0., 360.) 
     elif name == 'LowerAntarctic':
-        lat_bounds = (-89.,-60.)
+        lat_bounds = (-87.,-60.)
         lon_bounds = (0., 360.)  
     elif name == 'NHExtra':
         lat_bounds = (30.,65.)
@@ -1028,7 +1028,7 @@ def regions(name):
         lat_bounds = (24, 60)
         lon_bounds = (235, 290)
     elif name == 'NAext':
-        lat_bounds = (25, 89)
+        lat_bounds = (25, 87)
         lon_bounds = (200,330)         
     elif name == 'NAprop':
         lat_bounds = (10, 80)

@@ -1,8 +1,9 @@
 """
-Script for plotting softmax confidence after testing on observations 
+Script for plotting softmax confidence after testing on observations for
+regional masks
 
 Author     : Zachary M. Labe
-Date       : 11 May 2021
+Date       : 20 May 2021
 Version    : 4 (ANNv4)
 """
 
@@ -42,7 +43,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'SMILEGlobe'
+        reg_name = 'SH'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -54,7 +55,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         land_only = False
-        ocean_only = True
+        ocean_only = False
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
@@ -208,13 +209,13 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'LAND'
         elif ocean_only == True:
-            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'OCEAN'
         else:
-            saveData = timeper + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'GLOBAL'
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
@@ -309,8 +310,8 @@ for va in range(len(variablesall)):
         plt.ylim([0,1.0])           
     
         plt.ylabel(r'\textbf{Confidence [%s]}' % (seasons[0]),color='dimgrey',fontsize=8,labelpad=8)
-        plt.title(r'\textbf{ANN CONFIDENCE OF *OBS* PER YEAR -- %s -- %s}' % (typemask,variq),color='dimgrey',fontsize=13)
+        plt.title(r'\textbf{ANN CONFIDENCE OF *OBS* PER YEAR -- %s -- %s - %s}' % (typemask,variq,reg_name),color='dimgrey',fontsize=13)
     
         plt.tight_layout()
         plt.subplots_adjust(bottom=0.15)
-        plt.savefig(directoryfigure + '%s/Confidence/ModelConfidence_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        plt.savefig(directoryfigure + '%s/Regions/Confidence/ModelConfidence_%s.png' % (typeOfAnalysis,saveData),dpi=300)

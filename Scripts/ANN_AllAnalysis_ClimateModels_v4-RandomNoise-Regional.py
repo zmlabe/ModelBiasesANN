@@ -1,10 +1,10 @@
 """
 ANN for evaluating model biases, differences, and other thresholds using 
-explainable AI
+explainable AI for REGIONAL COMPOSITES
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 26 April 2021
+Date       : 20 May 2021
 Version    : 4 - subsamples random weight class (#8), but tries different noise
 """
 
@@ -64,10 +64,10 @@ directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
               'GFDL_CM3','GFDL_ESM2M','lens']
 datasetsingle = ['SMILE']
-dataset_obs = '20CRv3'
+dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'SMILEGlobe'
+reg_name = 'narrowTropics'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -79,7 +79,7 @@ else:
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = False
+ocean_only = True
 if land_only == True:
     maskNoiseClass = 'land'
 elif ocean_only == True:
@@ -288,11 +288,11 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################

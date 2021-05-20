@@ -819,7 +819,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         option4 = True
         biasBool = False
         hiddensList = [[0]]
-        ridge_penalty = [0.01]
+        ridge_penalty = [0]
         actFun = 'linear'
         
         expList = [(0)] # (0,1)
