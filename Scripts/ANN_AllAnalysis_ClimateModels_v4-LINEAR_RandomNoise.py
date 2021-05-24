@@ -66,8 +66,8 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'P'
-reg_name = 'SMILEGlobe'
+variq = 'T2M'
+reg_name = 'Arctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -78,7 +78,7 @@ else:
     lenOfPicks = len(modelGCMs)
 ###############################################################################
 ###############################################################################
-land_only = False
+land_only = True
 ocean_only = False
 if land_only == True:
     maskNoiseClass = 'land'
@@ -825,7 +825,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         expList = [(0)] # (0,1)
         expN = np.size(expList)
         
-        iterations = [100] 
+        iterations = [500] 
         random_segment = True
         foldsN = 1
         

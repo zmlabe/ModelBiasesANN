@@ -31,12 +31,12 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
-reg_name = 'SMILEGlobe'
+reg_name = 'Arctic'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
-land_only = True
+land_only = False
 ocean_only = False
 ###############################################################################
 ###############################################################################

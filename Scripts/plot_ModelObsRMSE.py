@@ -1,8 +1,8 @@
 """
-Script for calculating pattern correlations between models and observations
+Script for calculating RMSE between models and observations
 
 Author     : Zachary M. Labe
-Date       : 27 April 2021
+Date       : 24 May 2021
 Version    : 1
 """
 
@@ -15,6 +15,7 @@ import calc_dataFunctions as df
 import calc_Stats as dSS
 import scipy.stats as sts
 import calc_DetrendData as DET
+from netCDF4 import Dataset
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
@@ -75,29 +76,6 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
                                             lat_bounds,lon_bounds)    
     print('our OBS dataset: ',dataset_obs,' is shaped',data_obs.shape)
     return data_obs,lats_obs,lons_obs
-def calcTrend(data):
-    slopes = np.empty((data.shape[1],data.shape[2]))
-    x = np.arange(data.shape[0])
-    for i in range(data.shape[1]):
-        for j in range(data.shape[2]):
-            mask = np.isfinite(data[:,i,j])
-            y = data[:,i,j]
-            
-            if np.sum(mask) == y.shape[0]:
-                xx = x
-                yy = y
-            else:
-                xx = x[mask]
-                yy = y[mask]      
-            if np.isfinite(np.nanmean(yy)):
-                slopes[i,j],intercepts, \
-                r_value,p_value,std_err = sts.linregress(xx,yy)
-            else:
-                slopes[i,j] = np.nan
-    
-    dectrend = slopes * 10.   
-    print('Completed: Finished calculating trends!')      
-    return dectrend
 
 ###############################################################################
 ###############################################################################
@@ -136,107 +114,27 @@ for vv in range(len(variables)):
         ### Meshgrid of lat/lon
         lon2,lat2 = np.meshgrid(lons,lats)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Begin spatial correlations
-        
-        ### Begin function to correlate observations with model, ensemble, year
-        corr = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[2]))
+        ### Calculate rmse per year
+        rmsd = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[2]))
         for mo in range(modelsall.shape[0]):
             for ens in range(modelsall.shape[1]):
                 for yr in range(modelsall.shape[2]):
-                    varx = data_obs[yr,:,:]
-                    vary = modelsall[mo,ens,yr,:,:]
-                    corr[mo,ens,yr] = UT.calc_spatialCorr(varx,vary,lats,lons,'yes')
-                    
-        ### Average correlations across ensemble members
-        meancorr = np.nanmean(corr,axis=1)
+                    varxrm = data_obs[yr,:,:]
+                    varyrm = modelsall[mo,ens,yr,:,:]
+                    if any([land_only==True,ocean_only==True]):
+                        rmsd[mo,ens,yr] = UT.calc_RMSE(varxrm,varyrm,lats,lons,'yesnan')
+                        print('------USING MASKS FOR NANS!------')
+                    else:
+                        rmsd[mo,ens,yr] = UT.calc_RMSE(varxrm,varyrm,lats,lons,'yes')
         
-        ### Average across all years for each model
-        meanallcorr = np.nanmean(meancorr,axis=1)
+        ### Average RMSE across ensemble members
+        meanrmsd = np.nanmean(rmsd,axis=1)     
         
-        ### Check highest member
-        maxmodelcorr = np.argmax(meancorr,axis=0)
-        uniquecorr,countcorr = np.unique(maxmodelcorr,return_counts=True)
-        
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Detrend data for correlations
-        data_obsdt = DET.detrendDataR(data_obs,'surface','monthly')
-        modelsalldt = DET.detrendData(modelsall,'surface','monthly')
-        
-        ### Begin function to correlate observations with model, ensemble, year
-        corrdt = np.empty((modelsalldt.shape[0],modelsalldt.shape[1],modelsalldt.shape[2]))
-        for mo in range(modelsalldt.shape[0]):
-            for ens in range(modelsalldt.shape[1]):
-                for yr in range(modelsalldt.shape[2]):
-                    varxdt = data_obsdt[yr,:,:]
-                    varydt = modelsalldt[mo,ens,yr,:,:]
-                    corrdt[mo,ens,yr] = UT.calc_spatialCorr(varxdt,varydt,lats,lons,'yes')
-                    
-        ### Average correlations across ensemble members
-        meancorrdt = np.nanmean(corrdt,axis=1)
-        
-        ### Average across all years for each model
-        meanallcorrdt = np.nanmean(meancorrdt,axis=1)
-        
-        ### Check highest member
-        maxmodelcorrdt = np.argmax(meancorrdt,axis=0)
-        uniquecorrdt,countcorrdt = np.unique(maxmodelcorrdt,return_counts=True)
-        
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Remove annual mean
-        modelsallglo, data_obsglo = dSS.remove_annual_mean(modelsall,data_obs,lats,lons,lats_obs,lons_obs)
-        
-        ### Begin function to correlate observations with model, ensemble, year
-        corrglo = np.empty((modelsallglo.shape[0],modelsallglo.shape[1],modelsallglo.shape[2]))
-        for mo in range(modelsallglo.shape[0]):
-            for ens in range(modelsallglo.shape[1]):
-                for yr in range(modelsallglo.shape[2]):
-                    varxglo = data_obsglo[yr,:,:]
-                    varyglo = modelsallglo[mo,ens,yr,:,:]
-                    corrglo[mo,ens,yr] = UT.calc_spatialCorr(varxglo,varyglo,lats,lons,'yes')
-                    
-        ### Average correlations across ensemble members
-        meancorrglo = np.nanmean(corrglo,axis=1)
-        
-        ### Average across all years for each model
-        meanallcorrglo = np.nanmean(meancorrglo,axis=1)
-        
-        ### Check highest member
-        maxmodelcorrglo = np.argmax(meancorrglo,axis=0)
-        uniquecorrglo,countcorrglo = np.unique(maxmodelcorrglo,return_counts=True)
-        
-        ##############################################################################
-        ##############################################################################
-        ##############################################################################
-        ## Process trends
-        obstrend = calcTrend(data_obs)
-        modeltrends = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[3],modelsall.shape[4]))
-        for i in range(modeltrends.shape[0]):
-            for e in range(modeltrends.shape[1]):
-                modeltrends[i,e,:,:] = calcTrend(modelsall[i,e,:,:,:])
-                
-        ### Begin function to correlate observations with model, ensemble
-        corrtrends = np.empty((modeltrends.shape[0],modeltrends.shape[1]))
-        for mo in range(modeltrends.shape[0]):
-            for ens in range(modeltrends.shape[1]):
-                varxtrends = obstrend[:,:]
-                varytrends = modeltrends[mo,ens,:,:]
-                corrtrends[mo,ens] = UT.calc_spatialCorr(varxtrends,varytrends,lats,lons,'yes')
-        
-        ### Average correlations across ensemble members
-        meancorrtrends = np.nanmean(corrtrends,axis=1)      
-        
+        ### Average RMSE across years
+        meanrmsdyr = np.nanmean(meanrmsd,axis=1)
+
         ##############################################################################
         ##############################################################################
         ##############################################################################
         ### Save correlations
-        np.savez(directorydata + saveData + '_corrs.npz',corr)
-        np.savez(directorydata + saveData + '_corrsdt.npz',corrdt)
-        np.savez(directorydata + saveData + '_corrsglo.npz',corrglo)
-        np.savez(directorydata + saveData + '_corrstrends.npz',corrtrends)
+        np.savez(directorydata + saveData + '_RMSE.npz',rmsd)

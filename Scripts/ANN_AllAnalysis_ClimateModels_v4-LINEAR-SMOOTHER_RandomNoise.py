@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'SMILEGlobe'
+reg_name = 'Arctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -78,7 +78,7 @@ else:
     lenOfPicks = len(modelGCMs)
 ###############################################################################
 ###############################################################################
-land_only = False
+land_only = True
 ocean_only = False
 if land_only == True:
     maskNoiseClass = 'land'
@@ -822,13 +822,13 @@ for sis,singlesimulation in enumerate(datasetsingle):
         option4 = True
         biasBool = False
         hiddensList = [[0]]
-        ridge_penalty = [0.1]
+        ridge_penalty = [0]
         actFun = 'linear'
         
         expList = [(0)] # (0,1)
         expN = np.size(expList)
         
-        iterations = [100] 
+        iterations = [500] 
         random_segment = True
         foldsN = 1
         

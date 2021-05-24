@@ -67,8 +67,8 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'P'
-reg_name = 'SMILEGlobe'
+variq = 'T2M'
+reg_name = 'Arctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -80,7 +80,7 @@ else:
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = False
+ocean_only = True
 if land_only == True:
     maskNoiseClass = 'land'
 elif ocean_only == True:
