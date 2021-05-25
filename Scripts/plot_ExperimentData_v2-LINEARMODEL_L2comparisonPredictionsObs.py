@@ -25,9 +25,10 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-variablesall = ['P']
+variablesall = ['T2M']
 pickSMILEall = [[]] 
 ridge_penalty = [0,0.01,0.1,1,5]
+ridge_penalty = [0,0.1]
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         con = []
@@ -50,7 +51,7 @@ for va in range(len(variablesall)):
             dataset_obs = 'ERA5BE'
             seasons = ['annual']
             variq = variablesall[va]
-            reg_name = 'SMILEGlobe'
+            reg_name = 'narrowTropics'
             timeper = 'historical'
             ###############################################################################
             ###############################################################################
@@ -266,113 +267,113 @@ def adjust_spines(ax, spines):
     else:
             ax.xaxis.set_ticks([]) 
             
-### Begin plot
-fig = plt.figure(figsize=(8,5))
-for r in range(len(lab)*2):
-    ax = plt.subplot(2,5,r+1)
+# ### Begin plot
+# fig = plt.figure(figsize=(8,5))
+# for r in range(len(lab)*2):
+#     ax = plt.subplot(2,5,r+1)
 
-    if r < 5:
-        obsout = con[r]
-        label = np.argmax(obsout,axis=1)
+#     if r < 5:
+#         obsout = con[r]
+#         label = np.argmax(obsout,axis=1)
     
-        adjust_spines(ax, ['left', 'bottom'])
-        ax.spines['top'].set_color('none')
-        ax.spines['right'].set_color('none')
-        ax.spines['left'].set_color('dimgrey')
-        ax.spines['bottom'].set_color('dimgrey')
-        ax.spines['left'].set_linewidth(2)
-        ax.spines['bottom'].set_linewidth(2)
-        ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-        # ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.3)
+#         adjust_spines(ax, ['left', 'bottom'])
+#         ax.spines['top'].set_color('none')
+#         ax.spines['right'].set_color('none')
+#         ax.spines['left'].set_color('dimgrey')
+#         ax.spines['bottom'].set_color('dimgrey')
+#         ax.spines['left'].set_linewidth(2)
+#         ax.spines['bottom'].set_linewidth(2)
+#         ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
+#         # ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.3)
         
-        color = cmr.infinity(np.linspace(0.00,1,len(modelGCMsNames)))
-        ctest = []
-        for i,c in zip(range(len(modelGCMsNames)),color):
-            if i == 7:
-                c = 'k'
-            else:
-                c = c
-            plt.plot(yearsall,obsout[:,i],color=c,linewidth=0.2,
-                        label=r'\textbf{%s}' % modelGCMsNames[i],zorder=1,
-                        clip_on=False,alpha=0)
-            plt.scatter(yearsall,obsout[:,i],color=c,s=9,zorder=12,
-                        clip_on=False,alpha=0.2,edgecolors='none')
-            ctest.append(c)
+#         color = cmr.infinity(np.linspace(0.00,1,len(modelGCMsNames)))
+#         ctest = []
+#         for i,c in zip(range(len(modelGCMsNames)),color):
+#             if i == 7:
+#                 c = 'k'
+#             else:
+#                 c = c
+#             plt.plot(yearsall,obsout[:,i],color=c,linewidth=0.2,
+#                         label=r'\textbf{%s}' % modelGCMsNames[i],zorder=1,
+#                         clip_on=False,alpha=0)
+#             plt.scatter(yearsall,obsout[:,i],color=c,s=9,zorder=12,
+#                         clip_on=False,alpha=0.2,edgecolors='none')
+#             ctest.append(c)
             
-            for yr in range(yearsall.shape[0]):
-                la = label[yr]
-                if i == la:
-                    plt.scatter(yearsall[yr],obsout[yr,i],color=c,s=9,zorder=12,
-                                clip_on=False,alpha=1,edgecolors='none')
+#             for yr in range(yearsall.shape[0]):
+#                 la = label[yr]
+#                 if i == la:
+#                     plt.scatter(yearsall[yr],obsout[yr,i],color=c,s=9,zorder=12,
+#                                 clip_on=False,alpha=1,edgecolors='none')
                 
         
-        if r == 2:
-            leg = plt.legend(shadow=False,fontsize=6,loc='upper center',
-                          bbox_to_anchor=(0.5,-1.35),fancybox=True,ncol=4,frameon=False,
-                          handlelength=0,handletextpad=0)
-            for line,text in zip(leg.get_lines(), leg.get_texts()):
-                text.set_color(line.get_color())
+#         if r == 2:
+#             leg = plt.legend(shadow=False,fontsize=6,loc='upper center',
+#                           bbox_to_anchor=(0.5,-1.35),fancybox=True,ncol=4,frameon=False,
+#                           handlelength=0,handletextpad=0)
+#             for line,text in zip(leg.get_lines(), leg.get_texts()):
+#                 text.set_color(line.get_color())
                 
-        if r == 0:
-            plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
-        else:
-            plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
-            ax.set_yticklabels([])
+#         if r == 0:
+#             plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
+#         else:
+#             plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
+#             ax.set_yticklabels([])
         
-        plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
-        plt.xlim([1950,2020])   
-        plt.ylim([0,1.0])           
+#         plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
+#         plt.xlim([1950,2020])   
+#         plt.ylim([0,1.0])           
         
-        if r == 0:  
-            plt.ylabel(r'\textbf{Confidence [%s-%s]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=23)
-        plt.title(r'\textbf{L$_{2}$=%s}' % (ridge_penalty[r]),color='dimgrey',fontsize=10)
-    else:
-        obspred = lab[r-5]
-        adjust_spines(ax, ['left', 'bottom'])
-        ax.spines['top'].set_color('none')
-        ax.spines['right'].set_color('none')
-        ax.spines['left'].set_color('dimgrey')
-        ax.spines['bottom'].set_color('dimgrey')
-        ax.spines['left'].set_linewidth(2)
-        ax.spines['bottom'].set_linewidth(2)
-        ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-        ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
+#         if r == 0:  
+#             plt.ylabel(r'\textbf{Confidence [%s-%s-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=8,labelpad=23)
+#         plt.title(r'\textbf{L$_{2}$=%s}' % (ridge_penalty[r]),color='dimgrey',fontsize=10)
+#     else:
+#         obspred = lab[r-5]
+#         adjust_spines(ax, ['left', 'bottom'])
+#         ax.spines['top'].set_color('none')
+#         ax.spines['right'].set_color('none')
+#         ax.spines['left'].set_color('dimgrey')
+#         ax.spines['bottom'].set_color('dimgrey')
+#         ax.spines['left'].set_linewidth(2)
+#         ax.spines['bottom'].set_linewidth(2)
+#         ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
+#         ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
         
-        x=np.arange(1950,2019+1,1)
-        for cct in range(len(obspred)):
-            if obspred[cct] == 0:
-                col = ctest[0]
-            elif obspred[cct] == 1:
-                col = ctest[1]
-            elif obspred[cct] == 2:
-                col = ctest[2]
-            elif obspred[cct] == 3:
-                col = ctest[3]
-            elif obspred[cct] == 4:
-                col = ctest[4]
-            elif obspred[cct] == 5:
-                col = ctest[5]
-            elif obspred[cct] == 6:
-                col = ctest[6]
-            elif obspred[cct] == 7:
-                col = ctest[7]
-            plt.scatter(x[cct],obspred[cct],color=col,s=9,clip_on=False,
-                        edgecolor='none',linewidth=0.4,zorder=10)
+#         x=np.arange(1950,2019+1,1)
+#         for cct in range(len(obspred)):
+#             if obspred[cct] == 0:
+#                 col = ctest[0]
+#             elif obspred[cct] == 1:
+#                 col = ctest[1]
+#             elif obspred[cct] == 2:
+#                 col = ctest[2]
+#             elif obspred[cct] == 3:
+#                 col = ctest[3]
+#             elif obspred[cct] == 4:
+#                 col = ctest[4]
+#             elif obspred[cct] == 5:
+#                 col = ctest[5]
+#             elif obspred[cct] == 6:
+#                 col = ctest[6]
+#             elif obspred[cct] == 7:
+#                 col = ctest[7]
+#             plt.scatter(x[cct],obspred[cct],color=col,s=9,clip_on=False,
+#                         edgecolor='none',linewidth=0.4,zorder=10)
         
-        plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
-        if r-5 == 0:
-            plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=3)
-        else:
-            plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=3)
-            ax.set_yticklabels([])
-        plt.xlim([1950,2020])   
-        plt.ylim([0,lenOfPicks-1])
-        if r-5 == 0:  
-            plt.ylabel(r'\textbf{Prediction [%s-%s]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=7.5)
+#         plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
+#         if r-5 == 0:
+#             plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=3)
+#         else:
+#             plt.yticks(np.arange(0,lenOfPicks+1,1),modelGCMsNames,size=3)
+#             ax.set_yticklabels([])
+#         plt.xlim([1950,2020])   
+#         plt.ylim([0,lenOfPicks-1])
+#         if r-5 == 0:  
+#             plt.ylabel(r'\textbf{Prediction [%s-%s]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=7.5)
         
-# plt.tight_layout()
-# plt.subplots_adjust(bottom=0.15)
-plt.savefig(directoryfigure + '%s/Confidence/LinearModelL2_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+# # plt.tight_layout()
+# # plt.subplots_adjust(bottom=0.15)
+# plt.savefig(directoryfigure + '%s/Confidence/LinearModelL2_%s.png' % (typeOfAnalysis,saveData),dpi=300)
 
 ### Save files
 np.savez(directorydata + 'PlotLINEARLabels_' + saveDatao + '.npz',labsave)

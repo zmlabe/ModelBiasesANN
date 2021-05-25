@@ -44,7 +44,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'SMILEGlobe'
+        reg_name = 'narrowTropics'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -316,7 +316,7 @@ for va in range(len(variablesall)):
         plt.ylim([0,1.0])           
     
         plt.ylabel(r'\textbf{Confidence [%s], L$_{2}$=%s' % (seasons[0],ridge_penalty[0]),color='dimgrey',fontsize=8,labelpad=8)
-        plt.title(r'\textbf{ANN-LINEAR CONFIDENCE OF *OBS* PER YEAR -- %s -- %s}' % (typemask,variq),color='dimgrey',fontsize=10)
+        plt.title(r'\textbf{ANN-LINEAR CONFIDENCE OF *OBS* PER YEAR -- %s -- %s - %s}' % (typemask,variq,reg_name),color='dimgrey',fontsize=10)
     
         plt.tight_layout()
         plt.subplots_adjust(bottom=0.15)

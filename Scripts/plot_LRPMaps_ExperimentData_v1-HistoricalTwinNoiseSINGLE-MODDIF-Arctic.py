@@ -40,9 +40,9 @@ for va in range(len(variablesall)):
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
         dataset_obs = 'ERA5BE'
-        seasons = ['annual']
+        seasons = ['JFM']
         variq = variablesall[va]
-        reg_name = 'narrowTropics'
+        reg_name = 'Arctic'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -207,13 +207,22 @@ for va in range(len(variablesall)):
             sys.exit('Wrong parameters selected to analyze')
             
         ### Select how to save files
-        if land_only == True:
-            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
-        elif ocean_only == True:
-            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+        if seasons[0] == 'annual':
+            if land_only == True:
+                saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            elif ocean_only == True:
+                saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            else:
+                saveData = timeper + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            print('*Filename == < %s >' % saveData) 
         else:
-            saveData = timeper + '_NoiseTwinSingleMODDIF4_REGIONAL_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
-        print('*Filename == < %s >' % saveData) 
+            if land_only == True:
+                saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            elif ocean_only == True:
+                saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            else:
+                saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            print('*Filename == < %s >' % saveData) 
         ###############################################################################
         ###############################################################################
         ###############################################################################
@@ -368,7 +377,8 @@ for va in range(len(variablesall)):
             var = lrptest[r]
             
             ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            m = Basemap(projection='npstere',boundinglat=65,lon_0=0,
+                        resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lon1)
@@ -396,7 +406,7 @@ for va in range(len(variablesall)):
                           rotation=330,ha='center',va='center')
             
         ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
         cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
                             extend='max',extendfrac=0.07,drawedges=False)
         cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
@@ -411,9 +421,9 @@ for va in range(len(variablesall)):
         else: 
             plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
          
-        plt.text(-0.9,0.00,r'\textbf{TRAINING ACCURACY = %s \%%}' % np.round(acctrain,1),color='k',
+        plt.text(-0.9,-1,r'\textbf{TRAINING ACCURACY = %s \%%}' % np.round(acctrain,1),color='k',
               fontsize=7)
-        plt.text(-0.9,-1,r'\textbf{TESTING ACCURACY = %s \%%}' % np.round(acctest,1),color='k',
+        plt.text(-0.9,-2,r'\textbf{TESTING ACCURACY = %s \%%}' % np.round(acctest,1),color='k',
                   fontsize=7)
         
         plt.savefig(directoryfigure + '%s/Regions/LRPComposites_%s.png' % (typeOfAnalysis,saveData),dpi=300)
@@ -430,7 +440,8 @@ for va in range(len(variablesall)):
         fig = plt.figure(figsize=(6,8))
         ###############################################################################
         ax1 = plt.subplot(311)
-        m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        m = Basemap(projection='npstere',boundinglat=65,lon_0=0,
+                    resolution='l',round =True,area_thresh=10000)
         m.drawcoastlines(color='darkgrey',linewidth=0.27)
             
         var, lons_cyclic = addcyclic(meanlrpobs, lon1)
@@ -460,7 +471,8 @@ for va in range(len(variablesall)):
         ###############################################################################
         
         ax2 = plt.subplot(312)
-        m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        m = Basemap(projection='npstere',boundinglat=65,lon_0=0,
+                    resolution='l',round =True,area_thresh=10000)
         m.drawcoastlines(color='darkgrey',linewidth=0.27)
             
         var, lons_cyclic = addcyclic(lrp_maxModelObs, lon1)
@@ -493,7 +505,8 @@ for va in range(len(variablesall)):
         ###############################################################################
         
         ax3 = plt.subplot(313)
-        m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        m = Basemap(projection='npstere',boundinglat=65,lon_0=0,
+                    resolution='l',round =True,area_thresh=10000)
         m.drawcoastlines(color='darkgrey',linewidth=0.27)
             
         var, lons_cyclic = addcyclic(lrp_maxModelObsNOT, lon1)

@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'Arctic'
+reg_name = 'narrowTropics'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -78,7 +78,7 @@ else:
     lenOfPicks = len(modelGCMs)
 ###############################################################################
 ###############################################################################
-land_only = True
+land_only = False
 ocean_only = False
 if land_only == True:
     maskNoiseClass = 'land'
@@ -287,13 +287,23 @@ if typeOfAnalysis == 'issueWithExperiment':
     sys.exit('Wrong parameters selected to analyze')
     
 ### Select how to save files
-if land_only == True:
-    saveData = timeper + '_LAND' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
-elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+if seasons[0] != 'annual':
+    if land_only == True:
+        saveData = timeper + '_' + seasons[0] + '_LAND' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    elif ocean_only == True:
+        saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    else:
+        saveData = timeper + '_' + seasons[0] + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    print('*Filename == < %s >' % saveData)
 else:
-    saveData = timeper + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
-print('*Filename == < %s >' % saveData) 
+    ### Select how to save files
+    if land_only == True:
+        saveData = timeper + '_LAND' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    elif ocean_only == True:
+        saveData = timeper + '_OCEAN' + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    else:
+        saveData = timeper + '_LINEAR_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    print('*Filename == < %s >' % saveData) 
 
 ###############################################################################
 ###############################################################################
@@ -819,7 +829,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         option4 = True
         biasBool = False
         hiddensList = [[0]]
-        ridge_penalty = [0]
+        ridge_penalty = [0.1]
         actFun = 'linear'
         
         expList = [(0)] # (0,1)

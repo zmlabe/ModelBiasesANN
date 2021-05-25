@@ -19,15 +19,16 @@ from sklearn.metrics import accuracy_score
 import scipy.stats as sts
 import cmasher as cmr
 import cmocean
+from statsmodels.nonparametric.smoothers_lowess import lowess
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-variablesall = ['SLP']
+variablesall = ['T2M']
 pickSMILEall = [[]] 
-ridge_penalty = [0,0.01,0.1,1,5]
+ridge_penalty = [0,0.1]
 lab = ['LINEAR','LINEAR-L$_{2}$=0.1','ANN-L$_{2}$=0.1','ANN(smooth)-L$_{2}$=0.1']
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -46,7 +47,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'SMILEGlobe'
+        reg_name = 'Arctic'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -58,7 +59,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         land_only = False
-        ocean_only = False
+        ocean_only = True
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
@@ -246,7 +247,7 @@ for va in range(len(variablesall)):
             saveDataANNs = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         else:
             saveDataANNs = timeper + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
-        print('*Filename == < %s >' % saveDataANN) 
+        print('*Filename == < %s >' % saveDataANNs) 
         
         ###############################################################################
         ###############################################################################
@@ -323,6 +324,9 @@ for r in range(len(lab)*2):
                 if i == la:
                     plt.scatter(yearsall[yr],obsout[yr,i],color=c,s=9,zorder=12,
                                 clip_on=False,alpha=1,edgecolors='none')
+        
+        low = lowess(np.nanmax(obsout,axis=1),yearsall,frac=1/3)
+        plt.plot(yearsall,low[:,1],linestyle='-',linewidth=0.5,color='r')
                 
         
         if r == 1:
@@ -344,11 +348,11 @@ for r in range(len(lab)*2):
         
         if r == 0:  
             if land_only == True:
-                plt.ylabel(r'\textbf{Confidence [%s-%s-LAND]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=23)
+                plt.ylabel(r'\textbf{Confidence [%s-%s-LAND-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=6,labelpad=23)
             elif ocean_only == True:
-                plt.ylabel(r'\textbf{Confidence [%s-%s-OCEAN]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=23)
+                plt.ylabel(r'\textbf{Confidence [%s-%s-OCEAN-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=6,labelpad=23)
             else:
-                plt.ylabel(r'\textbf{Confidence [%s-%s]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=23)
+                plt.ylabel(r'\textbf{Confidence [%s-%s-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=6,labelpad=23)
         plt.title(r'\textbf{%s}' % (lab[r]),color='dimgrey',fontsize=10)
     else:
         obspred = pred[r-4]
@@ -393,11 +397,11 @@ for r in range(len(lab)*2):
         plt.ylim([0,lenOfPicks-1])
         if r-4 == 0:  
             if land_only == True:
-                plt.ylabel(r'\textbf{Prediction [%s-%s-LAND]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=7.5)
+                plt.ylabel(r'\textbf{Prediction [%s-%s-LAND-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=6,labelpad=7.5)
             elif ocean_only == True:
-                plt.ylabel(r'\textbf{Prediction [%s-%s-OCEAN]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=7.5)
+                plt.ylabel(r'\textbf{Prediction [%s-%s-OCEAN-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=6,labelpad=7.5)
             else:
-                plt.ylabel(r'\textbf{Prediction [%s-%s]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=7.5)
+                plt.ylabel(r'\textbf{Prediction [%s-%s-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=6,labelpad=7.5)
         
 # plt.tight_layout()
 # plt.subplots_adjust(bottom=0.15)

@@ -46,7 +46,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'SMILEGlobe'
+        reg_name = 'Arctic'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -328,11 +328,11 @@ for r in range(len(lab)*2):
         
         if r == 0:  
             if land_only == True:
-                plt.ylabel(r'\textbf{Confidence [%s-%s-LAND]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=23)
+                plt.ylabel(r'\textbf{Confidence [%s-%s-LAND-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=8,labelpad=23)
             elif ocean_only == True:
-                plt.ylabel(r'\textbf{Confidence [%s-%s-OCEAN]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=23)
+                plt.ylabel(r'\textbf{Confidence [%s-%s-OCEAN-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=8,labelpad=23)
             else:
-                plt.ylabel(r'\textbf{Confidence [%s-%s]' % (seasons[0],variq),color='dimgrey',fontsize=8,labelpad=23)
+                plt.ylabel(r'\textbf{Confidence [%s-%s-%s]' % (seasons[0],variq,reg_name),color='dimgrey',fontsize=8,labelpad=23)
         plt.title(r'\textbf{%s}' % (lab[r]),color='dimgrey',fontsize=10)
     else:
         obspred = pred[r-3]

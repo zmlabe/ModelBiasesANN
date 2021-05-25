@@ -29,24 +29,53 @@ dataset_obs = ['ERA5BE']
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 typeOfCorr = ['R','R-DT','R-RMGLO','R-TREND']
 variables = ['T2M','P','SLP']
-reg_name = 'SMILEGlobe'
+reg_name = 'narrowTropics'
 level = 'surface'
 timeper = 'historical'
 option = 8
+land_only = False
+ocean_only = False
+
 if timeper == 'historical':
     years = np.arange(1950,2019+1,1)
+if reg_name == 'SMILEGlobe':
+    region = 'Global'
+elif reg_name == 'narrowTropics':
+    region = 'Tropics'
+elif reg_name == 'Arctic':
+    region = 'Arctic'
 
 ### Read in data
 for vv in range(len(variables)):
     for mo in range(len(monthlychoiceq)):
 # for vv in range(1):
-#      for mo in range(1):
+#       for mo in range(1):
         variq = variables[vv]
         monthlychoice = monthlychoiceq[mo]
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
         directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/patternCorr/%s/%s/' % (variq,option)
-        saveData =  monthlychoice + '_' + variq + '_' + reg_name
-        print('*Filename == < %s >' % saveData) 
+        if reg_name != 'SMILEGlobe':
+            saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + timeper
+            if land_only == True:
+                saveData =  monthlychoice + '_LAND_' + variq + '_' + reg_name + '_' + timeper
+                typemask = 'LAND'
+            elif ocean_only == True:
+                saveData =  monthlychoice + '_OCEAN_' + variq + '_' + reg_name + '_' + timeper
+                typemask = 'OCEAN'
+            else:
+                typemask = 'LAND/OCEAN'
+            print('*Filename == < %s >' % saveData) 
+        else:
+            saveData =  monthlychoice + '_' + variq + '_' + reg_name
+            if land_only == True:
+                saveData =  monthlychoice + '_LAND_' + variq + '_' + reg_name
+                typemask = 'LAND'
+            elif ocean_only == True:
+                saveData =  monthlychoice + '_OCEAN_' + variq + '_' + reg_name
+                typemask = 'OCEAN'
+            else:
+                typemask = 'LAND/OCEAN'
+            print('*Filename == < %s >' % saveData) 
         
         corr = np.load(directorydata + saveData + '_corrs.npz')['arr_0'][:option]
         corrdt = np.load(directorydata + saveData + '_corrsdt.npz')['arr_0'][:option]
@@ -163,7 +192,7 @@ for vv in range(len(variables)):
             plt.ylim([-0.1,1])
             
             plt.xlabel(r'\textbf{highest R - [climate model data] - %s}' % (monthlychoice),color='dimgrey',fontsize=8,labelpad=8)
-            plt.title(r'\textbf{...AND FOR LINEAR TRENDS}',color='k',fontsize=15)
+            plt.title(r'\textbf{...AND FOR LINEAR TRENDS - %s - %s}' % (region,typemask),color='k',fontsize=15)
             
             plt.tight_layout()
             plt.savefig(directoryfigure + saveData + '_%s_RawClimateModel_PatternCorrelations_%sclasses.png' % (typeOfCorr[ii],len(corr)),dpi=300)
@@ -192,16 +221,39 @@ for vv in range(len(variables)):
                             clip_on=False,alpha=1)
             
             if variq == 'T2M':
-                leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
-                              bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
-                              handlelength=0,handletextpad=0)
-                for line,text in zip(leg.get_lines(), leg.get_texts()):
-                    text.set_color(line.get_color())
-                
-                plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
-                plt.yticks(np.arange(0.98,1.01,0.005),map(str,np.round(np.arange(0.98,1.01,0.005),3)),size=6)
-                plt.xlim([1950,2020])   
-                plt.ylim([0.98,1.0])
+                if reg_name == 'SMILEGlobe':
+                    leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                                  bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
+                                  handlelength=0,handletextpad=0)
+                    for line,text in zip(leg.get_lines(), leg.get_texts()):
+                        text.set_color(line.get_color())
+                    
+                    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                    plt.yticks(np.arange(0.98,1.01,0.005),map(str,np.round(np.arange(0.98,1.01,0.005),3)),size=6)
+                    plt.xlim([1950,2020])   
+                    plt.ylim([0.98,1.0])
+                elif reg_name == 'narrowTropics':
+                    leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                                  bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
+                                  handlelength=0,handletextpad=0)
+                    for line,text in zip(leg.get_lines(), leg.get_texts()):
+                        text.set_color(line.get_color())
+                    
+                    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                    plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
+                    plt.xlim([1950,2020])   
+                    plt.ylim([0.6,1.0])
+                elif reg_name == 'Arctic':
+                    leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                                  bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
+                                  handlelength=0,handletextpad=0)
+                    for line,text in zip(leg.get_lines(), leg.get_texts()):
+                        text.set_color(line.get_color())
+                    
+                    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                    plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
+                    plt.xlim([1950,2020])   
+                    plt.ylim([0.6,1.0])
             else:
                 leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
                                   bbox_to_anchor=(0.5,0.15),fancybox=True,ncol=4,frameon=False,
@@ -215,7 +267,7 @@ for vv in range(len(variables)):
                 plt.ylim([0.4,1.0])                
         
             plt.xlabel(r'\textbf{Average R - [climate model data] - %s for %s}' % (monthlychoice,variq),color='dimgrey',fontsize=8,labelpad=8)
-            plt.title(r'\textbf{PATTERN CORRELATIONS PER YEAR}',color='k',fontsize=15)
+            plt.title(r'\textbf{PATTERN CORRELATIONS PER YEAR - %s - %s}' % (region,typemask),color='k',fontsize=15)
         
             plt.tight_layout()
             

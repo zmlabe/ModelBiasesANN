@@ -31,13 +31,13 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
-reg_name = 'narrowTropics'
+reg_name = 'Arctic'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = False
+ocean_only = True
 ###############################################################################
 ###############################################################################
 baseline = np.arange(1951,1980+1,1)
@@ -89,6 +89,14 @@ for vv in range(len(variables)):
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
         directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/patternCorr/%s/' % variq
         saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + timeper
+        if land_only == True:
+            saveData =  monthlychoice + '_LAND_' + variq + '_' + reg_name + '_' + timeper
+            typemask = 'LAND'
+        elif ocean_only == True:
+            saveData =  monthlychoice + '_OCEAN_' + variq + '_' + reg_name + '_' + timeper
+            typemask = 'OCEAN'
+        else:
+            typemask = 'LAND/OCEAN'
         print('*Filename == < %s >' % saveData) 
         
         ### Read data
@@ -110,6 +118,26 @@ for vv in range(len(variables)):
         ### Add on additional "model" which is a multi-model mean
         modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
         modelsall = np.append(models,modelmean,axis=0)
+        
+###############################################################################        
+###############################################################################                        
+        if land_only == True:
+            modelsall, data_obs = dSS.remove_ocean(modelsall,data_obs,
+                                              lat_bounds,
+                                              lon_bounds) 
+            print('\n*Removed ocean data*')
+###############################################################################
+###############################################################################
+        if ocean_only == True:
+            modelsall, data_obs = dSS.remove_land(modelsall,data_obs,
+                                              lat_bounds,
+                                              lon_bounds) 
+            print('\n*Removed land data*')  
+###############################################################################
+###############################################################################        
+        ### Change 0s for mask to nans
+        modelsall[modelsall == 0.] = np.nan
+        data_obs[data_obs == 0.] = np.nan
         
         ### Meshgrid of lat/lon
         lon2,lat2 = np.meshgrid(lons,lats)

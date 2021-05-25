@@ -138,6 +138,14 @@ def read_ERA5_monthlyBE(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
             varshape = vartime
         print('Shape of output = ', varshape.shape,[[varshape.ndim]])
         print('Completed: JAS MEAN!')
+    elif sliceperiod == 'SON':
+        vartime = np.nanmean(varmon[:,8:11,:,:],axis=1)
+        if sliceshape == 1:
+            varshape = vartime.ravel()
+        elif sliceshape == 3:
+            varshape = vartime
+        print('Shape of output = ', varshape.shape,[[varshape.ndim]])
+        print('Completed: SON MEAN!')
     elif sliceperiod == 'OND':
         vartime = np.nanmean(varmon[:,9:,:,:],axis=1)
         if sliceshape == 1:

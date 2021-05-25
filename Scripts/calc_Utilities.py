@@ -985,7 +985,13 @@ def regions(name):
         lon_bounds = (0., 360.)  
     elif name == 'narrowTropics':
         lat_bounds = (-20., 20.)
-        lon_bounds = (0., 360.)  
+        lon_bounds = (0., 360.)      
+    elif name == 'eqPacific':
+        lat_bounds = (-20., 20.)
+        lon_bounds = (120., 260.)     
+    elif name == 'ENSO':
+        lat_bounds = (-20., 20.)
+        lon_bounds = (160., 255.) 
     elif name == 'wideTropics':
         lat_bounds = (-50., 50.)
         lon_bounds = (0., 360.)  
