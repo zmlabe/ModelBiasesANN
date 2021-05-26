@@ -40,7 +40,7 @@ for va in range(len(variablesall)):
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
         dataset_obs = 'ERA5BE'
-        seasons = ['JFM']
+        seasons = ['SON']
         variq = variablesall[va]
         reg_name = 'Arctic'
         timeper = 'historical'

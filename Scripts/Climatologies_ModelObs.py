@@ -38,10 +38,16 @@ allDataLabels = [dataset_obs,'CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 monthlychoiceq = ['JFM','AMJ','JAS','OND','annual']
+monthlychoiceq = ['annual']
 variables = ['T2M','P','SLP']
 # variables = ['T2M']
 reg_name = 'SMILEGlobe'
 level = 'surface'
+###############################################################################
+###############################################################################
+randomalso = False
+timeper = 'historical'
+shuffletype = 'GAUSS'
 ###############################################################################
 ###############################################################################
 land_only = False
@@ -71,16 +77,15 @@ lensalso = True
 ###############################################################################
 ###############################################################################
 ### Read in model and observational/reanalysis data
-def read_primary_dataset(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
-    data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary)
+def read_primary_dataset(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
+    data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
     datar,lats,lons = df.getRegion(data,lats,lons,lat_bounds,lon_bounds)
     print('\nOur dataset: ',dataset,' is shaped',data.shape)
     return datar,lats,lons
   
-def read_obs_dataset(variq,dataset_obs,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
-    data_obs,lats_obs,lons_obs = df.readFiles(variq,dataset_obs,monthlychoice,numOfEns,lensalso,ravelyearsbinary,ravelbinary)
-    data_obs,lats_obs,lons_obs = df.getRegion(data_obs,lats_obs,lons_obs,
-                                            lat_bounds,lon_bounds)
+def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
+    data_obs,lats_obs,lons_obs = df.readFiles(variq,dataset_obs,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
+    data_obs,lats_obs,lons_obs = df.getRegion(data_obs,lats_obs,lons_obs,lat_bounds,lon_bounds)
     
     print('our OBS dataset: ',dataset_obs,' is shaped',data_obs.shape)
     return data_obs,lats_obs,lons_obs
@@ -104,8 +109,10 @@ def calcCorrs(era,mod):
     return corrm,pvalue
 
 ### Call functions
-for vv in range(len(variables)):
-    for mo in range(len(monthlychoiceq)):
+# for vv in range(len(variables)):
+#     for mo in range(len(monthlychoiceq)):
+for vv in range(1):
+    for mo in range(1):
         variq = variables[vv]
         monthlychoice = monthlychoiceq[mo]
         directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/%s/' % variq
@@ -114,12 +121,10 @@ for vv in range(len(variables)):
     
         ### Read data
         models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
-                                                lensalso,ravelyearsbinary,ravelbinary,
+                                                lensalso,randomalso,ravelyearsbinary,
+                                                ravelbinary,shuffletype,timeper,
                                                 lat_bounds,lon_bounds)
-        obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,monthlychoice,numOfEns,
-                                                  lensalso,ravelyearsbinary,
-                                                  ravelbinary,lat_bounds,
-                                                  lon_bounds)
+        obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
         modelanom,obsanom = dSS.calculate_anomalies(models,obs,lats,lons,baseline,yearsall)
         modelannmean,obsannmean = dSS.remove_annual_mean(models,obs,lats,lons,lats_obs,lons_obs)
 
@@ -391,6 +396,77 @@ for vv in range(len(variables)):
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
         
         plt.savefig(directoryfigure + 'Trend-%s.png' % saveData,dpi=300)
+        
+###############################################################################
+###############################################################################
+###############################################################################     
+        #######################################################################
+        #######################################################################
+        #######################################################################
+        ### Plot subplot of model trends        
+        if variq == 'T2M':
+            limit = np.arange(-1,1.01,0.05)
+            barlim = np.round(np.arange(-1,1.01,0.25),2)
+            cmap = cmocean.cm.balance
+            label = r'\textbf{%s -- [$^{\circ}$C PER DECADE] -- 1950-2019}' % variq
+        elif variq == 'P':
+            limit = np.arange(-0.3,0.301,0.01)
+            barlim = np.round(np.arange(-0.30,0.301,0.1),2)
+            cmap = cmocean.cm.tarn                                                                                                                                   
+            label = r'\textbf{%s -- [mm/day PER DECADE] -- 1950-2019}' % variq
+        elif variq == 'SLP':
+            limit = np.arange(-0.4,0.401,0.01)
+            barlim = np.round(np.arange(-0.4,0.401,0.2),2)
+            cmap = cmocean.cm.diff
+            label = r'\textbf{%s -- [hPa PER DECADE] -- 1950-2019}' % variq
+        
+        fig = plt.figure(figsize=(8,4))
+        for r in range(len(allDataLabels)):
+            var = trendall[r]
+            
+            ax1 = plt.subplot(2,4,r+1)
+            m = Basemap(projection='npstere',boundinglat=65,lon_0=0,
+                        resolution='l',round =True,area_thresh=10000)
+            m.drawcoastlines(color='dimgrey',linewidth=0.27)
+                
+            var, lons_cyclic = addcyclic(var, lons)
+            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
+            x, y = m(lon2d, lat2d)
+               
+            if r == 0:
+                circle = m.drawmapboundary(fill_color='white',color='k',
+                                  linewidth=3)
+                circle.set_clip_on(False)
+            else:
+                circle = m.drawmapboundary(fill_color='white',color='dimgray',
+                                  linewidth=0.7)
+                circle.set_clip_on(False)
+            
+            cs1 = m.contourf(x,y,var,limit,extend='both')
+            cs1.set_cmap(cmap) 
+                    
+            ax1.annotate(r'\textbf{%s}' % allDataLabels[r],xy=(0,0),xytext=(0.5,1.10),
+                          textcoords='axes fraction',color='dimgrey',fontsize=8,
+                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+                          textcoords='axes fraction',color='k',fontsize=6,
+                          rotation=330,ha='center',va='center')
+            
+        ###############################################################################
+        cbar_ax1 = fig.add_axes([0.36,0.11,0.3,0.03])                
+        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+                            extend='both',extendfrac=0.07,drawedges=False)
+        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        cbar1.set_ticks(barlim)
+        cbar1.set_ticklabels(list(map(str,barlim)))
+        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        cbar1.outline.set_edgecolor('dimgrey')
+        
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
+        
+        plt.savefig(directoryfigure + 'Trend-Arctic-%s.png' % saveData,dpi=300)
         
 ###############################################################################
 ###############################################################################

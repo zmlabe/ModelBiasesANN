@@ -31,13 +31,13 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
-reg_name = 'Arctic'
+reg_name = 'SMILEGlobe'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = True
+ocean_only = False
 ###############################################################################
 ###############################################################################
 baseline = np.arange(1951,1980+1,1)
@@ -82,8 +82,10 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
 ###############################################################################
 ###############################################################################
 ### Call functions
-for vv in range(len(variables)):
-    for mo in range(len(monthlychoiceq)):
+# for vv in range(len(variables)):
+#     for mo in range(len(monthlychoiceq)):
+for vv in range(1):
+    for mo in range(1):
         variq = variables[vv]
         monthlychoice = monthlychoiceq[mo]
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'

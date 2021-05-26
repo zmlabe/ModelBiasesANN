@@ -29,13 +29,13 @@ dataset_obs = ['ERA5BE']
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 typeOfCorr = ['RMSE']
 variables = ['T2M','P','SLP']
-reg_name = 'Arctic'
+reg_name = 'SMILEGlobe'
 level = 'surface'
 timeper = 'historical'
 if timeper == 'historical':
     years = np.arange(1950,2019+1,1)
 land_only = False
-ocean_only = True
+ocean_only = False
 
 if reg_name == 'SMILEGlobe':
     region = 'Global'
