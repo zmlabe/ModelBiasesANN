@@ -43,7 +43,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'wideTropics'
+        reg_name = 'Arctic'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -209,13 +209,13 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData =  timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'LAND'
         elif ocean_only == True:
-            saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData =  timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'OCEAN'
         else:
-            saveData = timeper + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData =  timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'GLOBAL'
         print('*Filename == < %s >' % saveData) 
         ###############################################################################

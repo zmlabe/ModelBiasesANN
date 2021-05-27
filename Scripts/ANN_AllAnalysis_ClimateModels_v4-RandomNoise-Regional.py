@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'narrowTropics'
+reg_name = 'Arctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -79,7 +79,7 @@ else:
 ###############################################################################
 ###############################################################################
 land_only = False
-ocean_only = True
+ocean_only = False
 if land_only == True:
     maskNoiseClass = 'land'
 elif ocean_only == True:
