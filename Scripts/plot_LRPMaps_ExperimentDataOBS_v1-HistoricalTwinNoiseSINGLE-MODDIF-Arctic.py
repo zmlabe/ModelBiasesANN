@@ -28,7 +28,7 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 variablesall = ['T2M','P','SLP']
-variablesall = ['T2M']
+variablesall = ['annual']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -45,9 +45,9 @@ for va in range(len(variablesall)):
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
         dataset_obs = 'ERA5BE'
-        seasons = ['annual']
+        seasons = ['SON']
         variq = variablesall[va]
-        reg_name = 'SMILEGlobe'
+        reg_name = 'LowerArctic'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -382,7 +382,12 @@ for va in range(len(variablesall)):
             var = lrpobs[r]
             
             ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lon1)
@@ -435,8 +440,8 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Plot subplot of observations
         if variq == 'T2M':
-            limit = np.arange(-2,2.01,0.01)
-            barlim = np.round(np.arange(-2,3,1),2)
+            limit = np.arange(-4,4.01,0.05)
+            barlim = np.round(np.arange(-4,5,1),2)
             cmap = cmocean.cm.balance
             label = r'\textbf{OBS - [T2M : $^{\circ}$C]}'
         elif variq == 'P':
@@ -455,7 +460,12 @@ for va in range(len(variablesall)):
             var = dataanomsobstest[r]
             
             ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lon1)
@@ -508,8 +518,8 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Plot subplot of observations (dt)
         if variq == 'T2M':
-            limit = np.arange(-1,1.01,0.01)
-            barlim = np.round(np.arange(-1,2,1),2)
+            limit = np.arange(-4,4.01,0.05)
+            barlim = np.round(np.arange(-4,5,1),2)
             cmap = cmocean.cm.balance
             label = r'\textbf{OBSdt - [T2M : $^{\circ}$C]}'
         elif variq == 'P':
@@ -528,7 +538,12 @@ for va in range(len(variablesall)):
             var = dataanomsobstestdt[r]
             
             ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lon1)
@@ -581,8 +596,8 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Plot subplot of observations (glo)
         if variq == 'T2M':
-            limit = np.arange(-1,1.01,0.01)
-            barlim = np.round(np.arange(-1,2,1),2)
+            limit = np.arange(-4,4.01,0.05)
+            barlim = np.round(np.arange(-4,5,1),2)
             cmap = cmocean.cm.balance
             label = r'\textbf{OBSglo - [T2M : $^{\circ}$C]}'
         elif variq == 'P':
@@ -601,7 +616,12 @@ for va in range(len(variablesall)):
             var = dataanomsobstestglo[r]
             
             ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lon1)
@@ -654,8 +674,8 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Plot subplot of observations (z)
         if variq == 'T2M':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,4,1),2)
+            limit = np.arange(-4,4.01,0.05)
+            barlim = np.round(np.arange(-4,5,1),2)
             cmap = cmocean.cm.balance
             label = r'\textbf{OBSz - [T2M : $^{\circ}$C]}'
         elif variq == 'P':
@@ -674,7 +694,12 @@ for va in range(len(variablesall)):
             var = dataanomsobstestz[r]
             
             ax1 = plt.subplot(1,lenOfPicks,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lon1)

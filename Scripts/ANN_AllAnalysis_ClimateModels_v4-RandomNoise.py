@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'Arctic'
+reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################

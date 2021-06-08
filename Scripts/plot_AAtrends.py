@@ -40,7 +40,7 @@ monthlychoiceq = ['JFM','AMJ','JAS','OND','annual']
 monthlychoiceq = ['annual']
 variables = ['T2M','P','SLP']
 # variables = ['T2M']
-slicetimeperiod = 'AA'
+slicetimeperiod = 'preAA'
 reg_name = 'SMILEGlobe'
 level = 'surface'
 ###############################################################################
@@ -119,7 +119,7 @@ def readInData(variables,monthlychoice,reg_name,dataset_obs,slicetimeperiod):
         models = models[:,:,yearsq,:,:]
         obs = obs[yearsq,:,:]
     elif slicetimeperiod == 'preAA':
-        yearsq = np.where((yearsall >= 1950) & (yearsall <= 1999))[0]
+        yearsq = np.where((yearsall >= 1950) & (yearsall <= 1989))[0]
         yearsnew = yearsall[yearsq]
         models = models[:,:,yearsq,:,:]
         obs = obs[yearsq,:,:]
@@ -176,7 +176,7 @@ for vv in range(1):
                 limit = np.arange(-0.5,0.51,0.01)
                 barlim = np.round(np.arange(-0.5,0.51,0.25),2)
                 cmap = cmocean.cm.balance
-                label = r'\textbf{%s -- [$^{\circ}$C PER DECADE] -- 1950-1999}' % variq
+                label = r'\textbf{%s -- [$^{\circ}$C PER DECADE] -- 1950-1989}' % variq
         elif variq == 'P':
             limit = np.arange(-0.3,0.301,0.01)
             barlim = np.round(np.arange(-0.30,0.301,0.1),2)

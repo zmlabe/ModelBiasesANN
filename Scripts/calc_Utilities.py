@@ -1002,7 +1002,7 @@ def regions(name):
         lat_bounds = (-89., -20.)
         lon_bounds = (0., 360.)  
     elif name == 'Arctic':
-        lat_bounds = (65.,87.)
+        lat_bounds = (70.,87.)
         lon_bounds = (0., 360.)  
     elif name == 'LowerArctic':
         lat_bounds = (60.,87.)
@@ -1024,6 +1024,9 @@ def regions(name):
         lon_bounds = (0., 360.)  
     elif name == 'SHExtra':
         lat_bounds = (-65.,-30.)
+        lon_bounds = (0., 360.)  
+    elif name == 'SouthernOcean':
+        lat_bounds = (-67.,-50.)
         lon_bounds = (0., 360.)  
     elif name == 'SriLanka':
         lat_bounds = (6., 9.)

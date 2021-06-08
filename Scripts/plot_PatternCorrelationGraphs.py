@@ -29,7 +29,7 @@ dataset_obs = ['ERA5BE']
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 typeOfCorr = ['R','R-DT','R-RMGLO','R-TREND']
 variables = ['T2M','P','SLP']
-reg_name = 'narrowTropics'
+reg_name = 'SouthernOcean'
 level = 'surface'
 timeper = 'historical'
 option = 8
@@ -44,6 +44,8 @@ elif reg_name == 'narrowTropics':
     region = 'Tropics'
 elif reg_name == 'Arctic':
     region = 'Arctic'
+elif reg_name == 'SouthernOcean':
+    region = 'Southern Ocean'
 
 ### Read in data
 for vv in range(len(variables)):
@@ -243,6 +245,17 @@ for vv in range(len(variables)):
                     plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
                     plt.xlim([1950,2020])   
                     plt.ylim([0.6,1.0])
+                elif reg_name == 'SouthernOcean':
+                    leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                                  bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
+                                  handlelength=0,handletextpad=0)
+                    for line,text in zip(leg.get_lines(), leg.get_texts()):
+                        text.set_color(line.get_color())
+                    
+                    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                    plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
+                    plt.xlim([1950,2020])   
+                    plt.ylim([0.9,1.0])
                 elif reg_name == 'Arctic':
                     leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
                                   bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
