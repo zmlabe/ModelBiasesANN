@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'Arctic'
+reg_name = 'LowerArctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -78,7 +78,7 @@ else:
     lenOfPicks = len(modelGCMs)
 ###############################################################################
 ###############################################################################
-land_only = True
+land_only = False
 ocean_only = False
 if land_only == True:
     maskNoiseClass = 'land'
@@ -291,12 +291,12 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_LAND' + '_LINEAR_SMOOTHER_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_LAND' + '_LINEAR_MODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_LINEAR_SMOOTHER_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_LINEAR_MODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_LINEAR_SMOOTHER_MODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
-print('*Filename == < %s >' % saveData) 
+    saveData = timeper + '_' + seasons[0] + '_LINEAR_MODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+print('*Filename == < %s >' % saveData)
 
 ###############################################################################
 ###############################################################################

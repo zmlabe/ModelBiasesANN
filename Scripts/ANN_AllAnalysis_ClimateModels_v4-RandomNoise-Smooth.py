@@ -68,7 +68,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'narrowTropics'
+reg_name = 'Arctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -292,11 +292,11 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_LAND' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_OCEAN' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_SMOOTHER_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 ###############################################################################
 ###############################################################################
@@ -809,7 +809,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
         option4 = True
         biasBool = False
         hiddensList = [[10,10]]
-        ridge_penalty = [0.10]
+        ridge_penalty = [0.1]
         # hiddensList = [[8,8]]
         # ridge_penalty = [0.2]
         actFun = 'relu'
@@ -821,7 +821,6 @@ for sis,singlesimulation in enumerate(datasetsingle):
             option4 = True
             biasBool = False
             hiddensList = [[8,8]]
-            ridge_penalty = [0.10]
             actFun = 'relu'
         
         expList = [(0)] # (0,1)

@@ -25,10 +25,10 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-latarctic = 60
+latarctic = 70
 obsoutall = []
 regions = ['SMILEglobe','NH','SH','narrowTropics','Arctic','SouthernOcean']
-regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC','SOUTHERN OCEAN']
+regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC(%s)' % latarctic,'SOUTHERN OCEAN']
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         for rr in range(len(regions)):
@@ -327,4 +327,4 @@ for r,c in zip(range(len(regions)),color):
         
 # plt.tight_layout()
 # plt.subplots_adjust(bottom=0.15)
-plt.savefig(directoryfigure + '%s/Regions/Confidence/RegionsMaxConfidence.png' % (typeOfAnalysis),dpi=300)
+plt.savefig(directoryfigure + '%s/Regions/Confidence/RegionsMaxConfidence_%s.png' % (typeOfAnalysis,latarctic),dpi=300)
