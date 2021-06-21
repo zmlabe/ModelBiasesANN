@@ -99,33 +99,33 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
     print('our OBS dataset: ',dataset_obs,' is shaped',data_obs.shape)
     return data_obs,lats_obs,lons_obs
 
-# ### Call functions
-# vv = 0
-# mo = 0
-# variq = variables[vv]
-# monthlychoice = monthlychoiceq[mo]
-# directoryfigure = '/Users/zlabe/Documents/Projects/ModelBiasesANN/Dark_Figures/'
-# saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
-# print('*Filename == < %s >' % saveData) 
+### Call functions
+vv = 0
+mo = 0
+variq = variables[vv]
+monthlychoice = monthlychoiceq[mo]
+directoryfigure = '/Users/zlabe/Documents/Projects/ModelBiasesANN/Dark_Figures/'
+saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
+print('*Filename == < %s >' % saveData) 
 
-# ### Read data
-# models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
-#                                         lensalso,randomalso,ravelyearsbinary,
-#                                         ravelbinary,shuffletype,timeper,
-#                                         lat_bounds,lon_bounds)
-# obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
+### Read data
+models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
+                                        lensalso,randomalso,ravelyearsbinary,
+                                        ravelbinary,shuffletype,timeper,
+                                        lat_bounds,lon_bounds)
+obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
 
-# ### Calculate global mean temperature
-# lon2,lat2 = np.meshgrid(lons,lats)
-# modelsm = UT.calc_weightedAve(models,lat2)
-# obsm = UT.calc_weightedAve(obs,lat2)
+### Calculate global mean temperature
+lon2,lat2 = np.meshgrid(lons,lats)
+modelsm = UT.calc_weightedAve(models,lat2)
+obsm = UT.calc_weightedAve(obs,lat2)
 
-# ###############################################################################          
-# ### Calculate ensemble spread statistics
-# meaens = np.nanmean(modelsm[:,:,:],axis=1)
-# maxens = np.nanmax(modelsm[:,:,:],axis=1)
-# minens = np.nanmin(modelsm[:,:,:],axis=1)
-# spread = maxens - minens
+###############################################################################          
+### Calculate ensemble spread statistics
+meaens = np.nanmean(modelsm[:,:,:],axis=1)
+maxens = np.nanmax(modelsm[:,:,:],axis=1)
+minens = np.nanmin(modelsm[:,:,:],axis=1)
+spread = maxens - minens
 
 ###############################################################################
 ###############################################################################

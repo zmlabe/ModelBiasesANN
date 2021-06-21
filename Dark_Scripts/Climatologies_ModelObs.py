@@ -47,7 +47,7 @@ datasetsingle = ['SMILE']
 monthlychoiceq = ['JFM','AMJ','JAS','OND','annual']
 monthlychoiceq = ['annual']
 variables = ['T2M','P','SLP']
-# variables = ['T2M']
+variables = ['P']
 reg_name = 'SMILEGlobe'
 level = 'surface'
 ###############################################################################

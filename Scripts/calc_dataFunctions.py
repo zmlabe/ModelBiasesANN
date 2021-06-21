@@ -126,6 +126,16 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
         ensYes = False
         lat1,lon1,data,ENSmean = RA.read_randomData_monthly(directorydataRA,variq,monthlychoice,
                                                             sliceshapeRA,slicenanRA,numOfEnsRA,ensYes,shuffletype,timeper)
+    elif dataset == 'CESM2LEmean':
+        if timeper == 'historical':
+            import read_CESM2LEmean_historical as CE
+            directorydataCE = '/Users/zlabe/Data/CESM2-LE/monthly/'
+            sliceshapeCE = 4
+            slicenanCE = 'nan'
+            ENSmean = np.nan
+            lat1,lon1,data = CE.readCESM2LEmean(directorydataCE,variq,
+                                                monthlychoice,sliceshapeCE,
+                                                slicenanCE)    
     elif dataset == 'SMILE':
         if timeper == 'historical':
             import read_SMILE_historical as SM

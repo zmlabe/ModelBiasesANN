@@ -30,7 +30,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
-reg_name = 'narrowTropics'
+reg_name = 'SouthernOcean'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
