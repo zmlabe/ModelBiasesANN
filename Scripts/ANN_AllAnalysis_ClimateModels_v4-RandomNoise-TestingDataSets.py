@@ -116,7 +116,7 @@ ensTypeExperi = 'ENS'
 # shuffletype = 'ALLENSRAND'
 # shuffletype = 'ALLENSRANDrmmean'
 shuffletype = 'RANDGAUSS'
-sizeOfTwin = 4 # name of experiment for adding noise class #8
+sizeOfTwin = 0 # name of experiment for adding noise class #8
 if sizeOfTwin > 0:
     sizeOfTwinq = 1
 else:
@@ -291,11 +291,11 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 
 ###############################################################################
@@ -1016,7 +1016,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         #######################################################
                         #######################################################
                         ### Check null hypothesis of random data!
-                        randtest = 'CESM2LEmean'
+                        randtest = 'RANDOM'
                         timepertest = 'historical'
                         randarray,latsra,lonsra = read_primary_dataset(variq,randtest,
                                                                        numOfEns,lensalso,
@@ -1052,14 +1052,14 @@ for sis,singlesimulation in enumerate(datasetsingle):
         randout = YpredRand
         labelsrand = np.argmax(randout,axis=1)
         uniquerand,countrand = np.unique(labelsrand,return_counts=True)
-        # np.savetxt(directoryoutput + '%sLabels_' % randtest + saveData + '.txt',labelsrand)
-        # np.savetxt(directoryoutput + '%sConfid_' % randtest + saveData + '.txt',randout)
+        np.savetxt(directoryoutput + '%sLabels_' % randtest + saveData + '.txt',labelsrand)
+        np.savetxt(directoryoutput + '%sConfid_' % randtest + saveData + '.txt',randout)
             
         ### Observations
         obsout = YpredObs
         labelsobs = np.argmax(obsout,axis=1)
         uniqueobs,countobs = np.unique(labelsobs,return_counts=True)
-        sys.exit()
+        
         np.savetxt(directoryoutput + 'obsLabels_' + saveData + '.txt',labelsobs)
         np.savetxt(directoryoutput + 'obsConfid_' + saveData + '.txt',obsout)
         
@@ -1219,3 +1219,20 @@ for sis,singlesimulation in enumerate(datasetsingle):
         netcdfLRP(lats,lons,lrptrain,directoryoutput,'Training',saveData)
         netcdfLRP(lats,lons,lrptest,directoryoutput,'Testing',saveData)
         netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
+        
+
+### TSNE test code
+from keras import models
+from sklearn.manifold import TSNE
+layer_outputs = [layer.output for layer in model.layers[:]]
+activation_model = models.Model(inputs=model.input, outputs=layer_outputs)
+activations = activation_model.predict(XtrainS)
+plot_lines = []
+for l, layer in enumerate(activations):
+    layer_activation = activations[l]
+    layer_activation_embedded = TSNE(n_components=2).fit_transform(layer_activation)
+    cs = plt.scatter(layer_activation_embedded[:,0],layer_activation_embedded[:,1], cmap='plasma', s = 3)
+    plt.colorbar(cs)
+    plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+    plt.tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
+    plt.show()

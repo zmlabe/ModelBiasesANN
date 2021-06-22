@@ -1,14 +1,15 @@
 """
-Script for plotting softmax confidence after testing on observations 
+Script for plotting heat map of model rankings according to confidence
 
 Author     : Zachary M. Labe
-Date       : 11 May 2021
+Date       : 22 June 2021
 Version    : 4 (ANNv4)
 """
 
 ### Import packages
 import sys
 import matplotlib.pyplot as plt
+import matplotlib.colors as c
 import numpy as np
 import palettable.cubehelix as cm
 import palettable.scientific.sequential as sss
@@ -42,7 +43,25 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'LowerArctic'
+        reg_name = 'Antarctic'
+        if reg_name == 'SMILEGlobe':
+            reg_nameq = 'GLOBAL'
+        elif reg_name == 'LowerArctic':
+            reg_nameq = 'LOWER ARCTIC'
+        elif reg_name == 'Arctic':
+            reg_nameq = 'ARCTIC'
+        elif reg_name == 'narrowTropics':
+            reg_nameq = 'TROPICS'
+        elif reg_name == 'NH':
+            reg_nameq = 'NORTHERN HEMISPHERE'
+        elif reg_name == 'SH':
+            reg_nameq = 'SOUTHERN HEMISPHERE'
+        elif reg_name == 'SouthernOcean':
+            reg_nameq = 'SOUTHERN OCEAN'
+        elif reg_name == 'GlobeNoPoles':
+            reg_nameq = 'NO POLES'
+        elif reg_name == 'Antarctic':
+            reg_nameq = 'ANTARCTIC'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -239,78 +258,83 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         ###############################################################################
-        ###############################################################################       
-        ### Read in data
-                
+        ###############################################################################                      
         ### Read in observational data
-        obsout= np.genfromtxt(directorydata + 'obsConfid_' + saveData + '.txt')
-        label = np.argmax(obsout,axis=1)
+        obsout = np.genfromtxt(directorydata + 'obsConfid_' + saveData + '.txt')
         
+        ### Calculate temperature rankings
+        rank = np.empty(obsout.shape)
+        for i in range(obsout.shape[0]):
+            rank[i,:] = abs(sts.rankdata(obsout[i,:],method='average')-9)
+            
+        rank = np.transpose(rank)
+
         ###############################################################################
         ###############################################################################
         ###############################################################################
-        def adjust_spines(ax, spines):
-            for loc, spine in ax.spines.items():
-                if loc in spines:
-                    spine.set_position(('outward', 5))
-                else:
-                    spine.set_color('none')  
-            if 'left' in spines:
-                ax.yaxis.set_ticks_position('left')
-            else:
-                ax.yaxis.set_ticks([])
+        ###############################################################################                      
+        ### Call parameters
+        plt.rc('text',usetex=True)
+        plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
         
-            if 'bottom' in spines:
-                ax.xaxis.set_ticks_position('bottom')
-            else:
-                    ax.xaxis.set_ticks([]) 
-                    
-        ### Begin plot
+        ### Plot first meshgrid
         fig = plt.figure()
         ax = plt.subplot(111)
-        adjust_spines(ax, ['left', 'bottom'])
+        
         ax.spines['top'].set_color('none')
         ax.spines['right'].set_color('none')
-        ax.spines['left'].set_color('dimgrey')
-        ax.spines['bottom'].set_color('dimgrey')
-        ax.spines['left'].set_linewidth(2)
-        ax.spines['bottom'].set_linewidth(2)
-        ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-        # ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.3)
+        ax.spines['bottom'].set_color('none')
+        ax.spines['left'].set_color('none')
+        ax.get_xaxis().set_tick_params(direction='out', width=2,length=3,
+                    color='darkgrey')
+        ax.get_yaxis().set_tick_params(direction='out', width=2,length=3,
+                    color='darkgrey')
         
-        color = cmr.infinity(np.linspace(0.00,1,len(modelGCMsNames)))
-        for i,c in zip(range(len(modelGCMsNames)),color):
-            if i == 7:
-                c = 'k'
-            else:
-                c = c
-            plt.plot(yearsall,obsout[:,i],color=c,linewidth=0.3,
-                        label=r'\textbf{%s}' % modelGCMsNames[i],zorder=11,
-                        clip_on=False,alpha=1)
-            plt.scatter(yearsall,obsout[:,i],color=c,s=28,zorder=12,
-                        clip_on=False,alpha=0.2,edgecolors='none')
-            
-            for yr in range(yearsall.shape[0]):
-                la = label[yr]
-                if i == la:
-                    plt.scatter(yearsall[yr],obsout[yr,i],color=c,s=28,zorder=12,
-                                clip_on=False,alpha=1,edgecolors='none')
-                
+        plt.tick_params(
+            axis='x',          # changes apply to the x-axis
+            which='both',      # both major and minor ticks are affected
+            bottom='on',      # ticks along the bottom edge are off
+            top=False,         # ticks along the top edge are off
+            labelbottom='on')
+        plt.tick_params(
+            axis='y',          # changes apply to the x-axis
+            which='both',      # both major and minor ticks are affected
+            left='on',      # ticks along the bottom edge are off
+            right=False,         # ticks along the top edge are off
+            labelleft='on')
         
-        leg = plt.legend(shadow=False,fontsize=6,loc='upper center',
-                      bbox_to_anchor=(0.5,-0.08),fancybox=True,ncol=4,frameon=False,
-                      handlelength=0,handletextpad=0)
-        for line,text in zip(leg.get_lines(), leg.get_texts()):
-            text.set_color(line.get_color())
+        csm=plt.get_cmap(cmocean.cm.ice)
+        norm = c.BoundaryNorm(np.arange(1,9+1,1),csm.N)
         
-        plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
-        plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=6)
-        plt.xlim([1950,2020])   
-        plt.ylim([0,1.0])           
-    
-        plt.ylabel(r'\textbf{Confidence [%s]}' % (seasons[0]),color='dimgrey',fontsize=8,labelpad=8)
-        plt.title(r'\textbf{ANN CONFIDENCE OF *OBS* PER YEAR -- %s -- %s -- %s}' % (typemask,variq,reg_name),color='dimgrey',fontsize=10)
-    
+        cs = plt.pcolormesh(rank,shading='faceted',edgecolor='w',
+                            linewidth=0.05,vmin=1,vmax=8,norm=norm,cmap=csm)
+        
+        plt.yticks(np.arange(0.5,8.5,1),modelGCMsNames,ha='right',va='center',color='k',size=6)
+        yax = ax.get_yaxis()
+        yax.set_tick_params(pad=2)
+        plt.xticks(np.arange(0.5,70.5,5),map(str,np.arange(1950,2022,5)),
+                   color='k',size=6)
+        plt.xlim([0,70])
+        
+        for i in range(rank.shape[0]):
+            for j in range(rank.shape[1]):
+                cc = 'gold'         
+                plt.text(j+0.5,i+0.5,r'\textbf{%s}' % int(rank[i,j]),fontsize=4,
+                    color=cc,va='center',ha='center')
+                         
+        cbar = plt.colorbar(cs,orientation='horizontal',aspect=50,pad=0.12)
+        cbar.set_ticks([])
+        cbar.set_ticklabels([])  
+        cbar.ax.invert_xaxis()
+        cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
+        cbar.outline.set_edgecolor('darkgrey')
+        cbar.set_label(r'\textbf{%s - MODEL RANKING - %s}' % (reg_nameq,'ANNUAL'),
+                        color='k',labelpad=10,fontsize=18)
+        
+        plt.text(-2,-1.1,r'\textbf{WORST}',color=cmocean.cm.ice(0.99))
+        plt.text(67.3,-1.1,r'\textbf{BEST}',color=cmocean.cm.ice(0.2))
+        
         plt.tight_layout()
-        plt.subplots_adjust(bottom=0.15)
-        plt.savefig(directoryfigure + '%s/Confidence/ModelConfidence_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        plt.savefig(directoryfigure + '%s/Confidence/GCMrankConfidence_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        
+        
