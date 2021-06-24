@@ -318,6 +318,7 @@ if seasons != 'none':
         classeslnew = np.swapaxes(classesl,0,1)
     elif ensTypeExperi == 'GCM':
         classeslnew = classesl
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -1221,18 +1222,18 @@ for sis,singlesimulation in enumerate(datasetsingle):
         netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
         
 
-### TSNE test code
-from keras import models
-from sklearn.manifold import TSNE
-layer_outputs = [layer.output for layer in model.layers[:]]
-activation_model = models.Model(inputs=model.input, outputs=layer_outputs)
-activations = activation_model.predict(XtrainS)
-plot_lines = []
-for l, layer in enumerate(activations):
-    layer_activation = activations[l]
-    layer_activation_embedded = TSNE(n_components=2).fit_transform(layer_activation)
-    cs = plt.scatter(layer_activation_embedded[:,0],layer_activation_embedded[:,1], cmap='plasma', s = 3)
-    plt.colorbar(cs)
-    plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-    plt.tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
-    plt.show()
+# ### TSNE test code
+# from keras import models
+# from sklearn.manifold import TSNE
+# layer_outputs = [layer.output for layer in model.layers[:]]
+# activation_model = models.Model(inputs=model.input, outputs=layer_outputs)
+# activations = activation_model.predict(XtrainS)
+# plot_lines = []
+# for l, layer in enumerate(activations):
+#     layer_activation = activations[l]
+#     layer_activation_embedded = TSNE(n_components=2).fit_transform(layer_activation)
+#     cs = plt.scatter(layer_activation_embedded[:,0],layer_activation_embedded[:,1], cmap='plasma', s = 3)
+#     plt.colorbar(cs)
+#     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+#     plt.tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
+#     plt.show()

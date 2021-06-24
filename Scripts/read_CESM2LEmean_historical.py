@@ -190,27 +190,41 @@ def readCESM2LEmean(directory,vari,sliceperiod,sliceshape,slicenan):
     print('>>>>>>>>>> ENDING readCESM2LEmean function!')    
     return lat1,lon1,histmodel 
 
-### Test functions - do not use!
-import numpy as np
-import matplotlib.pyplot as plt
-import calc_Utilities as UT
-directory = '/Users/zlabe/Data/CESM2-LE/monthly/'
-vari = 'T2M'
-sliceperiod = 'annual'
-sliceshape = 4
-slicenan = 'nan'
-ravelbinary = True
-lensalso = True
-lat,lon,var = readCESM2LEmean(directory,vari,sliceperiod,sliceshape,slicenan)
-lon2,lat2 = np.meshgrid(lon,lat)
-ave = UT.calc_weightedAve(var,lat2)
+# ### Test functions - do not use!
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import calc_Utilities as UT
+# directory = '/Users/zlabe/Data/CESM2-LE/monthly/'
+# vari = 'T2M'
+# sliceperiod = 'annual'
+# sliceshape = 4
+# slicenan = 'nan'
+# ravelbinary = True
+# lensalso = True
+# lat,lon,var = readCESM2LEmean(directory,vari,sliceperiod,sliceshape,slicenan)
+# lon2,lat2 = np.meshgrid(lon,lat)
+# ave = UT.calc_weightedAve(var,lat2)
 
-from netCDF4 import Dataset
-data = Dataset('/Users/zlabe/Data/CESM2-LE/monthly/T2M/raw/TREFHT_1850-2100_ensmean.nc')
-var2 = data.variables['trefht'][:]
-lato2 = data.variables['lat'][:]
-lono2 = data.variables['lon'][:]
-data.close()
-lonss,latss = np.meshgrid(lono2,lato2)
-mean = np.nanmean(var2.reshape(251,12,181,360),axis=1)
-ave2 = UT.calc_weightedAve(mean,latss)
+# from netCDF4 import Dataset
+# data = Dataset('/Users/zlabe/Data/CESM2-LE/monthly/T2M/raw/TREFHT_1850-2100_ensmean.nc')
+# var2 = data.variables['trefht'][:]
+# lato2 = data.variables['lat'][:]
+# lono2 = data.variables['lon'][:]
+# data.close()
+# lonss,latss = np.meshgrid(lono2,lato2)
+# mean = np.nanmean(var2.reshape(251,12,181,360),axis=1)
+# ave2 = UT.calc_weightedAve(mean,latss)-273.15
+
+# yearsh = np.arange(1950,2019+1,1)
+# years = np.arange(1850,2100+1,1)
+# yearsold = np.arange(1920,2100+1,1)
+
+# from netCDF4 import Dataset
+# data = Dataset('/Users/zlabe/Data/LENS/monthly/T2M/T2M_ens-mean_1920-2100.nc')
+# var3 = data.variables['T2M'][:]
+# lato3 = data.variables['latitude'][:]
+# lono3 = data.variables['longitude'][:]
+# data.close()
+# lonss3,latss3 = np.meshgrid(lono3,lato3)
+# mean3 = np.nanmean(var3.reshape(181,12,96,144),axis=1)
+# ave3 = UT.calc_weightedAve(mean3,latss3)-273.15

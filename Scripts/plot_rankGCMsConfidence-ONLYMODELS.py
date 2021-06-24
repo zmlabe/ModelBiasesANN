@@ -1,8 +1,9 @@
 """
-Script for plotting heat map of model rankings according to confidence
+Script for plotting heat map of model rankings according to confidence for
+only models ANN
 
 Author     : Zachary M. Labe
-Date       : 22 June 2021
+Date       : 23 June 2021
 Version    : 4 (ANNv4)
 """
 
@@ -33,7 +34,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Data preliminaries 
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-Mmean/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2/'
         letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
         ###############################################################################
         ###############################################################################
@@ -43,7 +44,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'SH'
+        reg_name = 'LowerArctic'
         if reg_name == 'SMILEGlobe':
             reg_nameq = 'GLOBAL'
         elif reg_name == 'LowerArctic':
@@ -67,9 +68,9 @@ for va in range(len(variablesall)):
         ###############################################################################
         pickSMILE = pickSMILEall[m]
         if len(pickSMILE) >= 1:
-            lenOfPicks = len(pickSMILE) + 1 # For random class
+            lenOfPicks = len(pickSMILE)
         else:
-            lenOfPicks = len(modelGCMs) + 1 # For random class
+            lenOfPicks = len(modelGCMs)
         ###############################################################################
         ###############################################################################
         land_only = False
@@ -227,13 +228,13 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'LAND'
         elif ocean_only == True:
-            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'OCEAN'
         else:
-            saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'GLOBAL'
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
@@ -245,10 +246,6 @@ for va in range(len(variablesall)):
             classesl = np.empty((lenOfPicks,numOfEns,len(yearsall)))
             for i in range(lenOfPicks):
                 classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
-                
-            ### Add random noise models
-            randomNoiseClass = np.full((sizeOfTwin,numOfEns,len(yearsall)),i+1)
-            classesl = np.append(classesl,randomNoiseClass,axis=0)
                 
             if ensTypeExperi == 'ENS':
                 classeslnew = np.swapaxes(classesl,0,1)
@@ -265,9 +262,12 @@ for va in range(len(variablesall)):
         ### Calculate temperature rankings
         rank = np.empty(obsout.shape)
         for i in range(obsout.shape[0]):
-            rank[i,:] = abs(sts.rankdata(obsout[i,:],method='average')-9)
+            rank[i,:] = abs(sts.rankdata(obsout[i,:],method='average')-8)
             
         rank = np.transpose(rank)
+        empty = np.empty((1,rank.shape[1]))
+        empty[:] = np.nan
+        rank = np.append(rank,empty,axis=0)
 
         ###############################################################################
         ###############################################################################
@@ -304,19 +304,19 @@ for va in range(len(variablesall)):
             labelleft='on')
         
         csm=plt.get_cmap(cmocean.cm.ice)
-        norm = c.BoundaryNorm(np.arange(1,9+1,1),csm.N)
+        norm = c.BoundaryNorm(np.arange(1,8+1,1),csm.N)
         
         cs = plt.pcolormesh(rank,shading='faceted',edgecolor='w',
                             linewidth=0.05,vmin=1,vmax=8,norm=norm,cmap=csm)
         
-        plt.yticks(np.arange(0.5,8.5,1),modelGCMsNames,ha='right',va='center',color='k',size=6)
+        plt.yticks(np.arange(0.5,7.5,1),modelGCMsNames,ha='right',va='center',color='k',size=6)
         yax = ax.get_yaxis()
         yax.set_tick_params(pad=2)
         plt.xticks(np.arange(0.5,70.5,5),map(str,np.arange(1950,2022,5)),
                    color='k',size=6)
         plt.xlim([0,70])
         
-        for i in range(rank.shape[0]):
+        for i in range(rank.shape[0]-1):
             for j in range(rank.shape[1]):
                 cc = 'gold'         
                 plt.text(j+0.5,i+0.5,r'\textbf{%s}' % int(rank[i,j]),fontsize=4,

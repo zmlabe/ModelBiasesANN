@@ -42,7 +42,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'LowerArctic'
+        reg_name = 'SMILEGLobe'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
