@@ -135,7 +135,17 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
             ENSmean = np.nan
             lat1,lon1,data = CE.readCESM2LEmean(directorydataCE,variq,
                                                 monthlychoice,sliceshapeCE,
-                                                slicenanCE)    
+                                                slicenanCE)   
+    elif dataset == 'CESM2le':
+        if timeper == 'historical':
+            import read_CESM2LE as CEMLE
+            directorydataCEMLE = '/Users/zlabe/Data/CESM2-LE/monthly/'
+            sliceshapeCEMLE = 4
+            slicenanCEMLE = 'nan'
+            ENSmean = np.nan
+            lat1,lon1,data = CEMLE.read_CESM2LE(directorydataCEMLE,variq,
+                                             monthlychoice,sliceshapeCEMLE,
+                                             slicenanCEMLE,numOfEns,timeper)    
     elif dataset == 'SMILE':
         if timeper == 'historical':
             import read_SMILE_historical as SM
@@ -286,4 +296,9 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
 # lensalso = True
 # ravelyearsbinary = False
 # ravelbinary = False
-# data,lat1,lon1 = readFiles('T2M','RANDOM','annual',numOfEns,lensalso,ravelyearsbinary,ravelbinary)
+# randomalso = False
+# shuffletype = 'GAUSS'
+# timeper = 'historical'
+# data,lat1,lon1 = readFiles('SST','CESM2le','annual',numOfEns,lensalso,
+#                             randomalso,ravelyearsbinary,ravelbinary,
+#                             shuffletype,timeper)
