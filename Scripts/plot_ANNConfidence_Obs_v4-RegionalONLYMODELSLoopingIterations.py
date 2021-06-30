@@ -25,7 +25,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-latarctic = 60
+latarctic = 70
 obsoutall = []
 regions = ['SMILEglobe','NH','SH','narrowTropics','Arctic','SouthernOcean']
 regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC(%s)' % latarctic,'SOUTHERN OCEAN']
@@ -37,7 +37,7 @@ for va in range(len(variablesall)):
             ###############################################################################
             ### Data preliminaries 
             directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Loop/'
-            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-Mmean/'
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2/'
             letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
             ###############################################################################
             ###############################################################################
@@ -48,17 +48,15 @@ for va in range(len(variablesall)):
             seasons = ['annual']
             variq = variablesall[va]
             reg_name = regions[rr]
-            if reg_name == 'Arctic':
-                reg_name = 'Arctic%s' % latarctic
             timeper = 'historical'
             SAMPLEQ = 100
             ###############################################################################
             ###############################################################################
             pickSMILE = pickSMILEall[m]
             if len(pickSMILE) >= 1:
-                lenOfPicks = len(pickSMILE) + 1 # For random class
+                lenOfPicks = len(pickSMILE)
             else:
-                lenOfPicks = len(modelGCMs) + 1 # For random class
+                lenOfPicks = len(modelGCMs)
             ###############################################################################
             ###############################################################################
             land_only = False
@@ -128,7 +126,7 @@ for va in range(len(variablesall)):
             lrpRule = 'z'
             normLRP = True
             ###############################################################################
-            modelGCMsNames = np.append(modelGCMs,['MMean'])
+            modelGCMsNames = modelGCMs
     
             ###############################################################################
             ###############################################################################
@@ -216,11 +214,11 @@ for va in range(len(variablesall)):
               
             ### Select how to save files
             if land_only == True:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             elif ocean_only == True:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             else:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             print('*Filename == < %s >' % saveData) 
             
             ###############################################################################
@@ -257,18 +255,15 @@ for va in range(len(variablesall)):
 ###############################################################################
 ### See all regional data
 conf = np.asarray(obsoutall).squeeze()
-MEANmodel = np.nanmean(conf[:,:,:,-1],axis=1)
-GFDLmodel = np.nanmean(conf[:,:,:,4],axis=1)
-        
-### Counting number of mmean and gfdl
-maxconf = np.argmax(conf,axis=3)
-countingmean = np.empty((maxconf.shape[0],maxconf.shape[2]))
-countinggfdl = np.empty((maxconf.shape[0],maxconf.shape[2]))
-for i in range(maxconf.shape[0]):
-    for j in range(maxconf.shape[2]):
-        countingmean[i,j] = np.count_nonzero(maxconf[i,:,j] == len(modelGCMs))
-        countinggfdl[i,j] = np.count_nonzero(maxconf[i,:,j] == 4)
-        
+
+### Select argmax
+maxc = np.nanmax(conf,axis=3)
+
+### Statistics on data
+meanmax = np.nanmean(maxc,axis=1)           
+per05 = np.percentile(maxc,20,axis=1)
+per95 = np.percentile(maxc,80,axis=1)
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -294,54 +289,9 @@ color=cc.Antique_6.mpl_colormap(np.linspace(0,1,len(regions)))
 for r,c in zip(range(len(regions)),color):
     ax = plt.subplot(2,3,r+1)
 
-    adjust_spines(ax, ['left', 'bottom'])
-    ax.spines['top'].set_color('none')
-    ax.spines['right'].set_color('none')
-    ax.spines['left'].set_color('dimgrey')
-    ax.spines['bottom'].set_color('dimgrey')
-    ax.spines['left'].set_linewidth(2)
-    ax.spines['bottom'].set_linewidth(2)
-    ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-    ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
-    
-    x=np.arange(1950,2019+1,1)
-    plt.plot(yearsall,MEANmodel[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MMean}')
-    plt.plot(yearsall,GFDLmodel[r,:],linewidth=1,color=color[2],alpha=1,zorder=3,clip_on=False,label=r'\textbf{GFDL-CM3}')
-    
-    plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
-    if any([r==0,r==3]):
-        plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
-    else:
-        plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
-        # ax.set_yticklabels([])
-    
-    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5)
-    plt.xlim([1950,2020])   
-    plt.ylim([0,1.0])  
-    
-    if r == 0:
-        plt.text(1923,-0.5,r'\textbf{Average Confidence}',color='k',
-             fontsize=11,ha='left',rotation=90)       
-    plt.text(1950,0.01,r'\textbf{%s}' % regionnames[r],color='dimgrey',
-         fontsize=8,ha='left')  
-    
-    if r == 1:
-        leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
-                      bbox_to_anchor=(0.5,1.2),fancybox=True,ncol=4,frameon=False,
-                      handlelength=5,handletextpad=1)
-        
-# plt.tight_layout()
-# plt.subplots_adjust(bottom=0.15)
-plt.savefig(directoryfigure + '%s/Regions/Confidence/RegionsModelComparisonConfidence_%s.png' % (typeOfAnalysis,latarctic),dpi=300)
-
-###############################################################################
-###############################################################################
-###############################################################################          
-### Begin plot
-fig = plt.figure(figsize=(8,5))
-color=cc.Antique_6.mpl_colormap(np.linspace(0,1,len(regions)))
-for r,c in zip(range(len(regions)),color):
-    ax = plt.subplot(2,3,r+1)
+    mean = meanmax[r]
+    lower = per05[r]
+    upper = per95[r]
 
     adjust_spines(ax, ['left', 'bottom'])
     ax.spines['top'].set_color('none')
@@ -351,34 +301,28 @@ for r,c in zip(range(len(regions)),color):
     ax.spines['left'].set_linewidth(2)
     ax.spines['bottom'].set_linewidth(2)
     ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-    ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
     
-    x=np.arange(1950,2019+1,1)
-    plt.plot(yearsall,countingmean[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MMean}')
-    plt.plot(yearsall,countinggfdl[r,:],linewidth=1,color=color[2],alpha=1,zorder=3,clip_on=False,label=r'\textbf{GFDL-CM3}')
+    plt.plot(yearsall,mean,linewidth=2,color=c,alpha=1,zorder=3,clip_on=False)
+    ax.fill_between(yearsall,lower,mean,facecolor=c,alpha=0.35,zorder=1,clip_on=False)
+    ax.fill_between(yearsall,mean,upper,facecolor=c,alpha=0.35,zorder=1,clip_on=False)
     
-    plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
     if any([r==0,r==3]):
-        plt.yticks(np.arange(0,101,10),map(str,np.round(np.arange(0,101,10),2)),size=3)
+        plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
     else:
-        plt.yticks(np.arange(0,101,10),map(str,np.round(np.arange(0,101,10),2)),size=3)
+        plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
         # ax.set_yticklabels([])
     
     plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5)
     plt.xlim([1950,2020])   
-    plt.ylim([0,100])  
-    
-    if r == 1:
-        leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
-                      bbox_to_anchor=(0.5,1.2),fancybox=True,ncol=4,frameon=False,
-                      handlelength=5,handletextpad=1)
+    plt.ylim([0.3,1.0])  
+
+    plt.text(1950,0.31,r'\textbf{%s}' % regionnames[r],color='dimgrey',
+             fontsize=15,ha='left')  
     
     if r == 0:
-        plt.text(1923,-50,r'\textbf{Frequency of Label}',color='k',
-             fontsize=11,ha='left',rotation=90)       
-    plt.text(1950,0.01,r'\textbf{%s}' % regionnames[r],color='dimgrey',
-         fontsize=8,ha='left')  
+        plt.text(1930,-0.1,r'\textbf{Maximum Confidence}',color='k',
+                 fontsize=11,ha='left',rotation=90)       
         
 # plt.tight_layout()
 # plt.subplots_adjust(bottom=0.15)
-plt.savefig(directoryfigure + '%s/Regions/Confidence/RegionsModelComparisonConfidence_%s.png' % (typeOfAnalysis,latarctic),dpi=300)
+plt.savefig(directoryfigure + '%s/Regions/Confidence/RegionsMaxConfidence_%s.png' % (typeOfAnalysis,latarctic),dpi=300)

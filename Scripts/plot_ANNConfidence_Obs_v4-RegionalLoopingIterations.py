@@ -25,7 +25,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-latarctic = 70
+latarctic = 60
 obsoutall = []
 regions = ['SMILEglobe','NH','SH','narrowTropics','Arctic','SouthernOcean']
 regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC(%s)' % latarctic,'SOUTHERN OCEAN']

@@ -25,7 +25,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-latarctic = 60
+latarctic = 70
 obsoutall = []
 regions = ['SMILEglobe','NH','SH','narrowTropics','Arctic','SouthernOcean']
 regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC(%s)' % latarctic,'SOUTHERN OCEAN']
@@ -37,7 +37,7 @@ for va in range(len(variablesall)):
             ###############################################################################
             ### Data preliminaries 
             directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Loop/'
-            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-Mmean/'
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2/'
             letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
             ###############################################################################
             ###############################################################################
@@ -48,17 +48,15 @@ for va in range(len(variablesall)):
             seasons = ['annual']
             variq = variablesall[va]
             reg_name = regions[rr]
-            if reg_name == 'Arctic':
-                reg_name = 'Arctic%s' % latarctic
             timeper = 'historical'
             SAMPLEQ = 100
             ###############################################################################
             ###############################################################################
             pickSMILE = pickSMILEall[m]
             if len(pickSMILE) >= 1:
-                lenOfPicks = len(pickSMILE) + 1 # For random class
+                lenOfPicks = len(pickSMILE)
             else:
-                lenOfPicks = len(modelGCMs) + 1 # For random class
+                lenOfPicks = len(modelGCMs)
             ###############################################################################
             ###############################################################################
             land_only = False
@@ -128,7 +126,7 @@ for va in range(len(variablesall)):
             lrpRule = 'z'
             normLRP = True
             ###############################################################################
-            modelGCMsNames = np.append(modelGCMs,['MMean'])
+            modelGCMsNames = modelGCMs
     
             ###############################################################################
             ###############################################################################
@@ -216,11 +214,11 @@ for va in range(len(variablesall)):
               
             ### Select how to save files
             if land_only == True:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             elif ocean_only == True:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             else:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_ONLYMODELS_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             print('*Filename == < %s >' % saveData) 
             
             ###############################################################################
@@ -257,7 +255,7 @@ for va in range(len(variablesall)):
 ###############################################################################
 ### See all regional data
 conf = np.asarray(obsoutall).squeeze()
-MEANmodel = np.nanmean(conf[:,:,:,-1],axis=1)
+MEANmodel = np.nanmean(conf[:,:,:,2],axis=1)
 GFDLmodel = np.nanmean(conf[:,:,:,4],axis=1)
         
 ### Counting number of mmean and gfdl
@@ -266,7 +264,7 @@ countingmean = np.empty((maxconf.shape[0],maxconf.shape[2]))
 countinggfdl = np.empty((maxconf.shape[0],maxconf.shape[2]))
 for i in range(maxconf.shape[0]):
     for j in range(maxconf.shape[2]):
-        countingmean[i,j] = np.count_nonzero(maxconf[i,:,j] == len(modelGCMs))
+        countingmean[i,j] = np.count_nonzero(maxconf[i,:,j] == 2)
         countinggfdl[i,j] = np.count_nonzero(maxconf[i,:,j] == 4)
         
 ###############################################################################
@@ -305,7 +303,7 @@ for r,c in zip(range(len(regions)),color):
     ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
     
     x=np.arange(1950,2019+1,1)
-    plt.plot(yearsall,MEANmodel[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MMean}')
+    plt.plot(yearsall,MEANmodel[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{CSIRO-MK3.6}')
     plt.plot(yearsall,GFDLmodel[r,:],linewidth=1,color=color[2],alpha=1,zorder=3,clip_on=False,label=r'\textbf{GFDL-CM3}')
     
     plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
@@ -354,7 +352,7 @@ for r,c in zip(range(len(regions)),color):
     ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
     
     x=np.arange(1950,2019+1,1)
-    plt.plot(yearsall,countingmean[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MMean}')
+    plt.plot(yearsall,countingmean[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{CSIRO-MK3.6}')
     plt.plot(yearsall,countinggfdl[r,:],linewidth=1,color=color[2],alpha=1,zorder=3,clip_on=False,label=r'\textbf{GFDL-CM3}')
     
     plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
