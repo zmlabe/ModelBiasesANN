@@ -414,6 +414,10 @@ for va in range(len(variablesall)):
                   fontsize=7)
         
         plt.savefig(directoryfigure + '%s/LRPComposites_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+        np.save(directorydataMS + 'LRPcomposites_SMILEglobe_8classes.npy',lrptest)
+        np.save(directorydataMS + 'Lat_SMILEGlobe.npy',np.asarray(lat1))
+        np.save(directorydataMS + 'Lon_SMILEGlobe.npy',np.asarray(lon1))
         
         ###############################################################################
         ###############################################################################

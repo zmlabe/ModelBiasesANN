@@ -27,7 +27,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 variablesall = ['T2M','P','SLP']
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-THRESH = 0.1
+THRESH = 0.05
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         ###############################################################################

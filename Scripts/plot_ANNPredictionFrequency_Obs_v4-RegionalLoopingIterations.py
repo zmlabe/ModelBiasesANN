@@ -269,6 +269,10 @@ for i in range(maxconf.shape[0]):
         countingmean[i,j] = np.count_nonzero(maxconf[i,:,j] == len(modelGCMs))
         countinggfdl[i,j] = np.count_nonzero(maxconf[i,:,j] == 4)
         
+directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+np.savez(directorydataMS + 'CountingIterations_%s.npz' % ('SMILEGlobe'),mmean=countingmean[0,:],gfdlcm=countinggfdl[0,:])
+np.savez(directorydataMS + 'CountingIterations_%s.npz' % ('LowerArctic'),mmean=countingmean[4,:],gfdlcm=countinggfdl[4,:])
+        
 ###############################################################################
 ###############################################################################
 ###############################################################################

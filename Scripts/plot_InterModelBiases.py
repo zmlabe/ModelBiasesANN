@@ -107,13 +107,13 @@ for vv in range(len(variables)):
         diffmodmean = np.nanmean(diffmodensm[:,:,:,:],axis=1)
         
         ### Calculate different between each model
-        intermodel = np.empty((models.shape[0],models.shape[0],models.shape[1],
-                                models.shape[2],models.shape[3],models.shape[4]))
-        for mm in range(models.shape[0]):
-            for ea in range(models.shape[0]):
-                intermodel[mm,ea,:,:,:,:] = models[mm,:,:,:,:] - models[ea,:,:,:,:]
-        ensmeanintermodel = np.nanmean(intermodel[:,:,:,:,:,:],axis=2)
-        timeensmeanintermodel = np.nanmean(ensmeanintermodel[:,:,:,:,:],axis=2)
+        # intermodel = np.empty((models.shape[0],models.shape[0],models.shape[1],
+        #                         models.shape[2],models.shape[3],models.shape[4]))
+        # for mm in range(models.shape[0]):
+        #     for ea in range(models.shape[0]):
+        #         intermodel[mm,ea,:,:,:,:] = models[mm,:,:,:,:] - models[ea,:,:,:,:]
+        # ensmeanintermodel = np.nanmean(intermodel[:,:,:,:,:,:],axis=2)
+        # timeensmeanintermodel = np.nanmean(ensmeanintermodel[:,:,:,:,:],axis=2)
                               
 ###############################################################################
 ###############################################################################
@@ -178,313 +178,315 @@ for vv in range(len(variables)):
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
         
         plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL.png' % saveData,dpi=300)
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+        np.save(directorydataMS + 'MMMeandifferences_7models.npy',diffmodmean)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        fig = plt.figure(figsize=(10,2))
-        for r in range(len(diffmodmean)+1):
-            if r < 7:
-                var = diffmodmean[r]
-            else:
-                var = np.empty((lats.shape[0],lons.shape[0]))
-                var[:] = np.nan
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(len(diffmodmean)+1):
+        #     if r < 7:
+        #         var = diffmodmean[r]
+        #     else:
+        #         var = np.empty((lats.shape[0],lons.shape[0]))
+        #         var[:] = np.nan
             
-            ax1 = plt.subplot(1,len(diffmodmean)+1,r+1)
-            m = Basemap(projection='npstere',boundinglat=65,lon_0=0,
-                        resolution='l',round =True,area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,len(diffmodmean)+1,r+1)
+        #     m = Basemap(projection='npstere',boundinglat=65,lon_0=0,
+        #                 resolution='l',round =True,area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lons)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lons)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='both')
+        #     cs1.set_cmap(cmap) 
             
-            if ocean_only == True:
-                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-            elif land_only == True:
-                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+        #     if ocean_only == True:
+        #         m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+        #     elif land_only == True:
+        #         m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='both',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='both',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL-Arctic.png' % saveData,dpi=300)
+        # plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL-Arctic.png' % saveData,dpi=300)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        if variq == 'T2M':
-            limit = np.arange(-3,3.01,0.2)
-            barlim = np.round(np.arange(-3,4,1),2)
-            cmap = cmocean.cm.balance
-            label = r'\textbf{%s -- [$^{\circ}$C MMmean difference] -- 1950-2019}' % variq
-        elif variq == 'P':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,3.1,1),2)
-            cmap = cmocean.cm.tarn                                                                                                                                  
-            label = r'\textbf{%s -- [mm/day MMmean difference] -- 1950-2019}' % variq
-        elif variq == 'SLP':
-            limit = np.arange(-5,5.1,0.25)
-            barlim = np.round(np.arange(-5,6,1),2)
-            cmap = cmocean.cm.diff
-            label = r'\textbf{%s -- [hPa MMmean difference] -- 1950-2019}' % variq
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # if variq == 'T2M':
+        #     limit = np.arange(-3,3.01,0.2)
+        #     barlim = np.round(np.arange(-3,4,1),2)
+        #     cmap = cmocean.cm.balance
+        #     label = r'\textbf{%s -- [$^{\circ}$C MMmean difference] -- 1950-2019}' % variq
+        # elif variq == 'P':
+        #     limit = np.arange(-3,3.01,0.01)
+        #     barlim = np.round(np.arange(-3,3.1,1),2)
+        #     cmap = cmocean.cm.tarn                                                                                                                                  
+        #     label = r'\textbf{%s -- [mm/day MMmean difference] -- 1950-2019}' % variq
+        # elif variq == 'SLP':
+        #     limit = np.arange(-5,5.1,0.25)
+        #     barlim = np.round(np.arange(-5,6,1),2)
+        #     cmap = cmocean.cm.diff
+        #     label = r'\textbf{%s -- [hPa MMmean difference] -- 1950-2019}' % variq
         
-        fig = plt.figure(figsize=(10,2))
-        for r in range(len(diffmodmean)+1):
-            if r < 7:
-                var = diffmodmean[r]
-            else:
-                var = np.empty((lats.shape[0],lons.shape[0]))
-                var[:] = np.nan
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(len(diffmodmean)+1):
+        #     if r < 7:
+        #         var = diffmodmean[r]
+        #     else:
+        #         var = np.empty((lats.shape[0],lons.shape[0]))
+        #         var[:] = np.nan
             
-            ax1 = plt.subplot(1,len(diffmodmean)+1,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,len(diffmodmean)+1,r+1)
+        #     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lons)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lons)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='both')
+        #     cs1.set_cmap(cmap) 
             
-            if ocean_only == True:
-                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-            elif land_only == True:
-                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+        #     if ocean_only == True:
+        #         m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+        #     elif land_only == True:
+        #         m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='both',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='both',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL-StyleGlobe.png' % saveData,dpi=300)
+        # plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL-StyleGlobe.png' % saveData,dpi=300)
         
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        if variq == 'T2M':
-            limit = np.arange(-3,3.01,0.2)
-            barlim = np.round(np.arange(-3,4,1),2)
-            cmap = cmocean.cm.balance
-            label = r'\textbf{%s -- [$^{\circ}$C MMmean difference] -- 1950-2019}' % variq
-        elif variq == 'P':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,3.1,1),2)
-            cmap = cmocean.cm.tarn                                                                                                                                  
-            label = r'\textbf{%s -- [mm/day MMmean difference] -- 1950-2019}' % variq
-        elif variq == 'SLP':
-            limit = np.arange(-5,5.1,0.25)
-            barlim = np.round(np.arange(-5,6,1),2)
-            cmap = cmocean.cm.diff
-            label = r'\textbf{%s -- [hPa MMmean difference] -- 1950-2019}' % variq
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # if variq == 'T2M':
+        #     limit = np.arange(-3,3.01,0.2)
+        #     barlim = np.round(np.arange(-3,4,1),2)
+        #     cmap = cmocean.cm.balance
+        #     label = r'\textbf{%s -- [$^{\circ}$C MMmean difference] -- 1950-2019}' % variq
+        # elif variq == 'P':
+        #     limit = np.arange(-3,3.01,0.01)
+        #     barlim = np.round(np.arange(-3,3.1,1),2)
+        #     cmap = cmocean.cm.tarn                                                                                                                                  
+        #     label = r'\textbf{%s -- [mm/day MMmean difference] -- 1950-2019}' % variq
+        # elif variq == 'SLP':
+        #     limit = np.arange(-5,5.1,0.25)
+        #     barlim = np.round(np.arange(-5,6,1),2)
+        #     cmap = cmocean.cm.diff
+        #     label = r'\textbf{%s -- [hPa MMmean difference] -- 1950-2019}' % variq
         
-        fig = plt.figure(figsize=(10,2))
-        for r in range(len(diffmodmean)+1):
-            if r < 7:
-                var = diffmodmean[r]
-            else:
-                var = np.empty((lats.shape[0],lons.shape[0]))
-                var[:] = np.nan
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(len(diffmodmean)+1):
+        #     if r < 7:
+        #         var = diffmodmean[r]
+        #     else:
+        #         var = np.empty((lats.shape[0],lons.shape[0]))
+        #         var[:] = np.nan
                 
-            latq = np.where((lats >= -20) & (lats <= 20))[0]
-            latsqq = lats[latq]
-            var = var[latq,:]
+        #     latq = np.where((lats >= -20) & (lats <= 20))[0]
+        #     latsqq = lats[latq]
+        #     var = var[latq,:]
             
-            ax1 = plt.subplot(1,len(diffmodmean)+1,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,len(diffmodmean)+1,r+1)
+        #     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lons)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, latsqq)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lons)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, latsqq)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='both')
+        #     cs1.set_cmap(cmap) 
             
-            if ocean_only == True:
-                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-            elif land_only == True:
-                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+        #     if ocean_only == True:
+        #         m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+        #     elif land_only == True:
+        #         m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='both',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='both',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL-Tropics.png' % saveData,dpi=300)
+        # plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL-Tropics.png' % saveData,dpi=300)
         
-###############################################################################
-###############################################################################
-###############################################################################     
-        #######################################################################
-        #######################################################################
-        #######################################################################
-        ### Plot subplot of different from multimodel mean  
-        if variq == 'T2M':
-            limit = np.arange(-6,6.01,0.25)
-            barlim = np.round(np.arange(-6,7,2),2)
-            cmap = cmocean.cm.balance
-            label = r'\textbf{%s -- [$^{\circ}$C difference] -- 1950-2019}' % variq
-        elif variq == 'P':
-            limit = np.arange(-3,3.01,0.01)
-            barlim = np.round(np.arange(-3,3.1,1),2)
-            cmap = cmocean.cm.tarn                                                                                                                                  
-            label = r'\textbf{%s -- [mm/day difference] -- 1950-2019}' % variq
-        elif variq == 'SLP':
-            limit = np.arange(-5,5.1,0.25)
-            barlim = np.round(np.arange(-5,6,1),2)
-            cmap = cmocean.cm.diff
-            label = r'\textbf{%s -- [hPa difference] -- 1950-2019}' % variq
+# ###############################################################################
+# ###############################################################################
+# ###############################################################################     
+#         #######################################################################
+#         #######################################################################
+#         #######################################################################
+#         ### Plot subplot of different from multimodel mean  
+#         if variq == 'T2M':
+#             limit = np.arange(-6,6.01,0.25)
+#             barlim = np.round(np.arange(-6,7,2),2)
+#             cmap = cmocean.cm.balance
+#             label = r'\textbf{%s -- [$^{\circ}$C difference] -- 1950-2019}' % variq
+#         elif variq == 'P':
+#             limit = np.arange(-3,3.01,0.01)
+#             barlim = np.round(np.arange(-3,3.1,1),2)
+#             cmap = cmocean.cm.tarn                                                                                                                                  
+#             label = r'\textbf{%s -- [mm/day difference] -- 1950-2019}' % variq
+#         elif variq == 'SLP':
+#             limit = np.arange(-5,5.1,0.25)
+#             barlim = np.round(np.arange(-5,6,1),2)
+#             cmap = cmocean.cm.diff
+#             label = r'\textbf{%s -- [hPa difference] -- 1950-2019}' % variq
         
-        for diff in range(timeensmeanintermodel.shape[0]):
-            fig = plt.figure(figsize=(8,4))
-            for r in range(timeensmeanintermodel.shape[1]+1):
-                var = timeensmeanintermodel[diff,r-1,:,:]
+#         for diff in range(timeensmeanintermodel.shape[0]):
+#             fig = plt.figure(figsize=(8,4))
+#             for r in range(timeensmeanintermodel.shape[1]+1):
+#                 var = timeensmeanintermodel[diff,r-1,:,:]
                 
-                ax1 = plt.subplot(2,4,r+1)
-                if r == 0:
-                    varc = np.nanmean(ensmean[diff],axis=0) # average over years
-                    latsc = lats.copy()
-                    lonsc = lons.copy()
-                    if variq == 'T2M':
-                        limitc = np.arange(-35,35.01,0.5)
-                        barlimc = np.round(np.arange(-35,36,5),2)
-                        cmapc = plt.cm.CMRmap_r
-                        labelc = r'\textbf{%s -- [$^{\circ}$C mean] -- 1950-2019}' % variq
-                    elif variq == 'P':
-                        limitc = np.arange(0,10.01,0.01)
-                        barlimc = np.round(np.arange(-0,10.01,2),2)
-                        cmapc = cmocean.cm.rain                                                                                                                                 
-                        labelc = r'\textbf{%s -- [mm/day mean] -- 1950-2019}' % variq
-                    elif variq == 'SLP':
-                        limitc = np.arange(990,1020.01,0.5)
-                        barlimc = np.round(np.arange(990,1021,10),2)
-                        cmapc = sss.Nuuk_20.mpl_colormap 
-                        labelc = r'\textbf{%s -- [hPa : mean] -- 1950-2019}' % variq
+#                 ax1 = plt.subplot(2,4,r+1)
+#                 if r == 0:
+#                     varc = np.nanmean(ensmean[diff],axis=0) # average over years
+#                     latsc = lats.copy()
+#                     lonsc = lons.copy()
+#                     if variq == 'T2M':
+#                         limitc = np.arange(-35,35.01,0.5)
+#                         barlimc = np.round(np.arange(-35,36,5),2)
+#                         cmapc = plt.cm.CMRmap_r
+#                         labelc = r'\textbf{%s -- [$^{\circ}$C mean] -- 1950-2019}' % variq
+#                     elif variq == 'P':
+#                         limitc = np.arange(0,10.01,0.01)
+#                         barlimc = np.round(np.arange(-0,10.01,2),2)
+#                         cmapc = cmocean.cm.rain                                                                                                                                 
+#                         labelc = r'\textbf{%s -- [mm/day mean] -- 1950-2019}' % variq
+#                     elif variq == 'SLP':
+#                         limitc = np.arange(990,1020.01,0.5)
+#                         barlimc = np.round(np.arange(990,1021,10),2)
+#                         cmapc = sss.Nuuk_20.mpl_colormap 
+#                         labelc = r'\textbf{%s -- [hPa : mean] -- 1950-2019}' % variq
                         
-                    m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-                    m.drawcoastlines(color='dimgrey',linewidth=0.27)
+#                     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+#                     m.drawcoastlines(color='dimgrey',linewidth=0.27)
                         
-                    varc, lons_cyclicc = addcyclic(varc, lonsc)
-                    varc, lons_cyclicc = shiftgrid(180., varc, lons_cyclicc, start=False)
-                    lon2dc, lat2dc = np.meshgrid(lons_cyclicc, latsc)
-                    xc, yc = m(lon2dc, lat2dc)
-                    circle = m.drawmapboundary(fill_color='white',color='dimgray',
-                                      linewidth=0.7)
-                    circle.set_clip_on(False)
+#                     varc, lons_cyclicc = addcyclic(varc, lonsc)
+#                     varc, lons_cyclicc = shiftgrid(180., varc, lons_cyclicc, start=False)
+#                     lon2dc, lat2dc = np.meshgrid(lons_cyclicc, latsc)
+#                     xc, yc = m(lon2dc, lat2dc)
+#                     circle = m.drawmapboundary(fill_color='white',color='dimgray',
+#                                       linewidth=0.7)
+#                     circle.set_clip_on(False)
                     
-                    cs1 = m.contourf(xc,yc,varc,limitc,extend='both')
-                    cs1.set_cmap(cmapc) 
+#                     cs1 = m.contourf(xc,yc,varc,limitc,extend='both')
+#                     cs1.set_cmap(cmapc) 
                             
-                    ax1.annotate(r'\textbf{%s Climatology}' % modelGCMs[diff],xy=(0,0),xytext=(0.5,1.10),
-                                  textcoords='axes fraction',color='dimgrey',fontsize=8,
-                                  rotation=0,ha='center',va='center')
-                    ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                                  textcoords='axes fraction',color='k',fontsize=6,
-                                  rotation=330,ha='center',va='center')
-                else:
-                    m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-                    m.drawcoastlines(color='dimgrey',linewidth=0.27)
+#                     ax1.annotate(r'\textbf{%s Climatology}' % modelGCMs[diff],xy=(0,0),xytext=(0.5,1.10),
+#                                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+#                                   rotation=0,ha='center',va='center')
+#                     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+#                                   textcoords='axes fraction',color='k',fontsize=6,
+#                                   rotation=330,ha='center',va='center')
+#                 else:
+#                     m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+#                     m.drawcoastlines(color='dimgrey',linewidth=0.27)
                         
-                    var, lons_cyclic = addcyclic(var, lons)
-                    var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-                    lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
-                    x, y = m(lon2d, lat2d)
-                    circle = m.drawmapboundary(fill_color='white',color='dimgray',
-                                      linewidth=0.7)
-                    circle.set_clip_on(False)
+#                     var, lons_cyclic = addcyclic(var, lons)
+#                     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+#                     lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
+#                     x, y = m(lon2d, lat2d)
+#                     circle = m.drawmapboundary(fill_color='white',color='dimgray',
+#                                       linewidth=0.7)
+#                     circle.set_clip_on(False)
                     
-                    cs1 = m.contourf(x,y,var,limit,extend='both')
-                    cs1.set_cmap(cmap) 
+#                     cs1 = m.contourf(x,y,var,limit,extend='both')
+#                     cs1.set_cmap(cmap) 
                             
-                    ax1.annotate(r'\textbf{%s}' % modelGCMs[r-1],xy=(0,0),xytext=(0.5,1.10),
-                                  textcoords='axes fraction',color='dimgrey',fontsize=8,
-                                  rotation=0,ha='center',va='center')
-                    ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                                  textcoords='axes fraction',color='k',fontsize=6,
-                                  rotation=330,ha='center',va='center')
+#                     ax1.annotate(r'\textbf{%s}' % modelGCMs[r-1],xy=(0,0),xytext=(0.5,1.10),
+#                                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+#                                   rotation=0,ha='center',va='center')
+#                     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+#                                   textcoords='axes fraction',color='k',fontsize=6,
+#                                   rotation=330,ha='center',va='center')
             
             
-            ###############################################################################
-            fig.suptitle(r'\textbf{%s minus each SMILE}' % modelGCMs[diff],color='k',
-                      fontsize=15)
+#             ###############################################################################
+#             fig.suptitle(r'\textbf{%s minus each SMILE}' % modelGCMs[diff],color='k',
+#                       fontsize=15)
                 
-            cbar_ax1 = fig.add_axes([0.36,0.11,0.3,0.03])                
-            cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                                extend='both',extendfrac=0.07,drawedges=False)
-            cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-            cbar1.set_ticks(barlim)
-            cbar1.set_ticklabels(list(map(str,barlim)))
-            cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-            cbar1.outline.set_edgecolor('dimgrey')
+#             cbar_ax1 = fig.add_axes([0.36,0.11,0.3,0.03])                
+#             cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+#                                 extend='both',extendfrac=0.07,drawedges=False)
+#             cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+#             cbar1.set_ticks(barlim)
+#             cbar1.set_ticklabels(list(map(str,barlim)))
+#             cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+#             cbar1.outline.set_edgecolor('dimgrey')
             
-            plt.tight_layout()
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
+#             plt.tight_layout()
+#             plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
             
-            plt.savefig(directoryfigure + 'InterBias-%s_%s.png' % (saveData,modelGCMs[diff]),dpi=300)
+#             plt.savefig(directoryfigure + 'InterBias-%s_%s.png' % (saveData,modelGCMs[diff]),dpi=300)
         

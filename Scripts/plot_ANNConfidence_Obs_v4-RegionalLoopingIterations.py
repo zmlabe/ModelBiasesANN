@@ -266,6 +266,10 @@ meanmax = np.nanmean(maxc,axis=1)
 per05 = np.percentile(maxc,20,axis=1)
 per95 = np.percentile(maxc,80,axis=1)
 
+directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+np.savez(directorydataMS + 'StatisticsIterations_%s.npz' % ('SMILEGlobe'),mean=meanmax[0,:],p5=per05[0,:],p95=per95[0,:])
+np.savez(directorydataMS + 'StatisticsIterations_%s.npz' % ('LowerArctic'),mean=meanmax[4,:],p5=per05[4,:],p95=per95[4,:])
+
 ###############################################################################
 ###############################################################################
 ###############################################################################

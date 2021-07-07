@@ -25,7 +25,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 variablesall = ['T2M','P','SLP']
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-AA = True
+AA = False
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         ###############################################################################
@@ -43,7 +43,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'Arctic'
+        reg_name = 'LowerArctic'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -313,7 +313,16 @@ for va in range(len(variablesall)):
             for i in range(lenOfPicks):
                 lrpmodel = lrptestdata[model_test[i]]
                 lrpmodelmeanslice = lrpmodel.reshape(lrpmodel.shape[0]//yearsall.shape[0],yearsall.shape[0],lrpmodel.shape[1],lrpmodel.shape[2])
-                lrpmodelmean1 = np.nanmean(lrpmodelmeanslice[:,-10:,:,:],axis=0)
+                lrpmodelmean1 = np.nanmean(lrpmodelmeanslice[:,-15:,:,:],axis=0)
+                lrpmodelmean = np.nanmean(lrpmodelmean1,axis=0)
+                lrptest.append(lrpmodelmean)
+            lrptest = np.asarray(lrptest,dtype=object)
+        elif AA == False:
+            lrptest = []
+            for i in range(lenOfPicks):
+                lrpmodel = lrptestdata[model_test[i]]
+                lrpmodelmeanslice = lrpmodel.reshape(lrpmodel.shape[0]//yearsall.shape[0],yearsall.shape[0],lrpmodel.shape[1],lrpmodel.shape[2])
+                lrpmodelmean1 = np.nanmean(lrpmodelmeanslice[:,:-15,:,:],axis=0)
                 lrpmodelmean = np.nanmean(lrpmodelmean1,axis=0)
                 lrptest.append(lrpmodelmean)
             lrptest = np.asarray(lrptest,dtype=object)
@@ -436,6 +445,18 @@ for va in range(len(variablesall)):
             plt.savefig(directoryfigure + '%s/Regions/LRPComposites_%s_AA.png' % (typeOfAnalysis,saveData),dpi=300)
         else:
             plt.savefig(directoryfigure + '%s/Regions/LRPComposites_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        
+        ### Save files
+        if AA == False:
+            directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+            np.save(directorydataMS + 'LRPcomposites_LowerArctic_8classes.npy',lrptest)
+            np.save(directorydataMS + 'Lat_LowerArctic.npy',np.asarray(lat1))
+            np.save(directorydataMS + 'Lon_LowerArctic.npy',np.asarray(lon1))
+        elif AA == True:
+            directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+            np.save(directorydataMS + 'LRPcomposites_LowerArcticAA_8classes.npy',lrptest)
+            np.save(directorydataMS + 'Lat_LowerArctic.npy',np.asarray(lat1))
+            np.save(directorydataMS + 'Lon_LowerArctic.npy',np.asarray(lon1))
         
         ###############################################################################
         ###############################################################################

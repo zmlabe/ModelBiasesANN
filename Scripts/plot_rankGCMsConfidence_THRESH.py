@@ -27,7 +27,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 variablesall = ['T2M','P','SLP']
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-THRESH = 0.1
+THRESH = 0.05
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         ###############################################################################
@@ -274,6 +274,8 @@ for va in range(len(variablesall)):
             rank[i,:] = abs(sts.rankdata(obsout[i,:],method='min')-9)
             
         rank = np.transpose(rank)
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+        np.save(directorydataMS + 'Ranks_thresh-%s_%s.npy' % (THRESH,reg_name),rank)
 
         ###############################################################################
         ###############################################################################
