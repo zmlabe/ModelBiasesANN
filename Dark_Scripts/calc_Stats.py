@@ -18,10 +18,11 @@ Usage
     [8] remove_ocean(data,data_obs)
     [9] remove_land(data,data_obs)
     [10] standardize_data(Xtrain,Xtest)
-    [11] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
-    [12] rm_variance_dev(var,window)
-    [13] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
-    [14] smoothedEnsembles(data,lat_bounds,lon_bounds)
+    [11] standardize_dataSEPARATE(Xtrain,Xtest):
+    [12] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
+    [13] rm_variance_dev(var,window)
+    [14] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+    [15] smoothedEnsembles(data,lat_bounds,lon_bounds)
 """
 
 def rmse(a,b):
@@ -271,6 +272,37 @@ def standardize_data(Xtrain,Xtest):
     Xstd = np.std(Xtrain,axis=0)
     Xtest = (Xtest - Xmean)/Xstd
     Xtrain = (Xtrain - Xmean)/Xstd
+    
+    stdVals = (Xmean,Xstd)
+    stdVals = stdVals[:]
+    
+    ### If there is a nan (like for land/ocean masks)
+    if np.isnan(np.min(Xtrain)) == True:
+        Xtrain[np.isnan(Xtrain)] = 0
+        Xtest[np.isnan(Xtest)] = 0
+        print('--THERE WAS A NAN IN THE STANDARDIZED DATA!--')
+    
+    return Xtrain,Xtest,stdVals
+
+###############################################################################
+
+def standardize_dataSEPARATE(Xtrain,Xtest):
+    """
+    Standardizes training and testing data for each climate model separately
+    """
+    
+    ### Import modulates
+    import numpy as np
+
+    Xtrainq = Xtrain.reshape(8,12*70,Xtrain.shape[1]//144,144)
+    Xtrainallq = Xtrain.reshape(8,12,70,Xtrain.shape[1]//144,144)
+    Xtestallq = Xtest.reshape(8,4,70,Xtest.shape[1]//144,144)
+    
+    Xmean = np.mean(Xtrainq,axis=1)[:,np.newaxis,np.newaxis,:,:]
+    Xstd = np.std(Xtrainq,axis=1)[:,np.newaxis,np.newaxis,:,:]
+    
+    Xtest = ((Xtestallq - Xmean)/Xstd).reshape(Xtestallq.shape[0]*Xtestallq.shape[1]*Xtestallq.shape[2],Xtestallq.shape[3]*Xtestallq.shape[4])
+    Xtrain = ((Xtrainallq - Xmean)/Xstd).reshape(Xtrainallq.shape[0]*Xtrainallq.shape[1]*Xtrainallq.shape[2],Xtrainallq.shape[3]*Xtrainallq.shape[4])
     
     stdVals = (Xmean,Xstd)
     stdVals = stdVals[:]

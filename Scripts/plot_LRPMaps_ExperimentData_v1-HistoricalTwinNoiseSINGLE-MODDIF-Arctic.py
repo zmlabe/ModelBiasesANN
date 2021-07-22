@@ -25,7 +25,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 variablesall = ['T2M','P','SLP']
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-AA = False
+AA = True
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         ###############################################################################
@@ -59,7 +59,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = False
+        rm_annual_mean = True
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -209,11 +209,11 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_LAND' + '_StandMethods_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         elif ocean_only == True:
-            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_StandMethods_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         else:
-            saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_StandMethods_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
         ###############################################################################
@@ -449,12 +449,12 @@ for va in range(len(variablesall)):
         ### Save files
         if AA == False:
             directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-            np.save(directorydataMS + 'LRPcomposites_LowerArctic_8classes.npy',lrptest)
+            np.save(directorydataMS + 'LRPcomposites_LowerArctic_8classes_GLO.npy',lrptest)
             np.save(directorydataMS + 'Lat_LowerArctic.npy',np.asarray(lat1))
             np.save(directorydataMS + 'Lon_LowerArctic.npy',np.asarray(lon1))
         elif AA == True:
             directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-            np.save(directorydataMS + 'LRPcomposites_LowerArcticAA_8classes.npy',lrptest)
+            np.save(directorydataMS + 'LRPcomposites_LowerArcticAA_8classes_GLO.npy',lrptest)
             np.save(directorydataMS + 'Lat_LowerArctic.npy',np.asarray(lat1))
             np.save(directorydataMS + 'Lon_LowerArctic.npy',np.asarray(lon1))
         

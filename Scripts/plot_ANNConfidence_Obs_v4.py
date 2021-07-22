@@ -42,7 +42,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'SMILEGLobe'
+        reg_name = 'LowerArctic'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -246,6 +246,9 @@ for va in range(len(variablesall)):
         obsout= np.genfromtxt(directorydata + 'obsConfid_' + saveData + '.txt')
         label = np.argmax(obsout,axis=1)
         
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+        np.save(directorydataMS + 'Confidence_%s.npy' % reg_name, obsout)
+        np.save(directorydataMS + 'Label_%s.npy' % reg_name, label)
         ###############################################################################
         ###############################################################################
         ###############################################################################

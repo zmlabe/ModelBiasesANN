@@ -66,7 +66,7 @@ modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
-variq = 'P'
+variq = 'T2M'
 reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################
@@ -830,14 +830,14 @@ for sis,singlesimulation in enumerate(datasetsingle):
         random_segment = True
         foldsN = 1
         
-        for avgHalfChunk in (0,): # ([1,5,10]):#([1,2,5,10]):
+        for avgHalfChunk in (0,): 
             session_conf = tf.ConfigProto(intra_op_parallelism_threads=1,
                                           inter_op_parallelism_threads=1)
             sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
             K.set_session(sess)
             K.clear_session()
             
-            for loop in ([0]): # (0,1,2,3,4,5):
+            for loop in ([0]): 
                 ### Get info about the region
                 lat_bounds,lon_bounds = UT.regions(reg_name)
                 data_all,lats,lons = read_primary_dataset(variq,dataset,

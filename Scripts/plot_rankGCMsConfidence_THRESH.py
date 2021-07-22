@@ -42,10 +42,10 @@ for va in range(len(variablesall)):
         modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth',
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
-        dataset_obs = 'ERA5BE'
+        dataset_obs = '20CRv3'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'LowerArctic'
+        reg_name = 'SMILEGlobe'
         if reg_name == 'SMILEGlobe':
             reg_nameq = 'GLOBAL'
         elif reg_name == 'LowerArctic':
@@ -275,8 +275,8 @@ for va in range(len(variablesall)):
             
         rank = np.transpose(rank)
         directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-        np.save(directorydataMS + 'Ranks_thresh-%s_%s.npy' % (THRESH,reg_name),rank)
-
+        np.save(directorydataMS + 'Ranks_thresh-%s_%s_20C.npy' % (THRESH,reg_name),rank)
+        sys.exit()
         ###############################################################################
         ###############################################################################
         ###############################################################################

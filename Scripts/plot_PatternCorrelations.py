@@ -30,7 +30,9 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
-reg_name = 'SouthernOcean'
+monthlychoiceq = ['annual']
+variables = ['T2M']
+reg_name = 'LowerArctic'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
@@ -215,11 +217,11 @@ for vv in range(len(variables)):
         ##############################################################################
         ##############################################################################
         ## Process trends
-        obstrend = calcTrend(data_obs)
+        obstrend = calcTrend(data_obs[-15:,:,:])
         modeltrends = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[3],modelsall.shape[4]))
         for i in range(modeltrends.shape[0]):
             for e in range(modeltrends.shape[1]):
-                modeltrends[i,e,:,:] = calcTrend(modelsall[i,e,:,:,:])
+                modeltrends[i,e,:,:] = calcTrend(modelsall[i,e,-15:,:,:])
                 
         ### Begin function to correlate observations with model, ensemble
         corrtrends = np.empty((modeltrends.shape[0],modeltrends.shape[1]))
@@ -239,4 +241,4 @@ for vv in range(len(variables)):
         np.savez(directorydata + saveData + '_corrs.npz',corr)
         np.savez(directorydata + saveData + '_corrsdt.npz',corrdt)
         np.savez(directorydata + saveData + '_corrsglo.npz',corrglo)
-        np.savez(directorydata + saveData + '_corrstrends.npz',corrtrends)
+        np.savez(directorydata + saveData + '_corrstrends_AA.npz',corrtrends)

@@ -33,13 +33,13 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 ### Data preliminaries 
 modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS']
 modelGCMsMM = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS','MMean']
-modelGCMsMM2 = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS','MMmean','LENSmean']
+modelGCMsMM2 = ['ERA5BE','CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS','MMmean','LENSmean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
-reg_name = 'SMILEGlobe'
+reg_name = 'LowerArctic'
 level = 'surface'
 timeper = 'historical'
 directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/interModel/%s/' % variables[0]
@@ -177,50 +177,50 @@ def adjust_spines(ax, spines):
 #     slicenewmodel = np.nanmean(testens[slices,:,:,:],axis=0)
 #     newmodeltest[sh,:,:,:] = slicenewmodel
 
-###############################################################################
-###############################################################################
-###############################################################################
-### Calculate average standard deviation across years
-mmstd = np.nanstd(modelmean,axis=1)
-enstd = np.nanstd(newmodeltest,axis=1)
-alstd = np.nanstd(models,axis=2)
-obstdyr = np.nanstd(data_obs,axis=0)
+# ###############################################################################
+# ###############################################################################
+# ###############################################################################
+# ### Calculate average standard deviation across years
+# mmstd = np.nanstd(modelmean,axis=1)
+# enstd = np.nanstd(newmodeltest,axis=1)
+# alstd = np.nanstd(models,axis=2)
+# obstdyr = np.nanstd(data_obs,axis=0)
 
-### Calculate average standard deviation across ensemble members
-mmstdyr = np.nanmean(mmstd,axis=0)
-enstdyr = np.nanmean(enstd,axis=0)
-alstdyr = np.nanmean(alstd,axis=1)
+# ### Calculate average standard deviation across ensemble members
+# mmstdyr = np.nanmean(mmstd,axis=0)
+# enstdyr = np.nanmean(enstd,axis=0)
+# alstdyr = np.nanmean(alstd,axis=1)
 
-### Global mean std across years and ensembles
-mmave = UT.calc_weightedAve(mmstdyr,lat2)
-enave = UT.calc_weightedAve(enstdyr,lat2)
-alave = UT.calc_weightedAve(alstdyr,lat2)
-obave = UT.calc_weightedAve(obstdyr,lat2)
+# ### Global mean std across years and ensembles
+# mmave = UT.calc_weightedAve(mmstdyr,lat2)
+# enave = UT.calc_weightedAve(enstdyr,lat2)
+# alave = UT.calc_weightedAve(alstdyr,lat2)
+# obave = UT.calc_weightedAve(obstdyr,lat2)
 
-### Global mean std across years for EACH ensemble
-mmaveens = UT.calc_weightedAve(mmstd,lat2)
-enaveens = UT.calc_weightedAve(enstd,lat2)
-alaveens = UT.calc_weightedAve(alstd,lat2)
+# ### Global mean std across years for EACH ensemble
+# mmaveens = UT.calc_weightedAve(mmstd,lat2)
+# enaveens = UT.calc_weightedAve(enstd,lat2)
+# alaveens = UT.calc_weightedAve(alstd,lat2)
 
-### Maximum ensemble
-mmmaxens = np.max(mmaveens)
-enmaxens = np.max(enaveens)
-almaxens = np.max(alaveens,axis=1)
-maxall = np.concatenate((almaxens,[mmmaxens],[enmaxens]))
+# ### Maximum ensemble
+# mmmaxens = np.max(mmaveens)
+# enmaxens = np.max(enaveens)
+# almaxens = np.max(alaveens,axis=1)
+# maxall = np.concatenate((almaxens,[mmmaxens],[enmaxens]))
 
-### Minimum ensemble
-mmminens = np.min(mmaveens)
-enminens = np.min(enaveens)
-alminens = np.min(alaveens,axis=1)
-minall = np.concatenate((alminens,[mmminens],[enminens]))
+# ### Minimum ensemble
+# mmminens = np.min(mmaveens)
+# enminens = np.min(enaveens)
+# alminens = np.min(alaveens,axis=1)
+# minall = np.concatenate((alminens,[mmminens],[enminens]))
 
-### Standard deviation of ensemble member sampling
-mmstdOfEnsOnly = np.nanstd(mmaveens)
-entdOfEnsOnly = np.nanstd(enaveens)
-alstdOfEnsOnly = np.nanstd(alaveens,axis=1)
+# ### Standard deviation of ensemble member sampling
+# mmstdOfEnsOnly = np.nanstd(mmaveens)
+# entdOfEnsOnly = np.nanstd(enaveens)
+# alstdOfEnsOnly = np.nanstd(alaveens,axis=1)
 
 ### Add all data
-stdall = np.concatenate((alave,[mmave],[enave]))
+stdall = np.concatenate(([obave],alave,[mmave],[enave]))
 
 ###############################################################################
 ###############################################################################
@@ -240,9 +240,9 @@ ax.tick_params('x',length=0,width=0,which='major',color='dimgrey')
 rects = plt.bar(np.arange(len(stdall)),stdall, align='center')
 plt.axhline(y=obave,linestyle='--',linewidth=2,color='dimgrey',
             clip_on=False,zorder=100,dashes=(1,0.3))
-for ii in range(len(stdall)):
+for ii in range(1,len(stdall)-1):
     plt.errorbar(ii,stdall[ii],
-                     yerr=np.array([[stdall[ii]-minall[ii],maxall[ii]-stdall[ii]]]).T,
+                     yerr=np.array([[stdall[ii]-minall[ii-1],maxall[ii-1]-stdall[ii]]]).T,
                      color='k',linewidth=2,capthick=3,capsize=0)
 
 ### Set color
@@ -253,8 +253,8 @@ for i in range(len(stdall)):
 
 plt.xticks(np.arange(0,len(stdall)+1,1),modelGCMsMM2,size=5)
 plt.yticks(np.arange(0,2.1,0.1),map(str,np.round(np.arange(0,2.1,0.1),2)),size=6)
-plt.xlim([-0.5,9])   
-plt.ylim([0,0.8])
+plt.xlim([-0.5,10])   
+plt.ylim([0,2])
 plt.ylabel(r'\textbf{STDev-%s -- [$^{\circ}$C] -- 1950-2019}' % variq)
 
 plt.tight_layout()

@@ -27,6 +27,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
 directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures/'
 variablesall = 'T2M'
+scaleLRPmax = True
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
 
@@ -54,6 +55,11 @@ label = r'\textbf{RELEVANCE}'
 fig = plt.figure(figsize=(10,3))
 for r in range(alldata.shape[0]):
     var = alldata[r]
+    
+    if scaleLRPmax == True:
+        var = var/np.nanmax(var)
+    else:
+        var = var
     
     ax1 = plt.subplot(2,alldata.shape[0]//2,r+1)
     m = Basemap(projection='npstere',boundinglat=61.3,lon_0=0,
@@ -100,4 +106,7 @@ cbar1.outline.set_edgecolor('dimgrey')
 plt.tight_layout()
 plt.subplots_adjust(hspace=0.01,wspace=0.02,bottom=0.17,top=0.90)
 
-plt.savefig(directoryfigure + 'MS-Figure_5b_v1.png',dpi=1000)
+if scaleLRPmax == True:
+    plt.savefig(directoryfigure + 'MS-Figure_5b_v1_scaleLRP.png',dpi=1000)
+else:
+    plt.savefig(directoryfigure + 'MS-Figure_5b_v1.png',dpi=1000)

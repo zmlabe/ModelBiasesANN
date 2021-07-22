@@ -27,6 +27,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
 directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures/'
 variablesall = 'T2M'
+scaleLRPmax = True
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 
@@ -39,10 +40,20 @@ lon1 = np.load(directorydata + 'Lon_LowerArctic.npy',allow_pickle=True)
 lrp = np.load(directorydata + 'LRPcomposites_LowerArctic_8classes.npy',allow_pickle=True)
 lrpAA = np.load(directorydata + 'LRPcomposites_LowerArcticAA_8classes.npy',allow_pickle=True)
 
-difference = lrpAA - lrp
+if scaleLRPmax == True:
+    lrpn = np.empty((lrp.shape))
+    lrpAAn = np.empty((lrp.shape))
+    for i in range(lrp.shape[0]):
+        lrpn[i] = lrp[i]/np.nanmax(lrp[i])
+        lrpAAn[i] = lrpAA[i]/np.nanmax(lrpAA[i])
+    difference = lrpAAn - lrpn
+else:
+    lrpn = lrp
+    lrpAAn = lrpAAn
+    difference = lrpAAn - lrpn
 
 ### Prepare data for plotting
-alldata = np.concatenate([lrpAA,lrp,difference],axis=0)
+alldata = np.concatenate([lrpAAn,lrpn,difference],axis=0)
 
 ###############################################################################
 ###############################################################################
@@ -154,4 +165,7 @@ ax1.annotate(r'\textbf{2005-2019}',xy=(0,0),xytext=(-7.3,2.6),
 plt.tight_layout()
 plt.subplots_adjust(hspace=0.01,wspace=0.02)
 
-plt.savefig(directoryfigure + 'MS-Figure_5c_v1.png',dpi=1000)
+if scaleLRPmax == True:
+    plt.savefig(directoryfigure + 'MS-Figure_5c_v1_scaleLRP.png',dpi=1000)
+else:
+    plt.savefig(directoryfigure + 'MS-Figure_5c_v1.png',dpi=1000)

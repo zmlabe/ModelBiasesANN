@@ -29,7 +29,7 @@ dataset_obs = ['ERA5BE']
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 typeOfCorr = ['R','R-DT','R-RMGLO','R-TREND']
 variables = ['T2M','P','SLP']
-reg_name = 'SouthernOcean'
+reg_name = 'LowerArctic'
 level = 'surface'
 timeper = 'historical'
 option = 8
@@ -46,6 +46,8 @@ elif reg_name == 'Arctic':
     region = 'Arctic'
 elif reg_name == 'SouthernOcean':
     region = 'Southern Ocean'
+elif reg_name == 'LowerArctic':
+    region = 'Arctic'
 
 ### Read in data
 for vv in range(len(variables)):
