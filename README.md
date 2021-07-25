@@ -24,4 +24,4 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
 
 
 ## Conferences
-
++ **[1]** **Labe, Z.M.** and E.A. Barnes. Using explainable neural networks for comparing historical climate model simulations, *2nd Workshop on Knowledge Guided Machine Learning (KGML2021)*, Virtual Workshop (Aug 2021). [[POSTER]](https://sites.uci.edu/zlabe/files/2021/07/LabeBarnes_KGML2021_Poster_v2_Final.pdf)
