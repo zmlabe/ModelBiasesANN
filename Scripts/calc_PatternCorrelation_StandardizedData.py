@@ -1,8 +1,9 @@
 """
 Script for calculating pattern correlations between models and observations
+after standardizing data
 
 Author     : Zachary M. Labe
-Date       : 27 April 2021
+Date       : 26 July 2021
 Version    : 1
 """
 
@@ -138,18 +139,41 @@ for vv in range(len(variables)):
         ### Meshgrid of lat/lon
         lon2,lat2 = np.meshgrid(lons,lats)
         
+        ### Standardize all data
+        def standardize(modelsall,data_obs):
+            if modelsall.ndim == 5:
+                modelsall_flatyrens = modelsall.reshape(modelsall.shape[0],
+                                                        modelsall.shape[1]*modelsall.shape[2],
+                                                        lats.shape[0],lons.shape[0])
+                xmean = np.nanmean(modelsall_flatyrens,axis=1)[:,np.newaxis,np.newaxis,:,:]
+                xstd = np.nanstd(modelsall_flatyrens,axis=1)[:,np.newaxis,np.newaxis,:,:]
+                
+                obsmean = np.nanmean(data_obs,axis=0)
+                obstd = np.nanstd(data_obs,axis=0)
+                
+                modelsall_std = ((modelsall - xmean)/xstd).reshape(modelsall.shape[0],
+                                                        modelsall.shape[1],modelsall.shape[2],
+                                                        lats.shape[0],lons.shape[0])            
+                obs_std = (data_obs - obsmean)/obstd
+            else:
+                print(ValueError('\nCheck dimensions!\n'))
+                sys.exit()
+            print('\n------STANDARDIZE EACH MODEL SEPARATELY------\n')
+            return modelsall_std,obs_std
+
         ###############################################################################
         ###############################################################################
         ###############################################################################
         ### Begin spatial correlations
+        modelsallraw,data_obsraw, = standardize(modelsall,data_obs)
         
         ### Begin function to correlate observations with model, ensemble, year
-        corr = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[2]))
-        for mo in range(modelsall.shape[0]):
-            for ens in range(modelsall.shape[1]):
-                for yr in range(modelsall.shape[2]):
-                    varx = data_obs[yr,:,:]
-                    vary = modelsall[mo,ens,yr,:,:]
+        corr = np.empty((modelsallraw.shape[0],modelsallraw.shape[1],modelsallraw.shape[2]))
+        for mo in range(modelsallraw.shape[0]):
+            for ens in range(modelsallraw.shape[1]):
+                for yr in range(modelsallraw.shape[2]):
+                    varx = data_obsraw[yr,:,:]
+                    vary = modelsallraw[mo,ens,yr,:,:]
                     corr[mo,ens,yr] = UT.calc_spatialCorr(varx,vary,lats,lons,'yes')
                     
         ### Average correlations across ensemble members
@@ -161,13 +185,14 @@ for vv in range(len(variables)):
         ### Check highest member
         maxmodelcorr = np.argmax(meancorr,axis=0)
         uniquecorr,countcorr = np.unique(maxmodelcorr,return_counts=True)
-        
+
         ###############################################################################
         ###############################################################################
         ###############################################################################
         ### Detrend data for correlations
         data_obsdt = DET.detrendDataR(data_obs,'surface','monthly')
         modelsalldt = DET.detrendData(modelsall,'surface','monthly')
+        modelsalldt,data_obsdt = standardize(modelsalldt,data_obsdt)
         
         ### Begin function to correlate observations with model, ensemble, year
         corrdt = np.empty((modelsalldt.shape[0],modelsalldt.shape[1],modelsalldt.shape[2]))
@@ -193,6 +218,7 @@ for vv in range(len(variables)):
         ###############################################################################
         ### Remove annual mean
         modelsallglo, data_obsglo = dSS.remove_annual_mean(modelsall,data_obs,lats,lons,lats_obs,lons_obs)
+        modelsallglo,data_obsglo = standardize(modelsallglo,data_obsglo)
         
         ### Begin function to correlate observations with model, ensemble, year
         corrglo = np.empty((modelsallglo.shape[0],modelsallglo.shape[1],modelsallglo.shape[2]))
@@ -217,11 +243,12 @@ for vv in range(len(variables)):
         ##############################################################################
         ##############################################################################
         ## Process trends
-        obstrend = calcTrend(data_obs[:,:,:])
+        modelsall,data_obs = standardize(modelsall,data_obs)
+        obstrend = calcTrend(data_obs[-15:,:,:])
         modeltrends = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[3],modelsall.shape[4]))
         for i in range(modeltrends.shape[0]):
             for e in range(modeltrends.shape[1]):
-                modeltrends[i,e,:,:] = calcTrend(modelsall[i,e,:,:,:])
+                modeltrends[i,e,:,:] = calcTrend(modelsall[i,e,-15:,:,:])
                 
         ### Begin function to correlate observations with model, ensemble
         corrtrends = np.empty((modeltrends.shape[0],modeltrends.shape[1]))
@@ -238,7 +265,7 @@ for vv in range(len(variables)):
         ##############################################################################
         ##############################################################################
         ### Save correlations
-        np.savez(directorydata + saveData + '_corrs.npz',corr)
-        np.savez(directorydata + saveData + '_corrsdt.npz',corrdt)
-        np.savez(directorydata + saveData + '_corrsglo.npz',corrglo)
-        np.savez(directorydata + saveData + '_corrstrends.npz',corrtrends)
+        np.savez(directorydata + saveData + '_corrs_standardizedData.npz',corr)
+        np.savez(directorydata + saveData + '_corrsdt_standardizedData.npz',corrdt)
+        np.savez(directorydata + saveData + '_corrsglo_standardizedData.npz',corrglo)
+        np.savez(directorydata + saveData + '_corrstrends_AA_standardizedData.npz',corrtrends)

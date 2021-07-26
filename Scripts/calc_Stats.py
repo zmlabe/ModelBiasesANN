@@ -301,8 +301,8 @@ def standardize_dataSEPARATE(Xtrain,Xtest):
     Xmean = np.mean(Xtrainq,axis=1)[:,np.newaxis,np.newaxis,:,:]
     Xstd = np.std(Xtrainq,axis=1)[:,np.newaxis,np.newaxis,:,:]
     
-    Xtest = ((Xtestallq - Xmean)/Xstd).reshape(Xtestallq.shape[0]*Xtestallq.shape[1]*Xtestallq.shape[2],Xtestallq.shape[3]*Xtestallq.shape[4])
     Xtrain = ((Xtrainallq - Xmean)/Xstd).reshape(Xtrainallq.shape[0]*Xtrainallq.shape[1]*Xtrainallq.shape[2],Xtrainallq.shape[3]*Xtrainallq.shape[4])
+    Xtest = ((Xtestallq - Xmean)/Xstd).reshape(Xtestallq.shape[0]*Xtestallq.shape[1]*Xtestallq.shape[2],Xtestallq.shape[3]*Xtestallq.shape[4])
     
     stdVals = (Xmean,Xstd)
     stdVals = stdVals[:]
@@ -313,6 +313,7 @@ def standardize_dataSEPARATE(Xtrain,Xtest):
         Xtest[np.isnan(Xtest)] = 0
         print('--THERE WAS A NAN IN THE STANDARDIZED DATA!--')
     
+    print('------STANDARDIZE EACH MODEL SEPARATELY------')
     return Xtrain,Xtest,stdVals
 
 ###############################################################################

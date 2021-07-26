@@ -29,7 +29,7 @@ dataset_obs = ['ERA5BE']
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 typeOfCorr = ['RMSE']
 variables = ['T2M','P','SLP']
-reg_name = 'SMILEGlobe'
+reg_name = 'LowerArctic'
 level = 'surface'
 timeper = 'historical'
 if timeper == 'historical':
@@ -41,7 +41,7 @@ if reg_name == 'SMILEGlobe':
     region = 'Global'
 elif reg_name == 'narrowTropics':
     region = 'Tropics'
-elif reg_name == 'Arctic':
+elif reg_name == 'LowerArctic':
     region = 'Arctic'
 
 ### Read in data
@@ -180,6 +180,17 @@ for vv in range(1):
                     plt.yticks(np.arange(0,11.5,0.5),map(str,np.round(np.arange(0,11,0.5),3)),size=6)
                     plt.xlim([1950,2020])   
                     plt.ylim([0,3])
+                elif reg_name == 'LowerArctic':
+                    leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                                  bbox_to_anchor=(0.5,0.1),fancybox=True,ncol=4,frameon=False,
+                                  handlelength=0,handletextpad=0)
+                    for line,text in zip(leg.get_lines(), leg.get_texts()):
+                        text.set_color(line.get_color())
+                    
+                    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                    plt.yticks(np.arange(0,11.5,1),map(str,np.round(np.arange(0,11,1),3)),size=6)
+                    plt.xlim([1950,2020])   
+                    plt.ylim([0,8])
                 elif reg_name == 'Arctic':
                     if land_only == True:
                         leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
@@ -226,7 +237,7 @@ for vv in range(1):
                 plt.xlim([1950,2020])   
                 plt.ylim([0.4,1.0])                
         
-            plt.xlabel(r'\textbf{Average RMSE - [climate model data] - %s for %s}' % (monthlychoice,variq),color='dimgrey',fontsize=8,labelpad=8)
+            plt.xlabel(r'\textbf{Average RMSE - [climate model data] - %s for %s for \underline{%s}}' % (monthlychoice,variq,region),color='dimgrey',fontsize=8,labelpad=8)
             plt.title(r'\textbf{RMSE PER YEAR - %s}' % typemask,color='k',fontsize=15)
         
             plt.tight_layout()

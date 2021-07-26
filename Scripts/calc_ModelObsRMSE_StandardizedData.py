@@ -1,20 +1,22 @@
 """
-Script for calculating point by point correlations between models and observations
+Script for calculating RMSE between models and observations after 
+standardizing data
 
 Author     : Zachary M. Labe
-Date       : 4 May 2021
+Date       : 26 July 2021
 Version    : 1
 """
 
 ### Import packages
 import sys
 import matplotlib.pyplot as plt
-import cmocean
 import numpy as np
 import calc_Utilities as UT
 import calc_dataFunctions as df
 import calc_Stats as dSS
 import scipy.stats as sts
+import calc_DetrendData as DET
+from netCDF4 import Dataset
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
@@ -30,6 +32,8 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
+monthlychoiceq = ['annual']
+variables = ['T2M']
 reg_name = 'LowerArctic'
 level = 'surface'
 timeper = 'historical'
@@ -75,29 +79,6 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
                                             lat_bounds,lon_bounds)    
     print('our OBS dataset: ',dataset_obs,' is shaped',data_obs.shape)
     return data_obs,lats_obs,lons_obs
-def calcTrend(data):
-    slopes = np.empty((data.shape[1],data.shape[2]))
-    x = np.arange(data.shape[0])
-    for i in range(data.shape[1]):
-        for j in range(data.shape[2]):
-            mask = np.isfinite(data[:,i,j])
-            y = data[:,i,j]
-            
-            if np.sum(mask) == y.shape[0]:
-                xx = x
-                yy = y
-            else:
-                xx = x[mask]
-                yy = y[mask]      
-            if np.isfinite(np.nanmean(yy)):
-                slopes[i,j],intercepts, \
-                r_value,p_value,std_err = sts.linregress(xx,yy)
-            else:
-                slopes[i,j] = np.nan
-    
-    dectrend = slopes * 10.   
-    print('Completed: Finished calculating trends!')      
-    return dectrend
 
 ###############################################################################
 ###############################################################################
@@ -113,6 +94,14 @@ for vv in range(1):
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Climatologies/'
         directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/patternCorr/%s/' % variq
         saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + timeper
+        if land_only == True:
+            saveData =  monthlychoice + '_LAND_' + variq + '_' + reg_name + '_' + timeper
+            typemask = 'LAND'
+        elif ocean_only == True:
+            saveData =  monthlychoice + '_OCEAN_' + variq + '_' + reg_name + '_' + timeper
+            typemask = 'OCEAN'
+        else:
+            typemask = 'LAND/OCEAN'
         print('*Filename == < %s >' % saveData) 
         
         ### Read data
@@ -135,32 +124,73 @@ for vv in range(1):
         modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
         modelsall = np.append(models,modelmean,axis=0)
         
+###############################################################################        
+###############################################################################                        
+        if land_only == True:
+            modelsall, data_obs = dSS.remove_ocean(modelsall,data_obs,
+                                              lat_bounds,
+                                              lon_bounds) 
+            print('\n*Removed ocean data*')
+###############################################################################
+###############################################################################
+        if ocean_only == True:
+            modelsall, data_obs = dSS.remove_land(modelsall,data_obs,
+                                              lat_bounds,
+                                              lon_bounds) 
+            print('\n*Removed land data*')  
+###############################################################################
+###############################################################################        
+        ### Change 0s for mask to nans
+        modelsall[modelsall == 0.] = np.nan
+        data_obs[data_obs == 0.] = np.nan
+        
         ### Meshgrid of lat/lon
         lon2,lat2 = np.meshgrid(lons,lats)
-
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Begin point by point correlations
         
-        ### Begin function to correlate observations with model, ensemble, year
-        corr = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[3],modelsall.shape[4]))
+        ### Standardize all data
+        def standardize(modelsall,data_obs):
+            if modelsall.ndim == 5:
+                modelsall_flatyrens = modelsall.reshape(modelsall.shape[0],
+                                                        modelsall.shape[1]*modelsall.shape[2],
+                                                        lats.shape[0],lons.shape[0])
+                xmean = np.nanmean(modelsall_flatyrens,axis=1)[:,np.newaxis,np.newaxis,:,:]
+                xstd = np.nanstd(modelsall_flatyrens,axis=1)[:,np.newaxis,np.newaxis,:,:]
+                
+                obsmean = np.nanmean(data_obs,axis=0)
+                obstd = np.nanstd(data_obs,axis=0)
+                
+                modelsall_std = ((modelsall - xmean)/xstd).reshape(modelsall.shape[0],
+                                                        modelsall.shape[1],modelsall.shape[2],
+                                                        lats.shape[0],lons.shape[0])            
+                obs_std = (data_obs - obsmean)/obstd
+            else:
+                print(ValueError('\nCheck dimensions!\n'))
+                sys.exit()
+            print('\n------STANDARDIZE EACH MODEL SEPARATELY------\n')
+            return modelsall_std,obs_std
+        modelsall,data_obs, = standardize(modelsall,data_obs)
+        
+        ### Calculate rmse per year
+        rmsd = np.empty((modelsall.shape[0],modelsall.shape[1],modelsall.shape[2]))
         for mo in range(modelsall.shape[0]):
             for ens in range(modelsall.shape[1]):
-                for i in range(modelsall.shape[3]):
-                    for j in range(modelsall.shape[4]):
-                        varx = data_obs[:,i,j]
-                        vary = modelsall[mo,ens,:,i,j]
-                        corr[mo,ens,i,j] = sts.pearsonr(varx,vary)[0]
-            print('Model #%s done!' % (mo+1))
-                    
-        ### Average correlations across ensemble members
-        meancorr = np.nanmean(corr,axis=1)
+                for yr in range(modelsall.shape[2]):
+                    varxrm = data_obs[yr,:,:]
+                    varyrm = modelsall[mo,ens,yr,:,:]
+                    if any([land_only==True,ocean_only==True]):
+                        rmsd[mo,ens,yr] = UT.calc_RMSE(varxrm,varyrm,lats,lons,'yesnan')
+                        print('------USING MASKS FOR NANS!------')
+                    else:
+                        rmsd[mo,ens,yr] = UT.calc_RMSE(varxrm,varyrm,lats,lons,'yes')
         
+        ### Average RMSE across ensemble members
+        meanrmsd = np.nanmean(rmsd,axis=1)     
+        
+        ### Average RMSE across years
+        meanrmsdyr = np.nanmean(meanrmsd,axis=1)
+
         ##############################################################################
         ##############################################################################
         ##############################################################################
         ### Save correlations
-        np.savez(directorydata + saveData + '_PointByPoint_corrs.npz',meancorr)
-        np.savez(directorydata + saveData + '_PointByPoint_lats.npz',lats)
-        np.savez(directorydata + saveData + '_PointByPoint_lons.npz',lons)
+        np.savez(directorydata + saveData + '_RMSE_standardizedData.npz',rmsd)

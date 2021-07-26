@@ -39,15 +39,15 @@ ocean_only = False
 if timeper == 'historical':
     years = np.arange(1950,2019+1,1)
 if reg_name == 'SMILEGlobe':
-    region = 'Global'
+    region = 'Global(z)'
 elif reg_name == 'narrowTropics':
-    region = 'Tropics'
+    region = 'Tropic(z)'
 elif reg_name == 'Arctic':
-    region = 'Arctic'
+    region = 'Arctic(z)'
 elif reg_name == 'SouthernOcean':
-    region = 'Southern Ocean'
+    region = 'Southern Ocean (z)'
 elif reg_name == 'LowerArctic':
-    region = 'Arctic'
+    region = 'Arctic(z)'
 
 ### Read in data
 # for vv in range(len(variables)):
@@ -69,10 +69,10 @@ for vv in range(1):
             typemask = 'LAND/OCEAN'
         print('*Filename == < %s >' % saveData) 
         
-        corr = np.load(directorydata + saveData + '_corrs.npz')['arr_0'][:option]
-        corrdt = np.load(directorydata + saveData + '_corrsdt.npz')['arr_0'][:option]
-        corrglo = np.load(directorydata + saveData + '_corrsglo.npz')['arr_0'][:option]
-        corrtrends = np.load(directorydata + saveData + '_corrstrends_AA.npz')['arr_0'][:option]
+        corr = np.load(directorydata + saveData + '_corrs_standardizedData.npz')['arr_0'][:option]
+        corrdt = np.load(directorydata + saveData + '_corrsdt_standardizedData.npz')['arr_0'][:option]
+        corrglo = np.load(directorydata + saveData + '_corrsglo_standardizedData.npz')['arr_0'][:option]
+        corrtrends = np.load(directorydata + saveData + '_corrstrends_AA_standardizedData.npz')['arr_0'][:option]
         modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS','MMmean'][:option]
 
         ### Ensemble mean correlations
@@ -181,13 +181,13 @@ for vv in range(1):
             plt.xticks(np.arange(0,option+1,1),modelGCMs,size=4)
             plt.yticks(np.arange(-1,1.1,0.1),map(str,np.round(np.arange(-1,1.1,0.1),2)),size=6)
             plt.xlim([-0.5,option-1+0.5])   
-            plt.ylim([-0.1,1])
+            plt.ylim([-0.1,0.3])
             
             plt.xlabel(r'\textbf{highest R - [climate model data] - %s}' % (monthlychoice),color='dimgrey',fontsize=8,labelpad=8)
             plt.title(r'\textbf{...AND FOR LINEAR TRENDS - %s - %s}' % (region,typemask),color='k',fontsize=15)
             
             plt.tight_layout()
-            plt.savefig(directoryfigure + saveData + '_%s_RawClimateModel_PatternCorrelations_%sclasses.png' % (typeOfCorr[ii],len(corr)),dpi=300)
+            plt.savefig(directoryfigure + saveData + '_%s_RawClimateModel_PatternCorrelations_%sclasses_standardizedData.png' % (typeOfCorr[ii],len(corr)),dpi=300)
         
         if option == 8:
             fig = plt.figure()
@@ -221,9 +221,9 @@ for vv in range(1):
                         text.set_color(line.get_color())
                     
                     plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
-                    plt.yticks(np.arange(0.98,1.01,0.005),map(str,np.round(np.arange(0.98,1.01,0.005),3)),size=6)
+                    plt.yticks(np.arange(-1,1.01,0.1),map(str,np.round(np.arange(-1,1.01,0.1),3)),size=6)
                     plt.xlim([1950,2020])   
-                    plt.ylim([0.98,1.0])
+                    plt.ylim([-0.2,0.3])
                 elif reg_name == 'narrowTropics':
                     leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
                                   bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
@@ -246,17 +246,6 @@ for vv in range(1):
                     plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
                     plt.xlim([1950,2020])   
                     plt.ylim([0.9,1.0])
-                elif reg_name == 'LowerArctic':
-                    leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
-                                  bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
-                                  handlelength=0,handletextpad=0)
-                    for line,text in zip(leg.get_lines(), leg.get_texts()):
-                        text.set_color(line.get_color())
-                    
-                    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
-                    plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
-                    plt.xlim([1950,2020])   
-                    plt.ylim([0.7,1.0])
                 elif reg_name == 'Arctic':
                     leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
                                   bbox_to_anchor=(0.5,0.2),fancybox=True,ncol=4,frameon=False,
@@ -268,6 +257,17 @@ for vv in range(1):
                     plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),3)),size=6)
                     plt.xlim([1950,2020])   
                     plt.ylim([0.6,1.0])
+                elif reg_name == 'LowerArctic':
+                    leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+                                  bbox_to_anchor=(0.5,0.15),fancybox=True,ncol=4,frameon=False,
+                                  handlelength=0,handletextpad=0)
+                    for line,text in zip(leg.get_lines(), leg.get_texts()):
+                        text.set_color(line.get_color())
+                    
+                    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5.45)
+                    plt.yticks(np.arange(-1,1.01,0.1),map(str,np.round(np.arange(-1,1.01,0.1),3)),size=6)
+                    plt.xlim([1950,2020])   
+                    plt.ylim([-0.3,0.3])
             else:
                 leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
                                   bbox_to_anchor=(0.5,0.15),fancybox=True,ncol=4,frameon=False,
@@ -285,4 +285,4 @@ for vv in range(1):
         
             plt.tight_layout()
             
-            plt.savefig(directoryfigure + saveData + '_RawClimateModel_ActualPatternCorrs.png',dpi=300)
+            plt.savefig(directoryfigure + saveData + '_RawClimateModel_ActualPatternCorrs_standardizedData.png',dpi=300)
