@@ -24,4 +24,6 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
 
 
 ## Conferences
++ **[3]** **Labe, Z.M.** and E.A. Barnes. Exploring climate model large ensembles with explainable neural networks, *WCRP workshop on attribution of multi-annual to decadal changes in the climate system*, Virtual Workshop (Sep 2021).
++ **[2]** **Labe, Z.M.** and E.A. Barnes. Climate model evaluation with explainable neural networks, *3rd NOAA Workshop on Leveraging AI in Environmental Sciences*, Virtual Workshop (Sep 2021).
 + **[1]** **Labe, Z.M.** and E.A. Barnes. Using explainable neural networks for comparing historical climate model simulations, *2nd Workshop on Knowledge Guided Machine Learning (KGML2021)*, Virtual Workshop (Aug 2021). [[POSTER]](https://sites.uci.edu/zlabe/files/2021/07/LabeBarnes_KGML2021_Poster_v2_Final.pdf)
