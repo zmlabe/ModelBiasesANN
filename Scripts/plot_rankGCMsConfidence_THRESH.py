@@ -42,7 +42,7 @@ for va in range(len(variablesall)):
         modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth',
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
-        dataset_obs = '20CRv3'
+        dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
         reg_name = 'SMILEGlobe'
@@ -229,13 +229,13 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_LAND' + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'LAND'
         elif ocean_only == True:
-            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'OCEAN'
         else:
-            saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'GLOBAL'
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
@@ -274,8 +274,8 @@ for va in range(len(variablesall)):
             rank[i,:] = abs(sts.rankdata(obsout[i,:],method='min')-9)
             
         rank = np.transpose(rank)
-        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-        np.save(directorydataMS + 'Ranks_thresh-%s_%s_20C.npy' % (THRESH,reg_name),rank)
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
+        np.save(directorydataMS + 'Ranks_thresh-%s_%s.npy' % (THRESH,reg_name),rank)
         sys.exit()
         ###############################################################################
         ###############################################################################

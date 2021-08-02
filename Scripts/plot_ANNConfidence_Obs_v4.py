@@ -42,7 +42,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'LowerArctic'
+        reg_name = 'SMILEGlobe'
         timeper = 'historical'
         ###############################################################################
         ###############################################################################
@@ -208,13 +208,13 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_LAND' + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'LAND'
         elif ocean_only == True:
-            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'OCEAN'
         else:
-            saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'GLOBAL'
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
@@ -246,7 +246,7 @@ for va in range(len(variablesall)):
         obsout= np.genfromtxt(directorydata + 'obsConfid_' + saveData + '.txt')
         label = np.argmax(obsout,axis=1)
         
-        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
         np.save(directorydataMS + 'Confidence_%s.npy' % reg_name, obsout)
         np.save(directorydataMS + 'Label_%s.npy' % reg_name, label)
         ###############################################################################

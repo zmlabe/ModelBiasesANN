@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'LowerArctic'
+reg_name = 'SMILEGlobe'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -93,7 +93,7 @@ else:
 ###############################################################################
 ###############################################################################
 rm_merid_mean = False
-rm_annual_mean = False
+rm_annual_mean = True
 ###############################################################################
 ###############################################################################
 rm_ensemble_mean = False
@@ -291,11 +291,11 @@ if typeOfAnalysis == 'issueWithExperiment':
     
 ### Select how to save files
 if land_only == True:
-    saveData = timeper + '_' + seasons[0] + '_LAND' + '_StandMethods_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_LAND' + '_StandMethodsMM_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 elif ocean_only == True:
-    saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_StandMethods_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_StandMethodsMM_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 else:
-    saveData = timeper + '_' + seasons[0] + '_StandMethods_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+    saveData = timeper + '_' + seasons[0] + '_StandMethodsMM_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
 print('*Filename == < %s >' % saveData) 
 
 ###############################################################################

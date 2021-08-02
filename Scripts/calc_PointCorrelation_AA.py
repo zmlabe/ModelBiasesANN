@@ -30,7 +30,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
-reg_name = 'LowerArctic'
+reg_name = 'SMILEGlobe'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
@@ -137,6 +137,11 @@ for vv in range(1):
         
         ### Meshgrid of lat/lon
         lon2,lat2 = np.meshgrid(lons,lats)
+        
+        ### Take period for Arctic Amplification
+        yrq = 15
+        data_obs = data_obs[-yrq:,:,:]
+        modelsall = modelsall[:,:,-yrq:,:,:]
 
         ###############################################################################
         ###############################################################################
@@ -161,6 +166,32 @@ for vv in range(1):
         ##############################################################################
         ##############################################################################
         ### Save correlations
-        np.savez(directorydata + saveData + '_PointByPoint_corrs.npz',meancorr)
-        np.savez(directorydata + saveData + '_PointByPoint_lats.npz',lats)
-        np.savez(directorydata + saveData + '_PointByPoint_lons.npz',lons)
+        np.savez(directorydata + saveData + '_PointByPoint_corrs_AA.npz',meancorr)
+        np.savez(directorydata + saveData + '_PointByPoint_lats_AA.npz',lats)
+        np.savez(directorydata + saveData + '_PointByPoint_lons_AA.npz',lons)
+        
+        ###############################################################################
+        ###############################################################################
+        ###############################################################################
+        ### Begin point by point correlations after removing annual mean from each map
+        modelsallglo, data_obsglo = dSS.remove_annual_mean(modelsall,data_obs,lats,lons,lats_obs,lons_obs)
+        
+        ### Begin function to correlate observations with model, ensemble, year
+        corrglo = np.empty((modelsallglo.shape[0],modelsallglo.shape[1],modelsallglo.shape[3],modelsallglo.shape[4]))
+        for mo in range(modelsallglo.shape[0]):
+            for ens in range(modelsallglo.shape[1]):
+                for i in range(modelsallglo.shape[3]):
+                    for j in range(modelsallglo.shape[4]):
+                        varxglo = data_obsglo[:,i,j]
+                        varyglo = modelsallglo[mo,ens,:,i,j]
+                        corrglo[mo,ens,i,j] = sts.pearsonr(varxglo,varyglo)[0]
+            print('Model #%s done!' % (mo+1))
+                    
+        ### Average correlations across ensemble members
+        meancorrglo = np.nanmean(corrglo,axis=1)
+        
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
+        ### Save correlations
+        np.savez(directorydata + saveData + '_PointByPoint_corrsGLO_AA.npz',meancorrglo)

@@ -33,7 +33,7 @@ monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
 monthlychoiceq = ['annual']
 variables = ['T2M']
-reg_name = 'LowerArctic'
+reg_name = 'SMILEGlobe'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
@@ -168,5 +168,31 @@ for vv in range(1):
         ##############################################################################
         ##############################################################################
         ##############################################################################
+        ### Remove the annual mean from each map
+        modelsallglo, data_obsglo = dSS.remove_annual_mean(modelsall,data_obs,lats,lons,lats_obs,lons_obs)
+        
+        ### Calculate rmse per year
+        rmsdglo = np.empty((modelsallglo.shape[0],modelsallglo.shape[1],modelsallglo.shape[2]))
+        for mo in range(modelsallglo.shape[0]):
+            for ens in range(modelsallglo.shape[1]):
+                for yr in range(modelsallglo.shape[2]):
+                    varxrmglo = data_obsglo[yr,:,:]
+                    varyrmglo = modelsallglo[mo,ens,yr,:,:]
+                    if any([land_only==True,ocean_only==True]):
+                        rmsdglo[mo,ens,yr] = UT.calc_RMSE(varxrmglo,varyrmglo,lats,lons,'yesnan')
+                        print('------USING MASKS FOR NANS!------')
+                    else:
+                        rmsdglo[mo,ens,yr] = UT.calc_RMSE(varxrmglo,varyrmglo,lats,lons,'yes')
+        
+        ### Average RMSE across ensemble members
+        meanrmsdglo = np.nanmean(rmsdglo,axis=1)     
+        
+        ### Average RMSE across years
+        meanrmsdyrglo = np.nanmean(meanrmsdglo,axis=1)
+
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
         ### Save correlations
         np.savez(directorydata + saveData + '_RMSE.npz',rmsd)
+        np.savez(directorydata + saveData + '_RMSEglo.npz',rmsdglo)

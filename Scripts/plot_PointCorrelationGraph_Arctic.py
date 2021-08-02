@@ -89,7 +89,8 @@ for vv in range(1):
             var = corr[r]
             
             ax1 = plt.subplot(2,4,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                        resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='dimgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lons)
@@ -103,12 +104,12 @@ for vv in range(1):
             cs1 = m.contourf(x,y,var,limit,extend='both')
             cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0,0.90),
+                          textcoords='axes fraction',color='dimgrey',fontsize=7,
+                          rotation=42,ha='center',va='center')
             ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
                           textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+                          rotation=0,ha='center',va='center')
             
         ###############################################################################
         cbar_ax1 = fig.add_axes([0.36,0.11,0.3,0.03])                
@@ -123,7 +124,7 @@ for vv in range(1):
         plt.tight_layout()
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'PointCorrelationsRawData-%s_ALL.png' % saveData,dpi=300)
+        plt.savefig(directoryfigure + 'PointCorrelationsRawData-%s_Arctic.png' % saveData,dpi=300)
         
         ###############################################################################
         ###############################################################################
@@ -163,7 +164,8 @@ for vv in range(1):
             var = corr[-1,:,:] - varq
             
             ax1 = plt.subplot(2,4,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                        resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='dimgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lons)
@@ -177,12 +179,12 @@ for vv in range(1):
             cs1 = m.contourf(x,y,var,limit,extend='both')
             cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0,0.90),
+                          textcoords='axes fraction',color='dimgrey',fontsize=7,
+                          rotation=42,ha='center',va='center')
             ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
                           textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+                          rotation=0,ha='center',va='center')
             
         ###############################################################################
         cbar_ax1 = fig.add_axes([0.36,0.11,0.3,0.03])                
@@ -255,7 +257,8 @@ for vv in range(1):
             var = corr[r]
             
             ax1 = plt.subplot(2,4,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                        resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='dimgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lons)
@@ -269,15 +272,15 @@ for vv in range(1):
             cs1 = m.contourf(x,y,var,limit,extend='both')
             cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0,0.90),
+                          textcoords='axes fraction',color='dimgrey',fontsize=7,
+                          rotation=42,ha='center',va='center')
             ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
                           textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+                          rotation=0,ha='center',va='center')
             
         ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.11,0.3,0.03])                
+        cbar_ax1 = fig.add_axes([0.36,0.09,0.3,0.03])              
         cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
                             extend='both',extendfrac=0.07,drawedges=False)
         cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
@@ -289,7 +292,7 @@ for vv in range(1):
         plt.tight_layout()
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'PointCorrelationsRawData-%s_ALL_GLO.png' % saveData,dpi=300)
+        plt.savefig(directoryfigure + 'PointCorrelationsRawData-%s_Arctic_GLO.png' % saveData,dpi=300)
         
         ###############################################################################
         ###############################################################################
@@ -329,7 +332,8 @@ for vv in range(1):
             var = corr[-1,:,:] - varq
             
             ax1 = plt.subplot(2,4,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                        resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='dimgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lons)
@@ -343,15 +347,15 @@ for vv in range(1):
             cs1 = m.contourf(x,y,var,limit,extend='both')
             cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0,0.90),
+                          textcoords='axes fraction',color='dimgrey',fontsize=7,
+                          rotation=42,ha='center',va='center')
             ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
                           textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+                          rotation=0,ha='center',va='center')
             
         ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.11,0.3,0.03])                
+        cbar_ax1 = fig.add_axes([0.36,0.09,0.3,0.03])                
         cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
                             extend='both',extendfrac=0.07,drawedges=False)
         cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
@@ -363,4 +367,4 @@ for vv in range(1):
         plt.tight_layout()
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'MMDifference-PointCorrelationsRawData-%s_ALL_GLO.png' % saveData,dpi=300)
+        plt.savefig(directoryfigure + 'MMDifference-PointCorrelationsRawData-%s_Arctic_GLO.png' % saveData,dpi=300)

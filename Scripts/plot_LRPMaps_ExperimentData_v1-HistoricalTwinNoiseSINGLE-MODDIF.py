@@ -58,7 +58,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = False
+        rm_annual_mean = True
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -414,10 +414,10 @@ for va in range(len(variablesall)):
                   fontsize=7)
         
         plt.savefig(directoryfigure + '%s/LRPComposites_%s.png' % (typeOfAnalysis,saveData),dpi=300)
-        # directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-        # np.save(directorydataMS + 'LRPcomposites_SMILEglobe_8classes.npy',lrptest)
-        # np.save(directorydataMS + 'Lat_SMILEGlobe.npy',np.asarray(lat1))
-        # np.save(directorydataMS + 'Lon_SMILEGlobe.npy',np.asarray(lon1))
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
+        np.save(directorydataMS + 'LRPcomposites_SMILEglobe_8classes_GLO.npy',lrptest)
+        np.save(directorydataMS + 'Lat_SMILEGlobe.npy',np.asarray(lat1))
+        np.save(directorydataMS + 'Lon_SMILEGlobe.npy',np.asarray(lon1))
         
         ###############################################################################
         ###############################################################################

@@ -24,8 +24,8 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 ### Set parameters
-directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures/'
+directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
+directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures_v2/'
 variablesall = ['T2M']
 yearsall = np.arange(1950,2019+1,1)
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']

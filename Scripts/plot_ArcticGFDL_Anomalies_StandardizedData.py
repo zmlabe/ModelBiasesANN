@@ -104,12 +104,34 @@ for vv in range(1):
                                                 lensalso,randomalso,ravelyearsbinary,
                                                 ravelbinary,shuffletype,timeper,
                                                 lat_bounds,lon_bounds)
-        obsraw,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
-        models,obs = dSS.calculate_anomalies(modelsraw,obsraw,lats,lons,baseline,yearsall)
+        obsq,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
 
         ### Add mmean
-        mmmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
-        models = np.append(models,mmmean,axis=0)
+        mmmeanq = np.nanmean(modelsraw,axis=0)[np.newaxis,:,:,:,:]
+        modelsq = np.append(modelsraw,mmmeanq,axis=0)
+        
+      ### Standardize all data
+        def standardize(modelsall,data_obs):
+            if modelsall.ndim == 5:
+                modelsall_flatyrens = modelsall.reshape(modelsall.shape[0],
+                                                        modelsall.shape[1]*modelsall.shape[2],
+                                                        lats.shape[0],lons.shape[0])
+                xmean = np.nanmean(modelsall_flatyrens,axis=1)[:,np.newaxis,np.newaxis,:,:]
+                xstd = np.nanstd(modelsall_flatyrens,axis=1)[:,np.newaxis,np.newaxis,:,:]
+                
+                obsmean = np.nanmean(data_obs,axis=0)
+                obstd = np.nanstd(data_obs,axis=0)
+                
+                modelsall_std = ((modelsall - xmean)/xstd).reshape(modelsall.shape[0],
+                                                        modelsall.shape[1],modelsall.shape[2],
+                                                        lats.shape[0],lons.shape[0])            
+                obs_std = (data_obs - obsmean)/obstd
+            else:
+                print(ValueError('\nCheck dimensions!\n'))
+                sys.exit()
+            print('\n------STANDARDIZE EACH MODEL SEPARATELY------\n')
+            return modelsall_std,obs_std
+        models,obs, = standardize(modelsq,obsq)
         
 ###############################################################################          
         ### Read in Arctic data from neural network     
@@ -117,11 +139,38 @@ for vv in range(1):
         conf_arctic = np.load(directorydataANN + 'Confidence_%s.npy' % 'LowerArctic')
         label_arctic = np.load(directorydataANN + 'Label_%s.npy' % 'LowerArctic')
         
-        pickmodelq = 4
-        pickmodelname = modelGCMs[pickmodelq]
-        slicemodel = np.where((label_arctic==pickmodelq))[0]
-        models = models[:,:,slicemodel,:,:]
-        obs = obs[slicemodel,:,:]
+        pickmodelq = 7
+        if pickmodelq == 8:
+            pickmodelname = 'AAnow'
+            models = models[:,:,-15:,:,:]
+            obs = obs[-15:,:,:]
+        else:
+            pickmodelname = modelGCMs[pickmodelq]
+            slicemodel = np.where((label_arctic==pickmodelq))[0]
+            models = models[:,:,slicemodel,:,:]
+            obs = obs[slicemodel,:,:]
+
+###############################################################################          
+        ### Assess statistical significance by LRP
+        mask = True
+        if mask == True:
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/Arctic/'
+        directorydataANN = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
+        if any([pickmodelq==4,pickmodelq==8]):
+            lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArcticAA_8classes.npy',allow_pickle=True)
+        else:
+            lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArctic_8classes.npy',allow_pickle=True)
+        
+        lrpAAn = np.empty((lrpAA.shape))
+        for i in range(lrpAA.shape[0]):
+            lrpAAn[i] = lrpAA[i]/np.nanmax(lrpAA[i])
+            
+        lrpthresh = 0.1
+        lrpAAn[np.where(lrpAAn < lrpthresh)] = 0  
+        lrpAAn[np.where(lrpAAn >= lrpthresh)] = 1
+        emptylrp = np.empty((lats.shape[0],lons.shape[0]))
+        emptylrp[:] = 1
+        lrpAAn = np.append(emptylrp[np.newaxis,:,:],lrpAAn,axis=0)
         
 ###############################################################################        
         ### Calculate statistics
@@ -133,6 +182,11 @@ for vv in range(1):
         
         bias = models - obs
         biasmean = np.nanmean(bias[:,:,:,:,:],axis=2)
+        empty = np.empty((lats.shape[0],lons.shape[0]))
+        empty[:] = np.nan
+        
+        difmm = np.nanmean(np.nanmean(models - models[-1],axis=1),axis=1)
+        obdiffmm = np.nanmean(obs - np.nanmean(models[-1],axis=0),axis=0)
 
 ###############################################################################          
         ### Calculate ensemble spread statistics
@@ -151,137 +205,21 @@ for vv in range(1):
         ### Assemble all data for plotting
         stdall = np.append(stdobs[np.newaxis,:,:],stdens,axis=0)
         climall = np.append(climobs[np.newaxis,:,:],climens,axis=0)
-        biasall = biasens
+        biasall = np.append(empty[np.newaxis,:,:],biasens,axis=0)
         spreadall = spreadmean
-   
+        mmdiff = np.append(obdiffmm[np.newaxis,:,:],difmm ,axis=0)
+
 ###############################################################################     
         if variq == 'T2M':
-            limit = np.arange(-4,4.01,0.05)
-            barlim = np.round(np.arange(-4,5,2),2)
+            limit = np.arange(-2,2.01,0.1)
+            barlim = np.round(np.arange(-2,3,1),2)
             cmap = cmocean.cm.balance
-            label = r'\textbf{[T2M-BIAS : $^{\circ}$C]}'
-        
-        fig = plt.figure(figsize=(10,2))
-        for r in range(len(modelGCMs)):
-            var = biasall[r]
-            
-            ax1 = plt.subplot(1,len(modelGCMs),r+1)
-            if reg_name == 'LowerArctic':
-                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
-                            resolution='l',round =True,area_thresh=10000)
-            else:
-                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
-                            resolution='l',round =True,area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
-                
-            var, lons_cyclic = addcyclic(var, lons)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
-            x, y = m(lon2d, lat2d)
-               
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
-            
-            cs1 = m.contourf(x,y,var,limit,extend='both')
-            cs1.set_cmap(cmap) 
-            
-            if ocean_only == True:
-                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-            elif land_only == True:
-                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
-                    
-            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
-            
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
-        
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
-        
-        plt.savefig(directoryfigure + 'Arctic_AnomaliesBias_%s.png' % pickmodelname,dpi=300)
-        
-###############################################################################     
-        if variq == 'T2M':
-            limit = np.arange(0,7.01,0.25)
-            barlim = np.round(np.arange(0,8,1),2)
-            cmap = cmr.fall_r
-            label = r'\textbf{[T2M-SPREAD : $^{\circ}$C]}'
-        
-        fig = plt.figure(figsize=(10,2))
-        for r in range(len(modelGCMs)):
-            var = spreadall[r]
-            
-            ax1 = plt.subplot(1,len(modelGCMs),r+1)
-            if reg_name == 'LowerArctic':
-                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
-                            resolution='l',round =True,area_thresh=10000)
-            else:
-                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
-                            resolution='l',round =True,area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
-                
-            var, lons_cyclic = addcyclic(var, lons)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
-            x, y = m(lon2d, lat2d)
-               
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
-            
-            cs1 = m.contourf(x,y,var,limit,extend='max')
-            cs1.set_cmap(cmap) 
-            
-            if ocean_only == True:
-                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-            elif land_only == True:
-                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
-                    
-            ax1.annotate(r'\textbf{%s}' % modelGCMs[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
-            
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
-        
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
-        
-        plt.savefig(directoryfigure + 'Arctic_AnomaliesSpread_%s.png' % pickmodelname,dpi=300)
-        
-###############################################################################     
-        if variq == 'T2M':
-            limit = np.arange(0,3.01,0.25)
-            barlim = np.round(np.arange(0,4,1),2)
-            cmap = cmr.dusk
-            label = r'\textbf{[T2M-STDev : $^{\circ}$C]}'
+            label = r'\textbf{[T2M-zcomposite: $^{\circ}$C]}'
         
         fig = plt.figure(figsize=(10,2))
         for r in range(len(allDataLabels)):
-            var = stdall[r]
+            var = climall[r]
+            varm = climall[r] * lrpAAn[r]
             
             ax1 = plt.subplot(1,len(allDataLabels),r+1)
             if reg_name == 'LowerArctic':
@@ -296,12 +234,17 @@ for vv in range(1):
             var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
             lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
             x, y = m(lon2d, lat2d)
+            
+            varm, lons_cyclic = addcyclic(varm, lons)
+            varm, lons_cyclic = shiftgrid(180., varm, lons_cyclic, start=False)
                
             circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
                               linewidth=0.7)
             circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='max')
+            cs1 = m.contourf(x,y,var,limit,extend='both')
+            varm[np.where(varm)] = np.nan
+            cs2 = m.contourf(x,y,varm,colors='None',hatches=['///////'])
             cs1.set_cmap(cmap) 
             
             if ocean_only == True:
@@ -319,7 +262,72 @@ for vv in range(1):
         ###############################################################################
         cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
         cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
+                            extend='both',extendfrac=0.07,drawedges=False)
+        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        cbar1.set_ticks(barlim)
+        cbar1.set_ticklabels(list(map(str,barlim)))
+        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        cbar1.outline.set_edgecolor('dimgrey')
+        
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+
+        plt.savefig(directoryfigure + 'Arctic_zcomposite_%s.png' % pickmodelname,dpi=300)
+        
+###############################################################################     
+        if variq == 'T2M':
+            limit = np.arange(-1,1.01,0.1)
+            barlim = np.round(np.arange(-1,2,1),2)
+            cmap = cmocean.cm.balance
+            label = r'\textbf{[T2M-zbiasobs: $^{\circ}$C]}'
+        
+        fig = plt.figure(figsize=(10,2))
+        for r in range(len(allDataLabels)):
+            var = biasall[r]
+            varm = biasall[r] * lrpAAn[r]
+            
+            ax1 = plt.subplot(1,len(allDataLabels),r+1)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+                
+            var, lons_cyclic = addcyclic(var, lons)
+            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
+            x, y = m(lon2d, lat2d)
+            
+            varm, lons_cyclic = addcyclic(varm, lons)
+            varm, lons_cyclic = shiftgrid(180., varm, lons_cyclic, start=False)
+               
+            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+                              linewidth=0.7)
+            circle.set_clip_on(False)
+            
+            cs1 = m.contourf(x,y,var,limit,extend='both')
+            varm[np.where(varm)] = np.nan
+            cs2 = m.contourf(x,y,varm,colors='None',hatches=['///////'])
+            cs1.set_cmap(cmap) 
+            
+            if ocean_only == True:
+                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+            elif land_only == True:
+                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+                    
+            ax1.annotate(r'\textbf{%s}' % allDataLabels[r],xy=(0,0),xytext=(0.5,1.10),
+                          textcoords='axes fraction',color='dimgrey',fontsize=8,
+                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+                          textcoords='axes fraction',color='k',fontsize=6,
+                          rotation=330,ha='center',va='center')
+            
+        ###############################################################################
+        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+                            extend='both',extendfrac=0.07,drawedges=False)
         cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
         cbar1.set_ticks(barlim)
         cbar1.set_ticklabels(list(map(str,barlim)))
@@ -329,4 +337,134 @@ for vv in range(1):
         plt.tight_layout()
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
-        plt.savefig(directoryfigure + 'Arctic_AnomaliesSTD_%s.png' % pickmodelname,dpi=300)
+        plt.savefig(directoryfigure + 'Arctic_zbiasobs_%s.png' % pickmodelname,dpi=300)
+        
+###############################################################################     
+        if variq == 'T2M':
+            limit = np.arange(-1,1.01,0.1)
+            barlim = np.round(np.arange(-1,2,1),2)
+            cmap = cmocean.cm.balance
+            label = r'\textbf{[T2M-MMminusGCM: $^{\circ}$C]}'
+        
+        fig = plt.figure(figsize=(10,2))
+        for r in range(len(allDataLabels)):
+            var = mmdiff[r]
+            varm = mmdiff[r] * lrpAAn[r]
+            
+            ax1 = plt.subplot(1,len(allDataLabels),r+1)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+                
+            var, lons_cyclic = addcyclic(var, lons)
+            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
+            x, y = m(lon2d, lat2d)
+            
+            varm, lons_cyclic = addcyclic(varm, lons)
+            varm, lons_cyclic = shiftgrid(180., varm, lons_cyclic, start=False)
+               
+            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+                              linewidth=0.7)
+            circle.set_clip_on(False)
+            
+            cs1 = m.contourf(x,y,var,limit,extend='both')
+            varm[np.where(varm)] = np.nan
+            cs2 = m.contourf(x,y,varm,colors='None',hatches=['///////'])
+            cs1.set_cmap(cmap) 
+            
+            if ocean_only == True:
+                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+            elif land_only == True:
+                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+                    
+            ax1.annotate(r'\textbf{%s}' % allDataLabels[r],xy=(0,0),xytext=(0.5,1.10),
+                          textcoords='axes fraction',color='dimgrey',fontsize=8,
+                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+                          textcoords='axes fraction',color='k',fontsize=6,
+                          rotation=330,ha='center',va='center')
+            
+        ###############################################################################
+        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+                            extend='both',extendfrac=0.07,drawedges=False)
+        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        cbar1.set_ticks(barlim)
+        cbar1.set_ticklabels(list(map(str,barlim)))
+        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        cbar1.outline.set_edgecolor('dimgrey')
+        
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        
+        plt.savefig(directoryfigure + 'Arctic_zdiffmm_%s.png' % pickmodelname,dpi=300)
+        
+###############################################################################     
+        if variq == 'T2M':
+            limit = np.arange(-1,1.01,0.1)
+            barlim = np.round(np.arange(-1,2,1),2)
+            cmap = cmocean.cm.balance
+            label = r'\textbf{[T2M-MMminusGCMbias: $^{\circ}$C]}'
+        
+        fig = plt.figure(figsize=(10,2))
+        for r in range(len(allDataLabels)):
+            var = biasall[-1] - biasall[r]
+            varm = (biasall[-1] - biasall[r]) * lrpAAn[r]
+            
+            ax1 = plt.subplot(1,len(allDataLabels),r+1)
+            if reg_name == 'LowerArctic':
+                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            else:
+                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+                            resolution='l',round =True,area_thresh=10000)
+            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+                
+            var, lons_cyclic = addcyclic(var, lons)
+            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+            lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
+            x, y = m(lon2d, lat2d)
+            
+            varm, lons_cyclic = addcyclic(varm, lons)
+            varm, lons_cyclic = shiftgrid(180., varm, lons_cyclic, start=False)
+               
+            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+                              linewidth=0.7)
+            circle.set_clip_on(False)
+            
+            cs1 = m.contourf(x,y,var,limit,extend='both')
+            varm[np.where(varm)] = np.nan
+            cs2 = m.contourf(x,y,varm,colors='None',hatches=['///////'])
+            cs1.set_cmap(cmap) 
+            
+            if ocean_only == True:
+                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+            elif land_only == True:
+                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+                    
+            ax1.annotate(r'\textbf{%s}' % allDataLabels[r],xy=(0,0),xytext=(0.5,1.10),
+                          textcoords='axes fraction',color='dimgrey',fontsize=8,
+                          rotation=0,ha='center',va='center')
+            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+                          textcoords='axes fraction',color='k',fontsize=6,
+                          rotation=330,ha='center',va='center')
+            
+        ###############################################################################
+        cbar_ax1 = fig.add_axes([0.36,0.15,0.3,0.03])                
+        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+                            extend='both',extendfrac=0.07,drawedges=False)
+        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        cbar1.set_ticks(barlim)
+        cbar1.set_ticklabels(list(map(str,barlim)))
+        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        cbar1.outline.set_edgecolor('dimgrey')
+        
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        
+        plt.savefig(directoryfigure + 'Arctic_zbiasmm_%s.png' % pickmodelname,dpi=300)

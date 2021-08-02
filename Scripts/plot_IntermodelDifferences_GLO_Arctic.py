@@ -93,69 +93,69 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
 ### Call functions
 for vv in range(1):
     for mo in range(1):
-#         variq = variables[vv]
-#         monthlychoice = monthlychoiceq[mo]
-#         directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/Arctic/InterModel/'
-#         saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
-#         print('*Filename == < %s >' % saveData) 
+        variq = variables[vv]
+        monthlychoice = monthlychoiceq[mo]
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/Arctic/InterModel/'
+        saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
+        print('*Filename == < %s >' % saveData) 
     
-#         ### Read data
-#         models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
-#                                                 lensalso,randomalso,ravelyearsbinary,
-#                                                 ravelbinary,shuffletype,timeper,
-#                                                 lat_bounds,lon_bounds)
-#         obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
+        ### Read data
+        models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
+                                                lensalso,randomalso,ravelyearsbinary,
+                                                ravelbinary,shuffletype,timeper,
+                                                lat_bounds,lon_bounds)
+        obs,lats_obs,lons_obs = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
 
-#         ### Add mmean
-#         mmmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
-#         models = np.append(models,mmmean,axis=0)
+        ### Add mmean
+        mmmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
+        models = np.append(models,mmmean,axis=0)
         
-#         ### Remove annual mean from each map
-#         models,obs = dSS.remove_annual_mean(models,obs,lats,lons,lats_obs,lons_obs)
+        ### Remove annual mean from each map
+        models,obs = dSS.remove_annual_mean(models,obs,lats,lons,lats_obs,lons_obs)
         
-#         ### Slice time for Arctic Amplification
-#         AAyr = 15
-#         AA = 'now'
-#         if AA == 'now':
-#             models = models[:,:,-AAyr:,:,:]
-#             obs = obs[-AAyr:,:,:]
-#         elif AA == 'pre':
-#             models = models[:,:,:-AAyr,:,:]
-#             obs = obs[:-AAyr,:,:]
+        ### Slice time for Arctic Amplification
+        AAyr = 15
+        AA = 'pre'
+        if AA == 'now':
+            models = models[:,:,-AAyr:,:,:]
+            obs = obs[-AAyr:,:,:]
+        elif AA == 'pre':
+            models = models[:,:,:-AAyr,:,:]
+            obs = obs[:-AAyr,:,:]
         
-# ###############################################################################        
-#         ### Calculate difference
-#         diffallraw = models - models[-1,:,:,:,:]
-#         diffallensmean = np.nanmean(diffallraw[:,:,:,:,:],axis=1)
-#         diffall = np.nanmean(diffallensmean[:,:,:,:],axis=1)
+###############################################################################        
+        ### Calculate difference
+        diffallraw = models - models[-1,:,:,:,:]
+        diffallensmean = np.nanmean(diffallraw[:,:,:,:,:],axis=1)
+        diffall = np.nanmean(diffallensmean[:,:,:,:],axis=1)
         
-# ###############################################################################                  
-#         ### Read in data from LRP for statistical significance
-#         mask = True
-#         directorydataANN = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-#         if AA == 'now':
-#             lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArcticAA_8classes.npy',allow_pickle=True)
-#         else:
-#             lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArctic_8classes.npy',allow_pickle=True)
+###############################################################################                  
+        ### Read in data from LRP for statistical significance
+        mask = True
+        directorydataANN = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
+        if AA == 'now':
+            lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArcticAA_8classes.npy',allow_pickle=True)
+        else:
+            lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArctic_8classes.npy',allow_pickle=True)
         
-#         lrpAAn = np.empty((lrpAA.shape))
-#         for i in range(lrpAA.shape[0]):
-#             lrpAAn[i] = lrpAA[i]/np.nanmax(lrpAA[i])
+        lrpAAn = np.empty((lrpAA.shape))
+        for i in range(lrpAA.shape[0]):
+            lrpAAn[i] = lrpAA[i]/np.nanmax(lrpAA[i])
             
-#         lrpthresh = 0.1
-#         lrpAAn[np.where(lrpAAn < lrpthresh)] = 0  
-#         lrpAAn[np.where(lrpAAn >= lrpthresh)] = 1
+        lrpthresh = 0.1
+        lrpAAn[np.where(lrpAAn < lrpthresh)] = 0  
+        lrpAAn[np.where(lrpAAn >= lrpthresh)] = 1
         
-#         ### Mask data
-#         diffallm = diffall * lrpAAn
-#         diffallm[np.where(diffallm == 0)] = np.nan
+        ### Mask data
+        diffallm = diffall * lrpAAn
+        diffallm[np.where(diffallm == 0)] = np.nan
    
 ###############################################################################     
         if variq == 'T2M':
             limit = np.arange(-6,6.01,0.1)
             barlim = np.round(np.arange(-6,7,2),2)
             cmap = cmocean.cm.balance
-            label = r'\textbf{[T2M-Difference : $^{\circ}$C]}'
+            label = r'\textbf{[T2M-Difference [GLO] : $^{\circ}$C]}'
         
         fig = plt.figure(figsize=(10,2))
         for r in range(len(modelGCMs)):
@@ -215,6 +215,6 @@ for vv in range(1):
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
         
         if AA == 'now':
-            plt.savefig(directoryfigure + 'Arctic_InterModel_GLO_AA_mask.png',dpi=300)
+            plt.savefig(directoryfigure + 'Arctic_InterModel_GLO_AA.png',dpi=300)
         else:
             plt.savefig(directoryfigure + 'Arctic_InterModel_GLO.png',dpi=300)

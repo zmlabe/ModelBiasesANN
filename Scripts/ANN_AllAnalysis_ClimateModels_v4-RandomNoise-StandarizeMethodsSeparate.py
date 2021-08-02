@@ -100,7 +100,7 @@ rm_ensemble_mean = False
 rm_observational_mean = False
 ###############################################################################
 ###############################################################################
-calculate_anomalies = True
+calculate_anomalies = False
 if calculate_anomalies == True:
     if timeper == 'historical': 
         baseline = np.arange(1951,1980+1,1)

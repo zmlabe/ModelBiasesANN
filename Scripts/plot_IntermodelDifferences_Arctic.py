@@ -128,7 +128,7 @@ for vv in range(1):
 ###############################################################################                  
         ### Read in data from LRP for statistical significance
         mask = True
-        directorydataANN = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+        directorydataANN = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
         if AA == 'now':
             lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArcticAA_8classes.npy',allow_pickle=True)
         else:

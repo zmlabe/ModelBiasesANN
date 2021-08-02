@@ -174,9 +174,9 @@ for vv in range(1):
         ### Read in data from LRP for statistical significance
         mask = True
         if mask == True:
-            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/Arctic/mask/'
-        directorydataANN = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-        lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArcticAA_8classes.npy',allow_pickle=True)
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/Climatologies/Arctic/'
+        directorydataANN = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
+        lrpAA = np.load(directorydataANN + 'LRPcomposites_LowerArctic_8classes.npy',allow_pickle=True)
         
         lrpAAn = np.empty((lrpAA.shape))
         for i in range(lrpAA.shape[0]):

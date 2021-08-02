@@ -29,7 +29,7 @@ dataset_obs = ['ERA5BE']
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 typeOfCorr = ['R','R-DT','R-RMGLO','R-TREND']
 variables = ['T2M','P','SLP']
-reg_name = 'SMILEGlobe'
+reg_name = 'LowerArctic'
 level = 'surface'
 timeper = 'historical'
 option = 8
@@ -72,7 +72,7 @@ for vv in range(1):
         corr = np.load(directorydata + saveData + '_corrs.npz')['arr_0'][:option]
         corrdt = np.load(directorydata + saveData + '_corrsdt.npz')['arr_0'][:option]
         corrglo = np.load(directorydata + saveData + '_corrsglo.npz')['arr_0'][:option]
-        corrtrends = np.load(directorydata + saveData + '_corrstrends_AA.npz')['arr_0'][:option]
+        corrtrends = np.load(directorydata + saveData + '_corrstrends.npz')['arr_0'][:option]
         modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M','LENS','MMmean'][:option]
 
         ### Ensemble mean correlations
