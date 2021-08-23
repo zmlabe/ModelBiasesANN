@@ -939,7 +939,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         # For use later
                         XtrainS,XtestS,stdVals = dSS.standardize_dataSEPARATE(Xtrain,Xtest)
                         Xmean, Xstd = stdVals      
-        
+                        
                         #---------------------------
                         random_network_seed = 87750
                         #---------------------------

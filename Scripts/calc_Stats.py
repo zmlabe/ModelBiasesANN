@@ -293,16 +293,27 @@ def standardize_dataSEPARATE(Xtrain,Xtest):
     
     ### Import modulates
     import numpy as np
+    import sys
 
-    Xtrainq = Xtrain.reshape(8,12*70,Xtrain.shape[1]//144,144)
-    Xtrainallq = Xtrain.reshape(8,12,70,Xtrain.shape[1]//144,144)
-    Xtestallq = Xtest.reshape(8,4,70,Xtest.shape[1]//144,144)
+    Xtrainqswap = Xtrain.reshape(12,8,70,Xtrain.shape[1]//144,144)
+    xtrainflip = np.swapaxes(Xtrainqswap,0,1)
+    Xtrainq = xtrainflip.reshape(8,12*70,Xtrain.shape[1]//144,144)
+    Xtrainallq = Xtrainq.reshape(8,12,70,Xtrain.shape[1]//144,144)
+    
+    Xtestswap = Xtest.reshape(4,8,70,Xtest.shape[1]//144,144)
+    Xtestflip = np.swapaxes(Xtestswap,0,1)
+    Xtestallq = Xtestflip.reshape(8,4,70,Xtest.shape[1]//144,144)
     
     Xmean = np.mean(Xtrainq,axis=1)[:,np.newaxis,np.newaxis,:,:]
     Xstd = np.std(Xtrainq,axis=1)[:,np.newaxis,np.newaxis,:,:]
     
-    Xtrain = ((Xtrainallq - Xmean)/Xstd).reshape(Xtrainallq.shape[0]*Xtrainallq.shape[1]*Xtrainallq.shape[2],Xtrainallq.shape[3]*Xtrainallq.shape[4])
-    Xtest = ((Xtestallq - Xmean)/Xstd).reshape(Xtestallq.shape[0]*Xtestallq.shape[1]*Xtestallq.shape[2],Xtestallq.shape[3]*Xtestallq.shape[4])
+    Xtrainnew = ((Xtrainallq - Xmean)/Xstd)
+    Xtestnew = ((Xtestallq - Xmean)/Xstd)
+    
+    XtrainS = np.swapaxes(Xtrainnew,0,1)
+    XtestS = np.swapaxes(Xtestnew,0,1)
+    Xtrain = XtrainS.reshape(Xtrainallq.shape[0]*Xtrainallq.shape[1]*Xtrainallq.shape[2],Xtrainallq.shape[3]*Xtrainallq.shape[4])
+    Xtest = XtestS.reshape(Xtestallq.shape[0]*Xtestallq.shape[1]*Xtestallq.shape[2],Xtestallq.shape[3]*Xtestallq.shape[4])
     
     stdVals = (Xmean,Xstd)
     stdVals = stdVals[:]

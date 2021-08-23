@@ -117,7 +117,7 @@ for vv in range(1):
         conf_arctic = np.load(directorydataANN + 'Confidence_%s.npy' % 'LowerArctic')
         label_arctic = np.load(directorydataANN + 'Label_%s.npy' % 'LowerArctic')
         
-        pickmodelq = 7
+        pickmodelq = 4
         if pickmodelq == 8:
             pickmodelname = 'AAnow'
             models = models[:,:,-15:,:,:]
@@ -251,11 +251,11 @@ for vv in range(1):
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
 
         plt.savefig(directoryfigure + 'Arctic_GLOcomposite_%s.png' % pickmodelname,dpi=300)
-        sys.exit()
+
 ###############################################################################     
         if variq == 'T2M':
-            limit = np.arange(-1,1.01,0.1)
-            barlim = np.round(np.arange(-1,2,1),2)
+            limit = np.arange(-10,10.01,0.5)
+            barlim = np.round(np.arange(-10,11,5),2)
             cmap = cmocean.cm.balance
             label = r'\textbf{[T2M-GLObiasobs: $^{\circ}$C]}'
         
@@ -319,8 +319,8 @@ for vv in range(1):
         
 ###############################################################################     
         if variq == 'T2M':
-            limit = np.arange(-1,1.01,0.1)
-            barlim = np.round(np.arange(-1,2,1),2)
+            limit = np.arange(-10,10.01,0.5)
+            barlim = np.round(np.arange(-10,11,5),2)
             cmap = cmocean.cm.balance
             label = r'\textbf{[T2M-MMminusGCM[glo]: $^{\circ}$C]}'
         
@@ -384,8 +384,8 @@ for vv in range(1):
         
 ###############################################################################     
         if variq == 'T2M':
-            limit = np.arange(-1,1.01,0.1)
-            barlim = np.round(np.arange(-1,2,1),2)
+            limit = np.arange(-10,10.01,0.5)
+            barlim = np.round(np.arange(-10,11,5),2)
             cmap = cmocean.cm.balance
             label = r'\textbf{[T2M-MMminusGCMbias[glo]: $^{\circ}$C]}'
         
