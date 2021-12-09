@@ -3,8 +3,8 @@ Script for plotting heat map of model rankings according to confidence and
 uses a threshold for minimum confidence
 
 Author     : Zachary M. Labe
-Date       : 30 June 2021
-Version    : 4 (ANNv4)
+Date       : 1 December 2021
+Version    : 5 - standardizes observations by training data (includes MMmean)
 """
 
 ### Import packages
@@ -35,7 +35,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ### Data preliminaries 
         directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
-        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-Mmean/'
+        directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v5/'
         letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
         ###############################################################################
         ###############################################################################
@@ -45,7 +45,7 @@ for va in range(len(variablesall)):
         dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
-        reg_name = 'SMILEGlobe'
+        reg_name = 'Arctic'
         if reg_name == 'SMILEGlobe':
             reg_nameq = 'GLOBAL'
         elif reg_name == 'LowerArctic':
@@ -79,7 +79,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = False
+        rm_annual_mean = True
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -229,13 +229,13 @@ for va in range(len(variablesall)):
             
         ### Select how to save files
         if land_only == True:
-            saveData = timeper + '_' + seasons[0] + '_LAND' + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'LAND'
         elif ocean_only == True:
-            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'OCEAN'
         else:
-            saveData = timeper + '_' + seasons[0] + '_StandMethodsSEP_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+            saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             typemask = 'GLOBAL'
         print('*Filename == < %s >' % saveData) 
         ###############################################################################
@@ -274,9 +274,12 @@ for va in range(len(variablesall)):
             rank[i,:] = abs(sts.rankdata(obsout[i,:],method='min')-9)
             
         rank = np.transpose(rank)
-        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
-        np.save(directorydataMS + 'Ranks_thresh-%s_%s.npy' % (THRESH,reg_name),rank)
-        sys.exit()
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v5/'
+        if typeOfAnalysis == 'Experiment-3':
+            np.save(directorydataMS + 'Ranks_thresh-%s_%s.npy' % (THRESH,reg_name),rank)
+        elif typeOfAnalysis == 'Experiment-4':
+            np.save(directorydataMS + 'Ranks_thresh-%s_%s_GLO.npy' % (THRESH,reg_name),rank)
+
         ###############################################################################
         ###############################################################################
         ###############################################################################
@@ -343,6 +346,6 @@ for va in range(len(variablesall)):
         plt.text(67.3,-1.1,r'\textbf{BEST}',color=cmocean.cm.ice(0.2))
         
         plt.tight_layout()
-        plt.savefig(directoryfigure + '%s/Confidence/GCMrankConfidence_%s_THRESH.png' % (typeOfAnalysis,saveData),dpi=300)
+        plt.savefig(directoryfigure + '%s/GCMrankConfidence_%s_THRESH.png' % (typeOfAnalysis,saveData),dpi=300)
         
         

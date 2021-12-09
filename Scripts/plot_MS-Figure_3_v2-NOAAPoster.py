@@ -156,11 +156,6 @@ for j, lab in enumerate(range(1,9,1)):
     cbar.ax.text((2 * j+2.9)/2, 4.5, lab,ha='center',va='center',
                  size=5,color='dimgrey')
 
-# plt.annotate(r'\textbf{aaaaaaa}',
-#               textcoords='figure fraction',
-#               xy=(0,0), xytext=(0.38,0.13),ha='center',va='center',
-#               fontsize=5,color='crimson',alpha=1,rotation=0,zorder=100)
-
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.2,hspace=0.1)
 plt.savefig(directoryfigure + 'MS-Figure_3_v2_Poster.png',dpi=1000)

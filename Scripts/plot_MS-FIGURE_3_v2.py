@@ -24,16 +24,16 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 ### Set parameters
-directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
-directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures_v2/'
+directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v5/'
+directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v5/'
 variablesall = ['T2M']
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
-THRESH = 0.05
+THRESH = 0.01
 
 ### Read in data
-globe = np.load(directorydata + 'Ranks_thresh-%s_%s_GLO.npy' % (THRESH,'SMILEGlobe'))
-arctic = np.load(directorydata + 'Ranks_thresh-%s_%s_GLO.npy' % (THRESH,'LowerArctic'))
+globe = np.load(directorydata + 'Ranks_thresh-%s_%s.npy' % (THRESH,'SMILEGlobe'))
+arctic = np.load(directorydata + 'Ranks_thresh-%s_%s.npy' % (THRESH,'Arctic'))
 
 ###############################################################################
 ###############################################################################
@@ -163,6 +163,6 @@ for j, lab in enumerate(range(1,9,1)):
 
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.2,hspace=0.1)
-plt.savefig(directoryfigure + 'MS-Figure_3_v1_GLO.png',dpi=1000)
+plt.savefig(directoryfigure + 'MS-Figure_3_v1.png',dpi=1000)
         
         

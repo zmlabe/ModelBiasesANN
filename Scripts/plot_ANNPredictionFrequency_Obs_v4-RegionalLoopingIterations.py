@@ -25,9 +25,10 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-latarctic = 60
+latarctic = 67
 obsoutall = []
 regions = ['SMILEglobe','NH','SH','narrowTropics','Arctic','SouthernOcean']
+regions = ['SMILEGlobe','Arctic']
 regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC(%s)' % latarctic,'SOUTHERN OCEAN']
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -37,7 +38,7 @@ for va in range(len(variablesall)):
             ###############################################################################
             ### Data preliminaries 
             directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Loop/'
-            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-Mmean/'
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v6/'
             letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
             ###############################################################################
             ###############################################################################
@@ -48,17 +49,15 @@ for va in range(len(variablesall)):
             seasons = ['annual']
             variq = variablesall[va]
             reg_name = regions[rr]
-            if reg_name == 'Arctic':
-                reg_name = 'Arctic%s' % latarctic
             timeper = 'historical'
             SAMPLEQ = 100
             ###############################################################################
             ###############################################################################
             pickSMILE = pickSMILEall[m]
             if len(pickSMILE) >= 1:
-                lenOfPicks = len(pickSMILE) + 1 # For random class
+                lenOfPicks = len(pickSMILE)
             else:
-                lenOfPicks = len(modelGCMs) + 1 # For random class
+                lenOfPicks = len(modelGCMs)
             ###############################################################################
             ###############################################################################
             land_only = False
@@ -128,7 +127,7 @@ for va in range(len(variablesall)):
             lrpRule = 'z'
             normLRP = True
             ###############################################################################
-            modelGCMsNames = np.append(modelGCMs,['MMean'])
+            modelGCMsNames = modelGCMs
     
             ###############################################################################
             ###############################################################################
@@ -233,10 +232,6 @@ for va in range(len(variablesall)):
                 for i in range(lenOfPicks):
                     classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
                     
-                ### Add random noise models
-                randomNoiseClass = np.full((sizeOfTwin,numOfEns,len(yearsall)),i+1)
-                classesl = np.append(classesl,randomNoiseClass,axis=0)
-                    
                 if ensTypeExperi == 'ENS':
                     classeslnew = np.swapaxes(classesl,0,1)
                 elif ensTypeExperi == 'GCM':
@@ -262,17 +257,19 @@ GFDLmodel = np.nanmean(conf[:,:,:,4],axis=1)
         
 ### Counting number of mmean and gfdl
 maxconf = np.argmax(conf,axis=3)
-countingmean = np.empty((maxconf.shape[0],maxconf.shape[2]))
 countinggfdl = np.empty((maxconf.shape[0],maxconf.shape[2]))
+countinglens = np.empty((maxconf.shape[0],maxconf.shape[2]))
+countingmpi = np.empty((maxconf.shape[0],maxconf.shape[2]))
 for i in range(maxconf.shape[0]):
     for j in range(maxconf.shape[2]):
-        countingmean[i,j] = np.count_nonzero(maxconf[i,:,j] == len(modelGCMs))
         countinggfdl[i,j] = np.count_nonzero(maxconf[i,:,j] == 4)
+        countinglens[i,j] = np.count_nonzero(maxconf[i,:,j] == len(modelGCMs)-1)
+        countingmpi[i,j] = np.count_nonzero(maxconf[i,:,j] == 1)
         
-directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
-np.savez(directorydataMS + 'CountingIterations_%s.npz' % ('SMILEGlobe'),mmean=countingmean[0,:],gfdlcm=countinggfdl[0,:])
-np.savez(directorydataMS + 'CountingIterations_%s.npz' % ('LowerArctic'),mmean=countingmean[4,:],gfdlcm=countinggfdl[4,:])
-        
+directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v6/'
+np.savez(directorydataMS + 'CountingIterations_%s.npz' % ('SMILEGlobe'),mpi=countingmpi[0,:],lens=countinglens[0,:])
+np.savez(directorydataMS + 'CountingIterations_%s.npz' % ('Arctic'),gfdl=countinggfdl[1,:],mpi=countingmpi[1,:])
+sys.exit()   
 ###############################################################################
 ###############################################################################
 ###############################################################################

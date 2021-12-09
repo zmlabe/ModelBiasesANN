@@ -178,7 +178,7 @@ for vv in range(len(variables)):
         plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.00,bottom=0.14)
         
         plt.savefig(directoryfigure + 'MultiModelBias-%s_ALL.png' % saveData,dpi=300)
-        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+        directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v5/'
         np.save(directorydataMS + 'MMMeandifferences_7models.npy',diffmodmean)
         
         # ###############################################################################

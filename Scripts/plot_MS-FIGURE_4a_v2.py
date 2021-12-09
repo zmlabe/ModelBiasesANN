@@ -24,8 +24,8 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 ### Set parameters
-directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
-directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures_v2/'
+directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v5/'
+directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v5/'
 variablesall = ['T2M']
 yearsall = np.arange(1950,2019+1,1)
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
@@ -34,18 +34,18 @@ letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
 ### Read in confidence data
 conf_globe = np.load(directorydata + 'Confidence_%s.npy' % 'SMILEGlobe')
 label_globe = np.load(directorydata + 'Label_%s.npy' % 'SMILEGlobe')
-conf_arctic = np.load(directorydata + 'Confidence_%s.npy' % 'LowerArctic')
-label_arctic = np.load(directorydata + 'Label_%s.npy' % 'LowerArctic')
+conf_arctic = np.load(directorydata + 'Confidence_%s.npy' % 'Arctic')
+label_arctic = np.load(directorydata + 'Label_%s.npy' % 'Arctic')
 
 ### Read in frequency data
 globef = np.load(directorydata + 'CountingIterations_%s.npz' % ('SMILEGlobe'))
-arcticf = np.load(directorydata + 'CountingIterations_%s.npz' % ('LowerArctic'))
+arcticf = np.load(directorydata + 'CountingIterations_%s.npz' % ('Arctic'))
 
 gmeanff = globef['mmean']
-ggfdlff = globef['gfdlcm']
+ggfdlff = globef['lenscm']
 
 ameanff = arcticf['mmean']
-agfdlff = arcticf['gfdlcm']
+agfdlff = arcticf['mpi']
 
 ###############################################################################
 ###############################################################################
@@ -83,6 +83,8 @@ color = cmr.infinity(np.linspace(0.00,1,len(allDataLabels)))
 for i,c in zip(range(len(allDataLabels)),color):
     if i == 7:
         c = 'k'
+    elif allDataLabels[i] == 'LENS':
+        colorgfdl = c
     else:
         c = c
     plt.plot(yearsall,conf_globe[:,i],color=c,linewidth=0.3,
@@ -126,12 +128,18 @@ ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
 ax.yaxis.grid(zorder=1,color='darkgrey',alpha=0.35,clip_on=False,linewidth=0.5)
 
 x=np.arange(1950,2019+1,1)
-plt.plot(yearsall,gmeanff,linewidth=2,color='k',alpha=1,zorder=3,clip_on=False)
+plt.plot(yearsall,gmeanff,linewidth=2,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MM-Mean}')
+plt.plot(yearsall,ggfdlff,linewidth=1.5,color=colorgfdl,alpha=1,zorder=3,clip_on=False,label=r'\textbf{LENS}',
+         linestyle='--',dashes=(1,0.3))
 
 plt.yticks(np.arange(0,101,10),map(str,np.round(np.arange(0,101,10),2)),size=5)
 plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5)
 plt.xlim([1950,2020])   
 plt.ylim([0,100])  
+
+leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
+              bbox_to_anchor=(0.5,1.23),fancybox=True,ncol=4,frameon=False,
+              handlelength=5,handletextpad=1)
 
 plt.text(1948,104,r'\textbf{[b]}',color='dimgrey',
          fontsize=7,ha='center')  
@@ -156,7 +164,7 @@ color = cmr.infinity(np.linspace(0.00,1,len(allDataLabels)))
 for i,c in zip(range(len(allDataLabels)),color):
     if i == 7:
         c = 'k'
-    elif allDataLabels[i] == 'GFDL-CM3':
+    elif allDataLabels[i] == 'MPI':
         colorgfdl = c
     else:
         c = c
@@ -196,7 +204,7 @@ ax.yaxis.grid(zorder=1,color='darkgrey',alpha=0.35,clip_on=False,linewidth=0.5)
 
 x=np.arange(1950,2019+1,1)
 plt.plot(yearsall,ameanff,linewidth=2,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MM-Mean}')
-plt.plot(yearsall,agfdlff,linewidth=1.5,color=colorgfdl,alpha=1,zorder=3,clip_on=False,label=r'\textbf{GFDL-CM3}',
+plt.plot(yearsall,agfdlff,linewidth=1.5,color=colorgfdl,alpha=1,zorder=3,clip_on=False,label=r'\textbf{MPI}',
          linestyle='--',dashes=(1,0.3))
 
 plt.yticks(np.arange(0,101,10),map(str,np.round(np.arange(0,101,10),2)),size=5)

@@ -25,9 +25,10 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-latarctic = 60
+latarctic = 67
 obsoutall = []
 regions = ['SMILEglobe','NH','SH','narrowTropics','Arctic','SouthernOcean']
+regions = ['SMILEGlobe','Arctic']
 regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC(%s)' % latarctic,'SOUTHERN OCEAN']
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
@@ -37,7 +38,7 @@ for va in range(len(variablesall)):
             ###############################################################################
             ### Data preliminaries 
             directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Loop/'
-            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v2-Mmean/'
+            directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v6/'
             letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
             ###############################################################################
             ###############################################################################
@@ -48,17 +49,15 @@ for va in range(len(variablesall)):
             seasons = ['annual']
             variq = variablesall[va]
             reg_name = regions[rr]
-            if reg_name == 'Arctic':
-                reg_name = 'Arctic%s' % latarctic
             timeper = 'historical'
             SAMPLEQ = 100
             ###############################################################################
             ###############################################################################
             pickSMILE = pickSMILEall[m]
             if len(pickSMILE) >= 1:
-                lenOfPicks = len(pickSMILE) + 1 # For random class
+                lenOfPicks = len(pickSMILE)
             else:
-                lenOfPicks = len(modelGCMs) + 1 # For random class
+                lenOfPicks = len(modelGCMs)
             ###############################################################################
             ###############################################################################
             land_only = False
@@ -128,7 +127,7 @@ for va in range(len(variablesall)):
             lrpRule = 'z'
             normLRP = True
             ###############################################################################
-            modelGCMsNames = np.append(modelGCMs,['MMean'])
+            modelGCMsNames = modelGCMs
     
             ###############################################################################
             ###############################################################################
@@ -233,10 +232,6 @@ for va in range(len(variablesall)):
                 for i in range(lenOfPicks):
                     classesl[i,:,:] = np.full((numOfEns,len(yearsall)),i)  
                     
-                ### Add random noise models
-                randomNoiseClass = np.full((sizeOfTwin,numOfEns,len(yearsall)),i+1)
-                classesl = np.append(classesl,randomNoiseClass,axis=0)
-                    
                 if ensTypeExperi == 'ENS':
                     classeslnew = np.swapaxes(classesl,0,1)
                 elif ensTypeExperi == 'GCM':
@@ -266,10 +261,10 @@ meanmax = np.nanmean(maxc,axis=1)
 per05 = np.percentile(maxc,20,axis=1)
 per95 = np.percentile(maxc,80,axis=1)
 
-directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v1/'
+directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v6/'
 np.savez(directorydataMS + 'StatisticsIterations_%s.npz' % ('SMILEGlobe'),mean=meanmax[0,:],p5=per05[0,:],p95=per95[0,:])
-np.savez(directorydataMS + 'StatisticsIterations_%s.npz' % ('LowerArctic'),mean=meanmax[4,:],p5=per05[4,:],p95=per95[4,:])
-
+np.savez(directorydataMS + 'StatisticsIterations_%s.npz' % ('Arctic'),mean=meanmax[1,:],p5=per05[1,:],p95=per95[1,:])
+sys.exit()
 ###############################################################################
 ###############################################################################
 ###############################################################################

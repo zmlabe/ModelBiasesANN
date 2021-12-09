@@ -23,8 +23,8 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 ### Parameters
-directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
-directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures_v2/'
+directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v5/'
+directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v5/'
 variablesall = 'T2M'
 scaleLRPmax = True
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']

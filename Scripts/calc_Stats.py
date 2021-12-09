@@ -18,11 +18,12 @@ Usage
     [8] remove_ocean(data,data_obs)
     [9] remove_land(data,data_obs)
     [10] standardize_data(Xtrain,Xtest)
-    [11] standardize_dataSEPARATE(Xtrain,Xtest):
-    [12] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
-    [13] rm_variance_dev(var,window)
-    [14] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
-    [15] smoothedEnsembles(data,lat_bounds,lon_bounds)
+    [11] standardize_dataVal(Xtrain,Xtest,Xval)
+    [12] standardize_dataSEPARATE(Xtrain,Xtest):
+    [13] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
+    [14] rm_variance_dev(var,window)
+    [15] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+    [16] smoothedEnsembles(data,lat_bounds,lon_bounds)
 """
 
 def rmse(a,b):
@@ -283,6 +284,35 @@ def standardize_data(Xtrain,Xtest):
         print('--THERE WAS A NAN IN THE STANDARDIZED DATA!--')
     
     return Xtrain,Xtest,stdVals
+
+###############################################################################
+
+def standardize_dataVal(Xtrain,Xtest,Xval):
+    """
+    Standardizes training, testing, and validation data
+    """
+    
+    ### Import modulates
+    import numpy as np
+
+    Xmean = np.mean(Xtrain,axis=0)
+    Xstd = np.std(Xtrain,axis=0)
+    
+    Xtest = (Xtest - Xmean)/Xstd
+    Xtrain = (Xtrain - Xmean)/Xstd
+    Xval = (Xval - Xmean)/Xstd
+    
+    stdVals = (Xmean,Xstd)
+    stdVals = stdVals[:]
+    
+    ### If there is a nan (like for land/ocean masks)
+    if np.isnan(np.min(Xtrain)) == True:
+        Xtrain[np.isnan(Xtrain)] = 0
+        Xtest[np.isnan(Xtest)] = 0
+        Xval[np.isnan(Xval)] = 0
+        print('--THERE WAS A NAN IN THE STANDARDIZED DATA!--')
+    
+    return Xtrain,Xtest,Xval,stdVals
 
 ###############################################################################
 

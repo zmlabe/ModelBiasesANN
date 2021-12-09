@@ -47,7 +47,7 @@ datasetsingle = ['SMILE']
 monthlychoiceq = ['JFM','AMJ','JAS','OND','annual']
 monthlychoiceq = ['annual']
 variables = ['T2M','P','SLP']
-variables = ['P']
+variables = ['T2M']
 reg_name = 'SMILEGlobe'
 level = 'surface'
 ###############################################################################
@@ -270,7 +270,7 @@ for vv in range(1):
         if variq == 'T2M':
             limit = np.arange(-35,35.01,0.5)
             barlim = np.round(np.arange(-35,36,5),2)
-            cmap = plt.cm.CMRmap_r
+            cmap = plt.cm.twilight
             label = r'\textbf{%s -- [$^{\circ}$C mean] -- 1950-2019}' % variq
         elif variq == 'P':
             limit = np.arange(0,10.01,0.01)

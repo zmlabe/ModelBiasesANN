@@ -24,8 +24,8 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
 ### Parameters
-directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/MSFigures_v2/'
-directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/MSFigures_v2/'
+directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v5/'
+directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v5/'
 variablesall = 'T2M'
 scaleLRPmax = True
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
@@ -35,10 +35,10 @@ letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","
 ###############################################################################
 ############################################################################### 
 ### Read in data
-lat1 = np.load(directorydata + 'Lat_LowerArctic.npy',allow_pickle=True)
-lon1 = np.load(directorydata + 'Lon_LowerArctic.npy',allow_pickle=True)
-lrp = np.load(directorydata + 'LRPcomposites_LowerArctic_8classes.npy',allow_pickle=True)
-lrpAA = np.load(directorydata + 'LRPcomposites_LowerArcticAA_8classes.npy',allow_pickle=True)
+lat1 = np.load(directorydata + 'Lat_Arctic.npy',allow_pickle=True)
+lon1 = np.load(directorydata + 'Lon_Arctic.npy',allow_pickle=True)
+lrp = np.load(directorydata + 'LRPcomposites_Arctic_8classes.npy',allow_pickle=True)
+lrpAA = np.load(directorydata + 'LRPcomposites_ArcticAA_8classes.npy',allow_pickle=True)
 
 if scaleLRPmax == True:
     lrpn = np.empty((lrp.shape))
@@ -76,7 +76,7 @@ for r in range(alldata.shape[0]):
         var = alldata[r]
         
         ax1 = plt.subplot(3,alldata.shape[0]//3,r+1)
-        m = Basemap(projection='npstere',boundinglat=61.3,lon_0=0,
+        m = Basemap(projection='npstere',boundinglat=67.3,lon_0=0,
                     resolution='l',round =True,area_thresh=10000)
         m.drawcoastlines(color='darkgrey',linewidth=0.3)
             
@@ -104,7 +104,7 @@ for r in range(alldata.shape[0]):
         var = alldata[r]
         
         ax1 = plt.subplot(3,alldata.shape[0]//3,r+1)
-        m = Basemap(projection='npstere',boundinglat=61.3,lon_0=0,
+        m = Basemap(projection='npstere',boundinglat=67.3,lon_0=0,
                     resolution='l',round =True,area_thresh=10000)
         m.drawcoastlines(color='darkgrey',linewidth=0.3)
             

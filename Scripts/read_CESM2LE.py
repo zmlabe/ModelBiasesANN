@@ -218,7 +218,7 @@ def read_CESM2LE(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns,timeper
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
 # directory = '/Users/zlabe/Data/CESM2-LE/monthly/'
-# vari = 'PS'
+# vari = 'SST'
 # sliceperiod = 'annual'
 # sliceshape = 4
 # slicenan = 'nan'
