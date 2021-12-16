@@ -39,8 +39,8 @@ letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 monthlychoiceq = ['JFM','AMJ','JAS','OND','annual']
 monthlychoiceq = ['annual']
-variables = ['T2M','P','SLP']
-# variables = ['T2M']
+# variables = ['T2M','P','SLP']
+variables = ['T2M']
 reg_name = 'SMILEGlobe'
 level = 'surface'
 ###############################################################################

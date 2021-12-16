@@ -29,7 +29,7 @@ dataset_obs = ['ERA5BE']
 monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 typeOfCorr = ['RMSE']
 variables = ['T2M','P','SLP']
-reg_name = 'LowerArctic'
+reg_name = 'Arctic'
 level = 'surface'
 timeper = 'historical'
 if timeper == 'historical':
@@ -43,6 +43,8 @@ if reg_name == 'SMILEGlobe':
 elif reg_name == 'narrowTropics':
     region = 'Tropics'
 elif reg_name == 'LowerArctic':
+    region = 'Arctic'
+elif reg_name == 'Arctic':
     region = 'Arctic'
 
 ### Read in data

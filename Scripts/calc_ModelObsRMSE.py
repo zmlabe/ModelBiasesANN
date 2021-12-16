@@ -33,7 +33,7 @@ monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
 variables = ['T2M','P','SLP']
 monthlychoiceq = ['annual']
 variables = ['T2M']
-reg_name = 'SMILEGlobe'
+reg_name = 'Arctic'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################

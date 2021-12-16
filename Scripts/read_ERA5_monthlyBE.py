@@ -190,19 +190,19 @@ def read_ERA5_monthlyBE(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
     print('>>>>>>>>>> ENDING read_ERA5_monthlyBE (Back Extension) function!')
     return lat1,lon1,varshape
 
-### Test functions - do not use!
-import numpy as np
-import matplotlib.pyplot as plt
-import calc_Utilities as UT
-variq = 'T2M'
-directory = '/Users/zlabe/Data/ERA5/'
-sliceperiod = 'annual'
-sliceyear = np.arange(1950,2019+1,1)
-sliceshape = 3
-slicenan = 'nan'
-addclimo = True
-lat,lon,var = read_ERA5_monthlyBE(variq,directory,sliceperiod,
-                                sliceyear,sliceshape,addclimo,
-                                slicenan)
-lon2,lat2 = np.meshgrid(lon,lat)
-ave = UT.calc_weightedAve(var,lat2)
+# ### Test functions - do not use!
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import calc_Utilities as UT
+# variq = 'T2M'
+# directory = '/Users/zlabe/Data/ERA5/'
+# sliceperiod = 'annual'
+# sliceyear = np.arange(1950,2019+1,1)
+# sliceshape = 3
+# slicenan = 'nan'
+# addclimo = True
+# lat,lon,var = read_ERA5_monthlyBE(variq,directory,sliceperiod,
+#                                 sliceyear,sliceshape,addclimo,
+#                                 slicenan)
+# lon2,lat2 = np.meshgrid(lon,lat)
+# ave = UT.calc_weightedAve(var,lat2)
