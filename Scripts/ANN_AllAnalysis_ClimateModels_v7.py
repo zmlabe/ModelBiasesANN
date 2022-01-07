@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'SMILEGlobe'
+reg_name = 'Arctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
@@ -1021,6 +1021,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
     
         ### See more more details
         model.layers[0].get_config()
+        
+        ### Save training mean and std for normalization
+        np.savetxt(directoryoutput + 'TRAININGstandardmean_' + saveData + '.txt',Xmean)
+        np.savetxt(directoryoutput + 'TRAININGstandardstd_' + saveData + '.txt',Xstd)
    
         ## Define variable for analysis
         print('\n\n------------------------')
