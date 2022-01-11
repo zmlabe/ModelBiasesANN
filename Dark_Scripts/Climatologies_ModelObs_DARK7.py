@@ -276,5 +276,5 @@ for vv in range(len(variables)):
         
         plt.tight_layout()
         plt.subplots_adjust(bottom=0.11,hspace=0.00)
-        plt.savefig(directoryfigure + 'Mean-%s_DARK8_Vertical.png' % saveData,dpi=1000)
+        plt.savefig(directoryfigure + 'Mean-%s_DARK7_Vertical.png' % saveData,dpi=1000)
         

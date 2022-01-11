@@ -28,7 +28,13 @@ import cmasher as cmr
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
-plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
+plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
+plt.rc('savefig',facecolor='black')
+plt.rc('axes',edgecolor='darkgrey')
+plt.rc('xtick',color='darkgrey')
+plt.rc('ytick',color='darkgrey')
+plt.rc('axes',labelcolor='darkgrey')
+plt.rc('axes',facecolor='black')
 
 ###############################################################################
 ###############################################################################
@@ -160,7 +166,7 @@ for vv in range(len(variables)):
 ###############################################################################          
         ### Assemble all data for plotting
         stdall = np.append(stdobs[np.newaxis,:,:],stdens,axis=0)
-        climall = np.append(climobs[np.newaxis,:,:],climens,axis=0)
+        climall = climens
         biasall = biasens
         spreadall = spreadmean
         
@@ -172,9 +178,9 @@ for vv in range(len(variables)):
         #######################################################################
         ### Plot subplot of mean climate
         if variq == 'T2M':
-            limit = np.arange(-35,30.01,0.5)
-            barlim = np.round(np.arange(-35,31,65),2)
-            cmap = plt.cm.CMRmap
+            limit = np.arange(-25,15.01,0.1)
+            barlim = np.round(np.arange(-25,16,40),2)
+            cmap = plt.cm.twilight
             label = r'\textbf{%s -- [$^{\circ}$C] -- 1950-2019}' % variq
         elif variq == 'P':
             limit = np.arange(0,10.01,0.01)
@@ -192,7 +198,8 @@ for vv in range(len(variables)):
             var = climall[r]
             
             ax1 = plt.subplot(7,1,r+1)
-            m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+            m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+                        resolution='l',round =True,area_thresh=10000)
             m.drawcoastlines(color='dimgrey',linewidth=0.27)
                 
             var, lons_cyclic = addcyclic(var, lons)
@@ -211,15 +218,15 @@ for vv in range(len(variables)):
             cs1 = m.contourf(x,y,var,limit,extend=xx)
             cs1.set_cmap(cmap) 
                     
-            ax1.annotate(r'\textbf{%s}' % allDataLabels[r],xy=(0,0),xytext=(1.04,0.5),
-                          textcoords='axes fraction',color='k',fontsize=10,
+            ax1.annotate(r'\textbf{%s}' % allDataLabels[r],xy=(0,0),xytext=(1.08,0.5),
+                          textcoords='axes fraction',color='w',fontsize=10,
                           rotation=270,ha='center',va='center')
             
         ###############################################################################
         cbar_ax1 = fig.add_axes([0.20,0.09,0.6,0.009])                
         cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
                             extend=xx,extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        cbar1.set_label(label,fontsize=9,color='darkgrey',labelpad=1.4)  
         cbar1.set_ticks(barlim)
         cbar1.set_ticklabels(list(map(str,barlim)))
         cbar1.ax.tick_params(axis='x', size=.01,labelsize=4.5,pad=2)
@@ -227,5 +234,5 @@ for vv in range(len(variables)):
         
         plt.tight_layout()
         plt.subplots_adjust(bottom=0.11,hspace=0.00)
-        plt.savefig(directoryfigure + 'Mean-%s_CLEAR7_Vertical.png' % saveData,dpi=1000)
+        plt.savefig(directoryfigure + 'Mean-%s_CLEAR7_Vertical-Arctic_DARK.png' % saveData,dpi=1000)
         
