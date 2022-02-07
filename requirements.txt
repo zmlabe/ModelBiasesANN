@@ -61,6 +61,7 @@ clangxx_osx-64=4.0.1=h22b1bf0_18
 click=7.0=py37_0
 cloudpickle=1.3.0=py_0
 clyent=1.2.2=py37_1
+cmasher=1.6.0=pypi_0
 cmocean=2.0=py_3
 colorama=0.4.3=py_0
 colorspacious=1.1.2=pyh24bf2e0_0
@@ -86,6 +87,7 @@ diff-match-patch=20181111=py_0
 dill=0.3.1.1=py37_1
 distributed=2.11.0=py37_0
 docutils=0.16=py37_0
+e13tools=0.9.6=pypi_0
 entrypoints=0.3=py37_0
 eofs=1.4.0=py_0
 et_xmlfile=1.0.1=py37_0
