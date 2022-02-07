@@ -24,6 +24,7 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
 
 
 ## Conferences
++ **[5]** **Labe, Z.M.** and E.A. Barnes. Using explainable neural networks for comparing climate model projections, *27th Conference on Probability and Statistics*, Virtual Attendance (Jan 2022). [[Abstract]](https://ams.confex.com/ams/102ANNUAL/meetingapp.cgi/Paper/392538) [[Slides]](https://www.slideshare.net/ZacharyLabe/using-explainable-neural-networks-for-comparing-climate-model-projections)
 + **[4]** **Labe, Z.M.** and E.A. Barnes. Evaluating global climate models using simple, explainable neural networks, *2021 American Geophysical Union Annual Meeting*, Virtual Attendance (Dec 2021) (Invited). [[Abstract]](https://agu.confex.com/agu/fm21/meetingapp.cgi/Paper/797879) [[Slides]](https://www.slideshare.net/ZacharyLabe/evaluating-global-climate-models-using-simple-explainable-neural-networks)
 + **[3]** **Labe, Z.M.** and E.A. Barnes. Exploring climate model large ensembles with explainable neural networks, *WCRP workshop on attribution of multi-annual to decadal changes in the climate system*, Virtual Workshop (Sep 2021). [[Slides]](https://www.slideshare.net/ZacharyLabe/exploring-climate-model-large-ensembles-with-explainable-neural-networks)
 + **[2]** **Labe, Z.M.** and E.A. Barnes. Climate model evaluation with explainable neural networks, *3rd NOAA Workshop on Leveraging AI in Environmental Sciences*, Virtual Workshop (Sep 2021). [[Poster]](https://sites.uci.edu/zlabe/files/2021/08/LabeBarnes_NOAA-AIES_2021_Poster.pdf)
