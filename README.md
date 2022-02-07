@@ -20,6 +20,8 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
     + Kay, J. E and Coauthors, 2015: The Community Earth System Model (CESM) large ensemble project: A community resource for studying climate change in the presence of internal climate variability. Bull. Amer. Meteor. Soc., 96, 1333–1349, doi:10.1175/BAMS-D-13-00255.1 [[PUBLICATION]](http://journals.ametsoc.org/doi/full/10.1175/BAMS-D-13-00255.1)
 + Multi-Model Large Ensemble (SMILE) : [[DATA]](https://www.cesm.ucar.edu/projects/community-projects/MMLEA/)
     + Deser, C., Phillips, A. S., Simpson, I. R., Rosenbloom, N., Coleman, D., Lehner, F., ... & Stevenson, S. (2020). Deser, C., Lehner, F., Rodgers, K. B., Ault, T., Delworth, T. L., DiNezio, P. N., ... & Ting, M. (2020). Insights from Earth system model initial-condition large ensembles and future prospects. Nature Climate Change, 1-10. doi:10.1038/s41558-020-0731-2 [[PUBLICATION]](https://www.nature.com/articles/s41558-020-0731-2)
++ NOAA-CIRES-DOE Twentieth Century Reanalysis (20CRv3) : [[DATA]](https://psl.noaa.gov/data/gridded/data.20thC_ReanV3.html)
+    + Slivinski, L. C., Compo, G. P., Whitaker, J. S., Sardeshmukh, P. D., Giese, B. S., McColl, C., ... & Wyszyński, P. (2019). Towards a more reliable historical reanalysis: Improvements for version 3 of the Twentieth Century Reanalysis system. Quarterly Journal of the Royal Meteorological Society, 145(724), 2876-2908. doi:10.1002/qj.3598 [[PUBLICATION]](https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3598)
     
 ## Publications
 
