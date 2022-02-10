@@ -29,15 +29,15 @@ directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
 variablesall = ['T2M']
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
-THRESH = 0.01
+THRESH = 0.1
 
 ### Read in data
-arctic = np.load(directorydata + 'Ranks_thresh-%s_%s.npy' % (THRESH,'Arctic'))
+arctic = np.load(directorydata + 'Ranks_thresh-%s_%s_GLO.npy' % (THRESH,'Arctic'))
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
-fig = plt.figure()
+fig = plt.figure(figsize=(9,5))
 ax = plt.subplot(111)
 ax.spines['top'].set_color('none')
 ax.spines['right'].set_color('none')
@@ -77,8 +77,11 @@ plt.xlim([0,70])
 for i in range(arctic.shape[0]):
     for j in range(arctic.shape[1]):
         cc = 'crimson'         
-        plt.text(j+0.5,i+0.5,r'\textbf{%s}' % int(arctic[i,j]),fontsize=4,
+        plt.text(j+0.5,i+0.5,r'\textbf{%s}' % int(arctic[i,j]),fontsize=8,
             color=cc,va='center',ha='center')
+        
+plt.text(16.65,-0.78,r'\textbf{WORST}',color=cmocean.cm.ice(0.99))
+plt.text(44.3,-0.78,r'\textbf{BEST}',color=cmocean.cm.ice(0.1))
 
 ###############################################################################                
 cbar_ax1 = fig.add_axes([0.35,0.11,0.3,0.03])                
@@ -92,15 +95,15 @@ cbar.dividers.set_color('dimgrey')
 cbar.dividers.set_linewidth(1)
 cbar.outline.set_edgecolor('dimgrey')
 cbar.outline.set_linewidth(1)
-cbar.set_label(r'\textbf{ARCTIC -- RELATIVE MODEL CHOICE}',color='k',labelpad=7,fontsize=18)
+cbar.set_label(r'\textbf{RELATIVE MODEL CHOICE}',color='k',labelpad=7,fontsize=18)
 
 cbar.ax.get_yaxis().set_ticks([])
 for j, lab in enumerate(range(1,8,1)):
-    cbar.ax.text((2 * j+2.9)/2, 4.5, lab,ha='center',va='center',
-                 size=5,color='dimgrey')
+    cbar.ax.text((2 * j+2.9)/2, 4.0, r'\textbf{%s}' % lab,ha='center',va='center',
+                 size=8,color='crimson')
 
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.2,hspace=0.1)
-plt.savefig(directoryfigure + 'MSFigure-3_v7.png',dpi=1000)
+plt.savefig(directoryfigure + 'ArcticRank_ERA5BE_GLO.png',dpi=1000)
         
         

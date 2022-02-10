@@ -42,7 +42,7 @@ for va in range(len(variablesall)):
         modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth',
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
-        dataset_obs = 'ERA5BE'
+        dataset_obs = '20CRv3'
         seasons = ['annual']
         variq = variablesall[va]
         reg_name = 'Arctic'
@@ -270,8 +270,7 @@ for va in range(len(variablesall)):
         rank = np.transpose(rank)
         directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
         if typeOfAnalysis == 'Experiment-3':
-            np.save(directorydataMS + 'Ranks_thresh-%s_%s.npy' % (THRESH,reg_name),rank)
+            np.save(directorydataMS + 'Ranks_thresh-%s_%s_20CRv3.npy' % (THRESH,reg_name),rank)
         elif typeOfAnalysis == 'Experiment-4':
-            np.save(directorydataMS + 'Ranks_thresh-%s_%s_GLO.npy' % (THRESH,reg_name),rank)
-        
+            np.save(directorydataMS + 'Ranks_thresh-%s_%s_GLO_20CRv3.npy' % (THRESH,reg_name),rank)
         

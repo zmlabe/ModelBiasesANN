@@ -1,20 +1,20 @@
 """
-Function reads in monthly data from BEST
+Function reads in monthly data from GISTEMPv4
  
 Notes
 -----
     Author : Zachary Labe
-    Date   : 6 July 2020
+    Date   : 10 January 2022
     
 Usage
 -----
-    [1] read_BEST(directory,sliceperiod,sliceyear,
+    [1] read_GISTEMP(directory,sliceperiod,sliceyear,
                   sliceshape,addclimo,slicenan)
 """
 
-def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
+def read_GISTEMP(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     """
-    Function reads monthly data from BEST
+    Function reads monthly data from GISTEMP
     
     Parameters
     ----------
@@ -42,10 +42,10 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
         
     Usage
     -----
-    lat,lon,var = read_BEST(directory,sliceperiod,sliceyear,
+    lat,lon,var = read_GISTEMP(directory,sliceperiod,sliceyear,
                             sliceshape,addclimo,slicenan)
     """
-    print('\n>>>>>>>>>> STARTING read_BEST function!')
+    print('\n>>>>>>>>>> STARTING read_GISTEMP function!')
     
     ### Import modules
     import numpy as np
@@ -57,13 +57,13 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     
     ###########################################################################
     ### Parameters
-    time = np.arange(1850,2020+1,1)
+    time = np.arange(1880,2020+1,1)
     monthslice = sliceyear.shape[0]*12
     mon = 12
     
     ###########################################################################
     ### Read in data
-    filename = 'T2M_BEST_1850-2020.nc'
+    filename = 'T2M_GISTEMP_1880-2020.nc'
     data = Dataset(directory + filename,'r')
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
@@ -79,7 +79,7 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     ###########################################################################
     ### Return absolute temperature (1951-1980 baseline)
     if addclimo == True:
-        filename = 'CLIM_BEST_1850-2020.n'
+        filename = 'CLIM_GISTEMP_1880-2020.n'
         datac = Dataset(directory + filename,'r')
         clim = datac['CLIM'][:,:,:]
         datac.close()
@@ -141,16 +141,16 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     print(time[yearhistq])
     histmodel = tempshape[yearhistq,:,:]
         
-    print('>>>>>>>>>> ENDING read_BEST function!')
+    print('>>>>>>>>>> ENDING read_GISTEMP function!')
     return lat1,lon1,histmodel
 
 ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
-# directory = '/Users/zlabe/Data/BEST/'
+# directory = '/Users/zlabe/Data/GISTEMP/'
 # sliceperiod = 'DJF'
-# sliceyear = np.arange(1956,2019+1,1)
+# sliceyear = np.arange(1980,2020+1,1)
 # sliceshape = 3
 # slicenan = 'nan'
 # addclimo = True
-# lat,lon,var = read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan)
+# lat,lon,var = read_GISTEMP(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan)

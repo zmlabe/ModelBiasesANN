@@ -1,20 +1,20 @@
 """
-Function reads in monthly data from BEST
+Function reads in monthly data from HadCRUTv4
  
 Notes
 -----
     Author : Zachary Labe
-    Date   : 6 July 2020
+    Date   : 10 January 2022
     
 Usage
 -----
-    [1] read_BEST(directory,sliceperiod,sliceyear,
+    [1] read_HadCRUT(directory,sliceperiod,sliceyear,
                   sliceshape,addclimo,slicenan)
 """
 
-def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
+def read_HadCRUT(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     """
-    Function reads monthly data from BEST
+    Function reads monthly data from HadCRUT
     
     Parameters
     ----------
@@ -42,10 +42,10 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
         
     Usage
     -----
-    lat,lon,var = read_BEST(directory,sliceperiod,sliceyear,
+    lat,lon,var = read_HadCRUT(directory,sliceperiod,sliceyear,
                             sliceshape,addclimo,slicenan)
     """
-    print('\n>>>>>>>>>> STARTING read_BEST function!')
+    print('\n>>>>>>>>>> STARTING read_HadCRUT function!')
     
     ### Import modules
     import numpy as np
@@ -63,7 +63,7 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     
     ###########################################################################
     ### Read in data
-    filename = 'T2M_BEST_1850-2020.nc'
+    filename = 'T2M_HadCRUT_1850-2020.nc'
     data = Dataset(directory + filename,'r')
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
@@ -77,9 +77,9 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
                                lat1.shape[0],lon1.shape[0]))
     
     ###########################################################################
-    ### Return absolute temperature (1951-1980 baseline)
+    ### Return absolute temperature (1961-1990 baseline)
     if addclimo == True:
-        filename = 'CLIM_BEST_1850-2020.n'
+        filename = 'CLIM_HadCRUT_1880-2020.n'
         datac = Dataset(directory + filename,'r')
         clim = datac['CLIM'][:,:,:]
         datac.close()
@@ -135,22 +135,23 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     else:
         tempshape[np.where(np.isnan(tempshape))] = slicenan
         
+    print('>>>>>>>>>> ENDING read_HadCRUT function!')
+    
     ###########################################################################
     ### Change years
     yearhistq = np.where((time >= 1950) & (time <= 2019))[0]
     print(time[yearhistq])
     histmodel = tempshape[yearhistq,:,:]
-        
-    print('>>>>>>>>>> ENDING read_BEST function!')
+    
     return lat1,lon1,histmodel
 
 ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
-# directory = '/Users/zlabe/Data/BEST/'
+# directory = '/Users/zlabe/Data/HadCRUT/'
 # sliceperiod = 'DJF'
-# sliceyear = np.arange(1956,2019+1,1)
+# sliceyear = np.arange(1850,2020+1,1)
 # sliceshape = 3
 # slicenan = 'nan'
 # addclimo = True
-# lat,lon,var = read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan)
+# lat,lon,var = read_HadCRUT(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan)

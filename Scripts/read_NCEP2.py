@@ -1,20 +1,20 @@
 """
-Function reads in monthly data from BEST
+Function reads in monthly data from NCEP2
  
 Notes
 -----
     Author : Zachary Labe
-    Date   : 6 July 2020
+    Date   : 10 January 2022
     
 Usage
 -----
-    [1] read_BEST(directory,sliceperiod,sliceyear,
+    [1] read_NCEP2(directory,sliceperiod,sliceyear,
                   sliceshape,addclimo,slicenan)
 """
 
-def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
+def read_NCEP2(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     """
-    Function reads monthly data from BEST
+    Function reads monthly data from NCEP2
     
     Parameters
     ----------
@@ -42,10 +42,10 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
         
     Usage
     -----
-    lat,lon,var = read_BEST(directory,sliceperiod,sliceyear,
+    lat,lon,var = read_NCEP2(directory,sliceperiod,sliceyear,
                             sliceshape,addclimo,slicenan)
     """
-    print('\n>>>>>>>>>> STARTING read_BEST function!')
+    print('\n>>>>>>>>>> STARTING read_NCEP2 function!')
     
     ### Import modules
     import numpy as np
@@ -57,13 +57,13 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     
     ###########################################################################
     ### Parameters
-    time = np.arange(1850,2020+1,1)
+    time = np.arange(1979,2021+1,1)
     monthslice = sliceyear.shape[0]*12
     mon = 12
     
     ###########################################################################
     ### Read in data
-    filename = 'T2M_BEST_1850-2020.nc'
+    filename = 'T2M_NCEP2_1979-2021.nc'
     data = Dataset(directory + filename,'r')
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
@@ -77,9 +77,9 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
                                lat1.shape[0],lon1.shape[0]))
     
     ###########################################################################
-    ### Return absolute temperature (1951-1980 baseline)
+    ### Return absolute temperature (1981-2010 baseline)
     if addclimo == True:
-        filename = 'CLIM_BEST_1850-2020.n'
+        filename = 'CLIM_NCEP2_1979-2021.n'
         datac = Dataset(directory + filename,'r')
         clim = datac['CLIM'][:,:,:]
         datac.close()
@@ -136,21 +136,20 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
         tempshape[np.where(np.isnan(tempshape))] = slicenan
         
     ###########################################################################
-    ### Change years
-    yearhistq = np.where((time >= 1950) & (time <= 2019))[0]
-    print(time[yearhistq])
-    histmodel = tempshape[yearhistq,:,:]
-        
-    print('>>>>>>>>>> ENDING read_BEST function!')
-    return lat1,lon1,histmodel
+    ### Change units
+    tempshape = tempshape - 273.15 # K to C
+    print('Completed: Changed units (K to C)!')
+       
+    print('>>>>>>>>>> ENDING read_NCEP2 function!')
+    return lat1,lon1,tempshape
 
 ### Test functions - do not use!
 # import numpy as np
 # import matplotlib.pyplot as plt
-# directory = '/Users/zlabe/Data/BEST/'
+# directory = '/Users/zlabe/Data/NCEP2/'
 # sliceperiod = 'DJF'
-# sliceyear = np.arange(1956,2019+1,1)
+# sliceyear = np.arange(1979,2021+1,1)
 # sliceshape = 3
 # slicenan = 'nan'
 # addclimo = True
-# lat,lon,var = read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan)
+# lat,lon,var = read_NCEP2(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan)

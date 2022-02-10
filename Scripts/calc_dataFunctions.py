@@ -58,17 +58,50 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
     import numpy as np
     import sys
     
-    if dataset == 'best':
+    if dataset == 'BEST':
         import read_BEST as BB
         directorydataBB = '/Users/zlabe/Data/BEST/'
-        sliceyearBB = np.arange(1956,2019+1,1)
+        sliceyearBB = np.arange(1850,2020+1,1)
         sliceshapeBB = 3
         slicenanBB = 'nan'
-        addclimoBB = True
+        addclimoBB = False
         ENSmean = np.nan
         lat1,lon1,data = BB.read_BEST(directorydataBB,monthlychoice,
                                       sliceyearBB,sliceshapeBB,addclimoBB,
                                       slicenanBB)
+    elif dataset == 'HadCRUT':
+        import read_HadCRUT as HH
+        directorydataHH = '/Users/zlabe/Data/HadCRUT5/'
+        sliceyearHH = np.arange(1850,2020+1,1)
+        sliceshapeHH = 3
+        slicenanHH = 'nan'
+        addclimoHH = False
+        ENSmean = np.nan
+        lat1,lon1,data = HH.read_HadCRUT(directorydataHH,monthlychoice,
+                                         sliceyearHH,sliceshapeHH,addclimoHH,
+                                         slicenanHH)
+    elif dataset == 'NCEP2':
+        import read_NCEP2 as NR2
+        directorydataNR2 = '/Users/zlabe/Data/NCEP2/monthly/'
+        sliceyearNR2 = np.arange(1979,2021+1,1)
+        sliceshapeNR2 = 3
+        slicenanNR2 = 'nan'
+        addclimoNR2 = False
+        ENSmean = np.nan
+        lat1,lon1,data = NR2.read_NCEP2(directorydataNR2,monthlychoice,
+                                         sliceyearNR2,sliceshapeNR2,addclimoNR2,
+                                         slicenanNR2)
+    elif dataset == 'GISTEMP':
+        import read_GISTEMP as GG
+        directorydataGG = '/Users/zlabe/Data/GISTEMP/'
+        sliceyearGG = np.arange(1880,2020+1,1)
+        sliceshapeGG = 3
+        slicenanGG = 'nan'
+        addclimoGG = False
+        ENSmean = np.nan
+        lat1,lon1,data = GG.read_GISTEMP(directorydataGG,monthlychoice,
+                                         sliceyearGG,sliceshapeGG,addclimoGG,
+                                         slicenanGG)
     elif dataset == 'ERA5':
         import read_ERA5_monthly as ER
         directorydataER = '/Users/zlabe/Data/ERA5/'
