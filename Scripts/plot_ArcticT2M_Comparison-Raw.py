@@ -116,8 +116,14 @@ ensembleanom = meanmodel.reshape(meanmodel.shape[0]*meanmodel.shape[1],meanmodel
 ### Calculate statistics
 maxt = np.percentile(ensembleanom,95,axis=0)
 mint = np.percentile(ensembleanom,5,axis=0)
+mmmean = np.nanmean(ensembleanom,axis=0)
 
-# ##############################################################################
+# # ### Read in multimodel-mean
+# # meanTraining = np.genfromtxt('/Users/zlabe/Documents/Research/ModelComparison/Data/TRAININGstandardmean_historical_annual_NoiseTwinSingleMODDIF4_Experiment-3_T2M_Arctic_ERA5BE_NumOfSMILE-7_Method-ENS.txt',
+# #                                           unpack=True).reshape(lats_obs.shape[0],lons_obs.shape[0])
+# # mmm = UT.calc_weightedAve(meanTraining,lat2)
+
+###############################################################################
 ##############################################################################
 ##############################################################################
 fig = plt.figure()
@@ -156,6 +162,7 @@ ax.tick_params(axis='y',labelsize=7,pad=4)
 
 plt.fill_between(x=yearsall,y1=mint,y2=maxt,facecolor='darkgrey',zorder=0,
          alpha=0.6,edgecolor='none',clip_on=False,label=r'\textbf{MMLEA}')
+plt.plot(yearsobs[0],mmmean,linewidth=4,color='darkgrey',linestyle='-',clip_on=False)
 
 color = iter(cmr.infinity(np.linspace(0.00,1,len(meanobsq))))
 for i in range(len(meanobsq)):
@@ -179,10 +186,10 @@ leg = plt.legend(shadow=False,fontsize=12,loc='upper center',
 for line,text in zip(leg.get_lines(), leg.get_texts()):
     text.set_color(line.get_color())
     
-plt.ylabel(r'\textbf{Temperature [$^{\circ}$C]}',fontsize=8,color='dimgrey')
+plt.ylabel(r'\textbf{T2M [$^{\circ}$C]}',fontsize=8,color='dimgrey')
 plt.yticks(np.arange(-16,16,2),map(str,np.round(np.arange(-16,16,2),2)),size=9)
 plt.xticks(np.arange(1950,2021,10),map(str,np.arange(1950,2021,10)),size=9)
 plt.xlim([1950,2020])   
 plt.ylim([-16,-4])
 plt.subplots_adjust(bottom=0.15)
-plt.savefig(directoryfigure + 'ArcticGMST_Comparison-Raw.png',dpi=300)
+plt.savefig(directoryfigure + 'ArcticGMST_Comparison-Raw.png',dpi=600)

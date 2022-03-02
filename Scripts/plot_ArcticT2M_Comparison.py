@@ -183,7 +183,7 @@ leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
 for line,text in zip(leg.get_lines(), leg.get_texts()):
     text.set_color(line.get_color())
     
-plt.ylabel(r'\textbf{Temperature Anomaly [$^{\circ}$C]}',fontsize=8,color='dimgrey')
+plt.ylabel(r'\textbf{T2M Anomaly [$^{\circ}$C]}',fontsize=8,color='dimgrey')
 plt.yticks(np.arange(-4,4.5,0.5),map(str,np.round(np.arange(-4,4.5,0.5),2)),size=9)
 plt.xticks(np.arange(1950,2021,10),map(str,np.arange(1950,2021,10)),size=9)
 plt.xlim([1950,2020])   
