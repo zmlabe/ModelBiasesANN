@@ -489,7 +489,7 @@ def calc_RMSE(varx,vary,lats,lons,weight):
         varx : 2d array
         vary : 2d array
         lons : 1d array of latitude
-        weight : string (yes or no)
+        weight : string (yes, yesnan, or no)
         
         Returns
         -------

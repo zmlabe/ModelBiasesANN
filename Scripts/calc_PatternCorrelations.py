@@ -28,11 +28,11 @@ modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth','GFDL-CM3','GFDL-ESM2M
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
-monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
-variables = ['T2M','P','SLP']
+# monthlychoiceq = ['annual','JFM','AMJ','JAS','OND']
+# variables = ['T2M','P','SLP']
 monthlychoiceq = ['annual']
 variables = ['T2M']
-reg_name = 'SMILEGlobe'
+reg_name = 'Arctic'
 level = 'surface'
 timeper = 'historical'
 ###############################################################################
@@ -131,9 +131,12 @@ for vv in range(len(variables)):
             yearsall = np.arange(2020,2089+1,1)
             baseline = np.arange(2021,2050+1,1)
         
-        ### Add on additional "model" which is a multi-model mean
-        modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
-        modelsall = np.append(models,modelmean,axis=0)
+        # ### Add on additional "model" which is a multi-model mean
+        # modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
+        # modelsall = np.append(models,modelmean,axis=0)
+            
+        ### Do not include multi-model mean in this analysis
+        modelsall = models
         
         ### Meshgrid of lat/lon
         lon2,lat2 = np.meshgrid(lons,lats)

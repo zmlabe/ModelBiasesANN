@@ -119,9 +119,12 @@ for vv in range(1):
             yearsall = np.arange(2020,2089+1,1)
             baseline = np.arange(2021,2050+1,1)
         
-        ### Add on additional "model" which is a multi-model mean
-        modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
-        modelsall = np.append(models,modelmean,axis=0)
+        # ### Add on additional "model" which is a multi-model mean
+        # modelmean = np.nanmean(models,axis=0)[np.newaxis,:,:,:,:]
+        # modelsall = np.append(models,modelmean,axis=0)
+            
+        ### Do not include multi-model mean in this analysis
+        modelsall = models
         
 ###############################################################################        
 ###############################################################################                        

@@ -212,7 +212,7 @@ for vv in range(len(variables)):
         cbar1.set_label(label,fontsize=9,color='k',labelpad=1.4)  
         cbar1.set_ticks(barlim)
         cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.001,labelsize=4.5,pad=2)
+        cbar1.ax.tick_params(axis='x', size=.001,labelsize=7,pad=2)
         cbar1.outline.set_edgecolor('dimgrey')
         
         plt.tight_layout()
