@@ -30,16 +30,17 @@ variablesall = ['T2M']
 yearsall = np.arange(1950,2019+1,1)
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
+dataset_obs = 'ERA5BE'
 
 ### Read in confidence data
-conf_globe = np.load(directorydata + 'Confidence_%s.npy' % 'Arctic')
-label_globe = np.load(directorydata + 'Label_%s.npy' % 'Arctic')
-conf_arctic = np.load(directorydata + 'Confidence_%s_GLO.npy' % 'Arctic')
-label_arctic = np.load(directorydata + 'Label_%s_GLO.npy' % 'Arctic')
+conf_globe = np.load(directorydata + 'Confidence_%s_%s.npy' % ('Arctic',dataset_obs))
+label_globe = np.load(directorydata + 'Label_%s_%s.npy' % ('Arctic',dataset_obs))
+conf_arctic = np.load(directorydata + 'Confidence_%s_%s_GLO.npy' % ('Arctic',dataset_obs))
+label_arctic = np.load(directorydata + 'Label_%s_%s_GLO.npy' % ('Arctic',dataset_obs))
 
 ### Read in frequency data
-globef = np.load(directorydata + 'CountingIterations_%s.npz' % ('Arctic'))
-arcticf = np.load(directorydata + 'CountingIterations_%s_GLO.npz' % ('Arctic'))
+globef = np.load(directorydata + 'CountingIterations_%s_%s.npz' % ('Arctic',dataset_obs))
+arcticf = np.load(directorydata + 'CountingIterations_%s_%s_GLO.npz' % ('Arctic',dataset_obs))
 
 gmpi = globef['mpi'] 
 glens = globef['gfdl']
@@ -79,7 +80,7 @@ ax.spines['bottom'].set_linewidth(2)
 ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
 # ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.3)
 
-color = cmr.infinity(np.linspace(0.00,1,len(allDataLabels)))
+color = cmocean.cm.phase_r(np.linspace(0.00,1,len(allDataLabels)))
 for i,c in zip(range(len(allDataLabels)),color):
     if i == 6:
         c = 'k'
@@ -164,7 +165,7 @@ ax.spines['bottom'].set_linewidth(2)
 ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
 # ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.3)
 
-color = cmr.infinity(np.linspace(0.00,1,len(allDataLabels)))
+color = cmocean.cm.phase_r(np.linspace(0.00,1,len(allDataLabels)))
 for i,c in zip(range(len(allDataLabels)),color):
     if i == 6:
         c = 'k'

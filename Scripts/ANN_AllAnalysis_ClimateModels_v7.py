@@ -64,16 +64,13 @@ directoryoutput = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
 modelGCMs = ['CCCma_canesm2','MPI','CSIRO_MK3.6','KNMI_ecearth',
               'GFDL_CM3','GFDL_ESM2M','lens']
 datasetsingle = ['SMILE']
-dataset_obs = '20CRv3'
+dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
 reg_name = 'Arctic'
 timeper = 'historical'
 ###############################################################################
 ###############################################################################
-# pickSMILE = ['CCCma_canesm2','CSIRO_MK3.6','KNMI_ecearth',
-#               'GFDL_ESM2M','lens']
-# pickSMILE = ['CCCma_canesm2','MPI','lens']
 pickSMILE = []
 if len(pickSMILE) >= 1:
     lenOfPicks = len(pickSMILE)
@@ -355,24 +352,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
         if rm_ensemble_mean == True:
             directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
         
-        ### Split the data into training and testing sets? value of 1 will use all 
-        ### data as training
+        ### Split the data into training,testing,validation. 
+        ### Value of 1 will use all data as training
         segment_data_factor = .75
         
-        ### Hiddens corresponds to the number of hidden layers the nnet will use - 0 
-        ### for linear model, or a list [10, 20, 5] for multiple layers of nodes 
-        ### (10 nodes in first layer, 20 in second, etc); The "loop" part 
-        ### allows you to loop through multiple architectures. For example, 
-        ### hiddens_loop = [[2,4],[0],[1 1 1]] would produce three separate NNs, the 
-        ### first with 2 hidden layers of 2 and 4 nodes, the next the linear model,
-        ### and the next would be 3 hidden layers of 1 node each.
-        
-        ### Set useGPU to True to use the GPU, but only if you selected the GPU 
-        ### Runtime in the menu at the top of this page
-        useGPU = False
-        
-        ### Set Cascade to True to utilize the nnet's cascade function
-        cascade = False
         
         ### Plot within the training loop - may want to set to False when testing out 
         ### larget sets of parameters
@@ -428,7 +411,7 @@ for sis,singlesimulation in enumerate(datasetsingle):
                 print('Training on',segment_train,'ensembles, Testing on',segment_test,'ensembles, Validation on',segment_val,'ensembles')
                 print('--------------------------------------------------------------------')
         
-                ### Picking out random ensembles
+                ### Picking out random ensembles for training/testing/validation
                 i = 0
                 trainIndices = list()
                 while i < segment_train:
@@ -773,10 +756,10 @@ for sis,singlesimulation in enumerate(datasetsingle):
         ridge_penalty = [0.1]
         actFun = 'relu'
         
-        expList = [(0)] # (0,1)
+        expList = [(0)]
         expN = np.size(expList)
         
-        iterations = [500] 
+        iterations = [500] # There is early stopping
         random_segment = True
         foldsN = 1
         
@@ -904,9 +887,9 @@ for sis,singlesimulation in enumerate(datasetsingle):
                         
                         ################################################################################################################################################                
                         # save the model
-                        dirname = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
-                        savename = modelType+'_'+variq+'_kerasMultiClassBinaryOption4'+'_' + NNType + '_L2_'+ str(ridge_penalty[0])+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(iterations[0]) + '_' + str(hiddensList[0][0]) + 'x' + str(hiddensList[0][-1]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
-                        savenameModelTestTrain = modelType+'_'+variq+'_modelTrainTest_SegSeed'+str(random_segment_seed)+'_NetSeed'+str(random_network_seed)
+                        dirname = '/Users/zlabe/Documents/Research/ModelComparison/SavedModels/'
+                        savename = dataset_obs+'_'+variq+'_Classificationproblem'+'_' + NNType + '_L2_'+ str(ridge_penalty[0])+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(iterations[0]) + '_' + str(hiddensList[0][0]) + 'x' + str(hiddensList[0][-1]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
+                        savenameModelTestTrain = dataset_obs+'_'+variq+'_modelTrainTest_SegSeed'+str(random_segment_seed)+'_NetSeed'+str(random_network_seed)
         
                         if(reg_name=='Globe'):
                             regSave = ''
@@ -920,40 +903,45 @@ for sis,singlesimulation in enumerate(datasetsingle):
                             savename = savename + '_EnsembleMeanRemoved' 
                             savenameModelTestTrain = savenameModelTestTrain + '_EnsembleMeanRemoved'
         
-                        savename = savename + regSave    
+                        # savename = savename + regSave    
                         # model.save(dirname + savename + '.h5')
                         # np.savez(dirname + savenameModelTestTrain + '.npz',trainModels=trainIndices,testModels=testIndices,Xtrain=Xtrain,Ytrain=Ytrain,Xtest=Xtest,Ytest=Ytest,Xmean=Xmean,Xstd=Xstd,lats=lats,lons=lons)
-        
-                        print('saving ' + savename)
+                        # print('saving ' + savename)
                         
-                        ###############################################################
-                        ### Make final plot
-                        ### Get obs
+                        #######################################################
+                        #######################################################
+                        #######################################################                        
+                        ### Make final predictions
                         dataOBSERVATIONS = data_obs
                         latsOBSERVATIONS = lats_obs
                         lonsOBSERVATIONS = lons_obs
-        
                         Xobs = dataOBSERVATIONS.reshape(dataOBSERVATIONS.shape[0],dataOBSERVATIONS.shape[1]*dataOBSERVATIONS.shape[2])
         
-                        annType = 'class'
-                        if monthlychoice == 'DJF':
-                            startYear = yearsall[sis].min()+1
-                            endYear = yearsall[sis].max()
-                        else:
-                            startYear = yearsall[sis].min()
-                            endYear = yearsall[sis].max()
-                        years = np.arange(startYear,endYear+1,1)    
-                        Xmeanobs = np.nanmean(Xobs,axis=0)
+                        startYear = yearsall[sis].min()
+                        endYear = yearsall[sis].max()
+                        years = np.arange(startYear,endYear+1,1)   
                         
+                        ### Standardize obs
+                        Xmeanobs = np.nanmean(Xobs,axis=0)
                         XobsS = (Xobs-Xmean)/Xstd
                         XobsS[np.isnan(XobsS)] = 0
+                        
+                        ### Prepare training again
                         xtrainpred = (Xtrain-Xmean)/Xstd
                         xtrainpred[np.isnan(xtrainpred)] = 0
+                        
+                        ### Prepare testing again
                         xtestpred = (Xtest-Xmean)/Xstd
                         xtestpred[np.isnan(xtestpred)] = 0
+                        
+                        ### Prepare validation again
                         xvalpred = (Xval-Xmean)/Xstd
                         xvalpred[np.isnan(xvalpred)] = 0
                         
+                        ### This is an ANN using classification
+                        annType = 'class'
+                        
+                        ### Make final predictions
                         if(annType=='class'):
                             YpredObs = model.predict(XobsS)
                             YpredTrain = model.predict(xtrainpred)
@@ -974,8 +962,6 @@ for sis,singlesimulation in enumerate(datasetsingle):
         obsout = YpredObs
         labelsobs = np.argmax(obsout,axis=1)
         uniqueobs,countobs = np.unique(labelsobs,return_counts=True)
-        np.savetxt(directoryoutput + 'obsLabels_' + saveData + '.txt',labelsobs)
-        np.savetxt(directoryoutput + 'obsConfid_' + saveData + '.txt',obsout)
         
         def truelabel(data):
             """
@@ -1009,130 +995,228 @@ for sis,singlesimulation in enumerate(datasetsingle):
         print('Accuracy Testing == ',acctest)
         print('Accuracy Validation == ',accval)
         
-        ## Save the output for plotting
-        np.savetxt(directoryoutput + 'trainingEnsIndices_' + saveData + '.txt',trainIndices)
-        np.savetxt(directoryoutput + 'testingEnsIndices_' + saveData + '.txt',testIndices)
+        # ### Save predictions for observations
+        # np.savetxt(directoryoutput + 'obsLabels_' + saveData + '.txt',labelsobs)
+        # np.savetxt(directoryoutput + 'obsConfid_' + saveData + '.txt',obsout)
         
-        np.savetxt(directoryoutput + 'trainingTrueLabels_' + saveData + '.txt',classesltrain)
-        np.savetxt(directoryoutput + 'testingTrueLabels_' + saveData + '.txt',classesltest)
+        # ## Save the output for plotting
+        # np.savetxt(directoryoutput + 'trainingEnsIndices_' + saveData + '.txt',trainIndices)
+        # np.savetxt(directoryoutput + 'testingEnsIndices_' + saveData + '.txt',testIndices)
         
-        np.savetxt(directoryoutput + 'trainingPredictedLabels_' + saveData + '.txt',indextrain)
-        np.savetxt(directoryoutput + 'testingPredictedLabels_' + saveData + '.txt',indextest)
+        # np.savetxt(directoryoutput + 'trainingTrueLabels_' + saveData + '.txt',classesltrain)
+        # np.savetxt(directoryoutput + 'testingTrueLabels_' + saveData + '.txt',classesltest)
+        
+        # np.savetxt(directoryoutput + 'trainingPredictedLabels_' + saveData + '.txt',indextrain)
+        # np.savetxt(directoryoutput + 'testingPredictedLabels_' + saveData + '.txt',indextest)
     
-        ### See more more details
-        model.layers[0].get_config()
+        # ### See more more details
+        # model.layers[0].get_config()
         
-        ### Save training mean and std for normalization
-        np.savetxt(directoryoutput + 'TRAININGstandardmean_' + saveData + '.txt',Xmean)
-        np.savetxt(directoryoutput + 'TRAININGstandardstd_' + saveData + '.txt',Xstd)
+        # ### Save training mean and std for normalization
+        # np.savetxt(directoryoutput + 'TRAININGstandardmean_' + saveData + '.txt',Xmean)
+        # np.savetxt(directoryoutput + 'TRAININGstandardstd_' + saveData + '.txt',Xstd)
    
-        ## Define variable for analysis
-        print('\n\n------------------------')
-        print(variq,'= Variable!')
-        print(monthlychoice,'= Time!')
-        print(reg_name,'= Region!')
-        print(lat_bounds,lon_bounds)
-        print(dataset,'= Model!')
-        print(dataset_obs,'= Observations!\n')
-        print(rm_annual_mean,'= rm_annual_mean') 
-        print(rm_merid_mean,'= rm_merid_mean') 
-        print(rm_ensemble_mean,'= rm_ensemble_mean') 
-        print(land_only,'= land_only')
-        print(ocean_only,'= ocean_only')
+        # ## Define variable for analysis
+        # print('\n\n------------------------')
+        # print(variq,'= Variable!')
+        # print(monthlychoice,'= Time!')
+        # print(reg_name,'= Region!')
+        # print(lat_bounds,lon_bounds)
+        # print(dataset,'= Model!')
+        # print(dataset_obs,'= Observations!\n')
+        # print(rm_annual_mean,'= rm_annual_mean') 
+        # print(rm_merid_mean,'= rm_merid_mean') 
+        # print(rm_ensemble_mean,'= rm_ensemble_mean') 
+        # print(land_only,'= land_only')
+        # print(ocean_only,'= ocean_only')
         
-        ## Variables for plotting
-        lons2,lats2 = np.meshgrid(lons,lats) 
-        observations = data_obs
-        modeldata = data
-        modeldatamean = np.nanmean(modeldata,axis=1)
+        # ## Variables for plotting
+        # lons2,lats2 = np.meshgrid(lons,lats) 
+        # observations = data_obs
+        # modeldata = data
+        # modeldatamean = np.nanmean(modeldata,axis=1)
         
-        spatialmean_obs = UT.calc_weightedAve(observations,lats2)
-        spatialmean_mod = UT.calc_weightedAve(modeldata,lats2)
-        spatialmean_modmean = np.nanmean(spatialmean_mod,axis=1)
-        plt.figure()
-        plt.plot(spatialmean_modmean.transpose())
-        plt.plot(spatialmean_obs,color='k',linewidth=2)
+        # spatialmean_obs = UT.calc_weightedAve(observations,lats2)
+        # spatialmean_mod = UT.calc_weightedAve(modeldata,lats2)
+        # spatialmean_modmean = np.nanmean(spatialmean_mod,axis=1)
+        # plt.figure()
+        # plt.plot(spatialmean_modmean.transpose())
+        # plt.plot(spatialmean_obs,color='k',linewidth=2)
         
-        ##############################################################################
-        ##############################################################################
-        ##############################################################################
-        ## Visualizing through LRP
-        numLats = lats.shape[0]
-        numLons = lons.shape[0]  
-        numDim = 3
+        # ##############################################################################
+        # ##############################################################################
+        # ##############################################################################
+        # ## Visualizing through LRP
+        # numLats = lats.shape[0]
+        # numLons = lons.shape[0]  
+        # numDim = 3
 
-        ##############################################################################
-        ##############################################################################
-        ##############################################################################
+        # ##############################################################################
+        # ##############################################################################
+        # ##############################################################################
         
-        lrpall = LRP.calc_LRPModel(model,np.append(XtrainS,XtestS,axis=0),
-                                                np.append(Ytrain,Ytest,axis=0),
-                                                biasBool,annType,num_of_class,
-                                                yearsall,lrpRule,normLRP,
-                                                numLats,numLons,numDim)
-        meanlrp = np.nanmean(lrpall,axis=0)
-        fig=plt.figure()
-        plt.contourf(meanlrp,300,cmap=cmocean.cm.thermal)
+        # lrpall = LRP.calc_LRPModel(model,np.append(XtrainS,XtestS,axis=0),
+        #                                         np.append(Ytrain,Ytest,axis=0),
+        #                                         biasBool,annType,num_of_class,
+        #                                         yearsall,lrpRule,normLRP,
+        #                                         numLats,numLons,numDim)
+        # meanlrp = np.nanmean(lrpall,axis=0)
+        # fig=plt.figure()
+        # plt.contourf(meanlrp,300,cmap=cmocean.cm.thermal)
         
-        ### For training data only
-        lrptrain = LRP.calc_LRPModel(model,XtrainS,Ytrain,biasBool,
-                                                annType,num_of_class,
-                                                yearsall,lrpRule,normLRP,
-                                                numLats,numLons,numDim)
+        # ### For training data only
+        # lrptrain = LRP.calc_LRPModel(model,XtrainS,Ytrain,biasBool,
+        #                                         annType,num_of_class,
+        #                                         yearsall,lrpRule,normLRP,
+        #                                         numLats,numLons,numDim)
         
-        ### For training data only
-        lrptest = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
-                                                annType,num_of_class,
-                                                yearsall,lrpRule,normLRP,
-                                                numLats,numLons,numDim)
+        # ### For testing data only (z-rule)
+        # lrptest = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
+        #                                         annType,num_of_class,
+        #                                         yearsall,lrpRule,normLRP,
+        #                                         numLats,numLons,numDim)
+        # ### For testing data only (e-rule)
+        # lrpteste = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
+        #                                         annType,num_of_class,
+        #                                         yearsall,'epsilon',normLRP,
+        #                                         numLats,numLons,numDim)
+        # ### For testing data only (integrated gradients)
+        # lrptestig = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
+        #                                         annType,num_of_class,
+        #                                         yearsall,'integratedgradient',normLRP,
+        #                                         numLats,numLons,numDim)
         
         
-        ### For observations data only
-        lrpobservations = LRP.calc_LRPObs(model,XobsS,biasBool,annType,
-                                            num_of_class,yearsall,lrpRule,
-                                            normLRP,numLats,numLons,numDim)
+        # ### For observations data only
+        # lrpobservations = LRP.calc_LRPObs(model,XobsS,biasBool,annType,
+        #                                     num_of_class,yearsall,lrpRule,
+        #                                     normLRP,numLats,numLons,numDim)
       
-        ##############################################################################
-        ##############################################################################
-        ##############################################################################
-        def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
-            print('\n>>> Using netcdfLRP function!')
+        # ##############################################################################
+        # ##############################################################################
+        # ##############################################################################
+        # def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
+        #     print('\n>>> Using netcdfLRP function!')
             
-            from netCDF4 import Dataset
-            import numpy as np
+        #     from netCDF4 import Dataset
+        #     import numpy as np
             
-            name = 'LRPMap' + typemodel + '_' + saveData + '.nc'
-            filename = directory + name
-            ncfile = Dataset(filename,'w',format='NETCDF4')
-            ncfile.description = 'LRP maps for using selected seed' 
+        #     name = 'LRPMap' + typemodel + '_' + saveData + '.nc'
+        #     filename = directory + name
+        #     ncfile = Dataset(filename,'w',format='NETCDF4')
+        #     ncfile.description = 'LRP maps for using selected seed' 
             
-            ### Dimensions
-            ncfile.createDimension('years',var.shape[0])
-            ncfile.createDimension('lat',var.shape[1])
-            ncfile.createDimension('lon',var.shape[2])
+        #     ### Dimensions
+        #     ncfile.createDimension('years',var.shape[0])
+        #     ncfile.createDimension('lat',var.shape[1])
+        #     ncfile.createDimension('lon',var.shape[2])
             
-            ### Variables
-            years = ncfile.createVariable('years','f4',('years'))
-            latitude = ncfile.createVariable('lat','f4',('lat'))
-            longitude = ncfile.createVariable('lon','f4',('lon'))
-            varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
+        #     ### Variables
+        #     years = ncfile.createVariable('years','f4',('years'))
+        #     latitude = ncfile.createVariable('lat','f4',('lat'))
+        #     longitude = ncfile.createVariable('lon','f4',('lon'))
+        #     varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
             
-            ### Units
-            varns.units = 'unitless relevance'
-            ncfile.title = 'LRP relevance'
-            ncfile.instituion = 'Colorado State University'
-            ncfile.references = 'Barnes et al. [2020]'
+        #     ### Units
+        #     varns.units = 'unitless relevance'
+        #     ncfile.title = 'LRP relevance'
+        #     ncfile.instituion = 'Colorado State University'
+        #     ncfile.references = 'Barnes et al. [2020]'
             
-            ### Data
-            years[:] = np.arange(var.shape[0])
-            latitude[:] = lats
-            longitude[:] = lons
-            varns[:] = var
+        #     ### Data
+        #     years[:] = np.arange(var.shape[0])
+        #     latitude[:] = lats
+        #     longitude[:] = lons
+        #     varns[:] = var
             
-            ncfile.close()
-            print('*Completed: Created netCDF4 File!')
+        #     ncfile.close()
+        #     print('*Completed: Created netCDF4 File!')
         
-        netcdfLRP(lats,lons,lrpall,directoryoutput,'AllData',saveData)
-        netcdfLRP(lats,lons,lrptrain,directoryoutput,'Training',saveData)
-        netcdfLRP(lats,lons,lrptest,directoryoutput,'Testing',saveData)
-        netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
+        # netcdfLRP(lats,lons,lrpall,directoryoutput,'AllData',saveData)
+        # netcdfLRP(lats,lons,lrptrain,directoryoutput,'Training',saveData)
+        # netcdfLRP(lats,lons,lrptest,directoryoutput,'Testing',saveData)
+        # netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
+        
+        # ##############################################################################
+        # ##############################################################################
+        # ##############################################################################
+        # def netcdfLRPe(lats,lons,var,directory,typemodel,saveData):
+        #     print('\n>>> Using netcdfLRP-e-rule function!')
+            
+        #     from netCDF4 import Dataset
+        #     import numpy as np
+            
+        #     name = 'LRPMap_E' + typemodel + '_' + saveData + '.nc'
+        #     filename = directory + name
+        #     ncfile = Dataset(filename,'w',format='NETCDF4')
+        #     ncfile.description = 'LRP maps for using selected seed' 
+            
+        #     ### Dimensions
+        #     ncfile.createDimension('years',var.shape[0])
+        #     ncfile.createDimension('lat',var.shape[1])
+        #     ncfile.createDimension('lon',var.shape[2])
+            
+        #     ### Variables
+        #     years = ncfile.createVariable('years','f4',('years'))
+        #     latitude = ncfile.createVariable('lat','f4',('lat'))
+        #     longitude = ncfile.createVariable('lon','f4',('lon'))
+        #     varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
+            
+        #     ### Units
+        #     varns.units = 'unitless relevance'
+        #     ncfile.title = 'LRP relevance'
+        #     ncfile.instituion = 'Colorado State University'
+        #     ncfile.references = 'Barnes et al. [2020]'
+            
+        #     ### Data
+        #     years[:] = np.arange(var.shape[0])
+        #     latitude[:] = lats
+        #     longitude[:] = lons
+        #     varns[:] = var
+            
+        #     ncfile.close()
+        #     print('*Completed: Created netCDF4 File!')
+            
+        # netcdfLRPe(lats,lons,lrpteste,directoryoutput,'Testing',saveData)
+        
+        # ##############################################################################
+        # ##############################################################################
+        # ##############################################################################
+        # def netcdfLRPig(lats,lons,var,directory,typemodel,saveData):
+        #     print('\n>>> Using netcdfLRP-integratedgradients function!')
+            
+        #     from netCDF4 import Dataset
+        #     import numpy as np
+            
+        #     name = 'LRPMap_IG' + typemodel + '_' + saveData + '.nc'
+        #     filename = directory + name
+        #     ncfile = Dataset(filename,'w',format='NETCDF4')
+        #     ncfile.description = 'LRP maps for using selected seed' 
+            
+        #     ### Dimensions
+        #     ncfile.createDimension('years',var.shape[0])
+        #     ncfile.createDimension('lat',var.shape[1])
+        #     ncfile.createDimension('lon',var.shape[2])
+            
+        #     ### Variables
+        #     years = ncfile.createVariable('years','f4',('years'))
+        #     latitude = ncfile.createVariable('lat','f4',('lat'))
+        #     longitude = ncfile.createVariable('lon','f4',('lon'))
+        #     varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
+            
+        #     ### Units
+        #     varns.units = 'unitless relevance'
+        #     ncfile.title = 'LRP relevance'
+        #     ncfile.instituion = 'Colorado State University'
+        #     ncfile.references = 'Barnes et al. [2020]'
+            
+        #     ### Data
+        #     years[:] = np.arange(var.shape[0])
+        #     latitude[:] = lats
+        #     longitude[:] = lons
+        #     varns[:] = var
+            
+        #     ncfile.close()
+        #     print('*Completed: Created netCDF4 File!')
+            
+        # netcdfLRPig(lats,lons,lrptestig,directoryoutput,'Testing',saveData)

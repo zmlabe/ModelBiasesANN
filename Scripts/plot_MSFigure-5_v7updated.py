@@ -27,7 +27,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
 directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
 variablesall = 'T2M'
-dataset_obs = 'ERA5BE'
+dataset_obs = '20CRv3'
 scaleLRPmax = True
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
@@ -38,35 +38,33 @@ letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
 ### Read in data
 lat1 = np.load(directorydata + 'Lat_ArcticALL.npy',allow_pickle=True)
 lon1 = np.load(directorydata + 'Lon_ArcticALL.npy',allow_pickle=True)
-lat1g = np.load(directorydata + 'Lat_SMILEGlobe.npy',allow_pickle=True)
-lon1g = np.load(directorydata + 'Lon_SMILEGlobe.npy',allow_pickle=True)
-rawdata = np.load(directorydata + 'MMMeandifferences_7models.npy',allow_pickle=True)
-lrp = np.load(directorydata + 'LRPcomposites_ArcticALL_7classes_%s.npy' % dataset_obs,allow_pickle=True)
+lrp = np.load(directorydata + 'LRPobs_ArcticALL_7classes_%s.npy' % dataset_obs,allow_pickle=True)
+rawdata = np.load(directorydata + 'LRPobs_OBSCALED_ArcticALL_7classes_%s.npy' % dataset_obs,allow_pickle=True)
+obs_test = np.load(directorydata + 'Labels_LRPObs_%s.npy' % dataset_obs,allow_pickle=True)
 
 ### Prepare data for plotting
 alldata = list(itertools.chain(*[lrp,rawdata]))
-# alldata = [lrp,rawdata]
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ### Plot subplot of LRP means training
-limit = np.arange(0,0.80001,0.005)
-barlim = np.round(np.arange(0,0.801,0.8),2)
+limit = np.arange(0,0.30001,0.005)
+barlim = np.round(np.arange(0,0.301,0.3),2)
 cmap = cm.cubehelix2_16.mpl_colormap
 label = r'\textbf{RELEVANCE}'
 
-limitr = np.arange(-8,8.01,0.2)
-barlimr = np.round(np.arange(-8,9,8),2)
+limitr = np.arange(-2,2.01,0.01)
+barlimr = np.round(np.arange(-2,3,2),2)
 cmapr = cmocean.cm.balance
-labelr = r'\textbf{$^{\circ}$C}'
+labelr = r'\textbf{T2M-Scaled [$^{\circ}$C]}'
 
 fig = plt.figure(figsize=(10,3))
 for r in range(lrp.shape[0]*2):
     if r < 7:
         var = alldata[r]
         
-        if scaleLRPmax == True:
+        if (scaleLRPmax == True) & (len(obs_test[r]) > 1):
             var = var/np.nanmax(var)
         else:
             var = var
@@ -94,19 +92,21 @@ for r in range(lrp.shape[0]*2):
         ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
                       textcoords='axes fraction',color='k',fontsize=6,
                       rotation=330,ha='center',va='center')
+        ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
+                      textcoords='axes fraction',color=cmap(0.4),fontsize=6,
+                      rotation=0,ha='center',va='center')
+            
     elif r >= 7:
         var = alldata[r]
         
         ax1 = plt.subplot(2,rawdata.shape[0],r+1)
         m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
                     resolution='l',round =True,area_thresh=10000)
-        m.drawcoastlines(color='dimgrey',linewidth=0.24)
-        if r == 12: 
-            m.drawcoastlines(color='darkgrey',linewidth=0.24,zorder=20)
+        m.drawcoastlines(color='darkgrey',linewidth=0.24,zorder=20)
             
-        var, lons_cyclic = addcyclic(var, lon1g)
+        var, lons_cyclic = addcyclic(var, lon1)
         var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-        lon2d, lat2d = np.meshgrid(lons_cyclic, lat1g)
+        lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
         x, y = m(lon2d, lat2d)
            
         circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
@@ -120,6 +120,9 @@ for r in range(lrp.shape[0]*2):
         ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
                       textcoords='axes fraction',color='k',fontsize=6,
                       rotation=330,ha='center',va='center')
+        ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r-7]),xy=(0,0),xytext=(0.09,0.97),
+                      textcoords='axes fraction',color=cmapr(0.4),fontsize=6,
+                      rotation=0,ha='center',va='center')
     
     if r == 5:
         cbar_ax = fig.add_axes([0.91,0.63,0.011,0.14])                
@@ -152,6 +155,6 @@ for r in range(lrp.shape[0]*2):
 # plt.tight_layout()
 plt.subplots_adjust(wspace=0.01,hspace=0)
 if scaleLRPmax == True:
-    plt.savefig(directoryfigure + 'MSFigure-2_v7_scaleLRP.png',dpi=1000)
+    plt.savefig(directoryfigure + 'MSFigure-5updated_v7_scaleLRP_20CRv3.png',dpi=1000)
 else:
-    plt.savefig(directoryfigure + 'MSFigure-2_v7.png',dpi=1000)
+    plt.savefig(directoryfigure + 'MSFigure-5updated_v7.png_20CRv3',dpi=1000)

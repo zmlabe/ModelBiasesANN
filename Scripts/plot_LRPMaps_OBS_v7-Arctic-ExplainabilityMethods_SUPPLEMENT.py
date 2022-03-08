@@ -1,43 +1,44 @@
 """
-Script for plotting softmax confidence after testing on observations for
-regional masks for looping iterations
+Plot comparison of different explainability methods for the climate model 
+results of the ANN
 
 Author     : Zachary M. Labe
-Date       : 16 December 2021
+Date       : 7 March 2022
 Version    : 7 - adds validation data for early stopping
 """
 
 ### Import packages
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+from netCDF4 import Dataset
+from mpl_toolkits.basemap import Basemap, addcyclic, shiftgrid
 import palettable.cubehelix as cm
-import palettable.scientific.sequential as sss
 import palettable.cartocolors.qualitative as cc
-import cmocean as cmocean
-import cmasher as cmr
-import calc_Utilities as UT
 import scipy.stats as sts
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
+variablesall = ['T2M','P','SLP']
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-obsoutall = []
-regions = ['Arctic']
-regionnames = ['GLOBE','N. HEMISPHERE','S. HEMISPHERE','TROPICS','ARCTIC','SOUTHERN OCEAN']
+fileLRP = ['LRPMap','LRPMap_E','LRPMap_IG']
+fileLRPnames = [r'\textbf{LRP$_{z}$ Rule}',r'\textbf{LRP$_{\epsilon}$ Rule}',r'\textbf{Integrated Gradients}']
+allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS']
+AA = 'none'
+lrptestalltypes = []
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
-        for rr in range(len(regions)):
+        for lr in range(len(fileLRP)):
             ###############################################################################
             ###############################################################################
             ###############################################################################
             ### Data preliminaries 
-            directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/Loop/'
+            directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/'
             directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
-            letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
+            letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v"]
             ###############################################################################
             ###############################################################################
             modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth',
@@ -46,14 +47,13 @@ for va in range(len(variablesall)):
             dataset_obs = 'ERA5BE'
             seasons = ['annual']
             variq = variablesall[va]
-            reg_name = regions[rr]
+            reg_name = 'Arctic'
             timeper = 'historical'
-            SAMPLEQ = 100
             ###############################################################################
             ###############################################################################
             pickSMILE = pickSMILEall[m]
             if len(pickSMILE) >= 1:
-                lenOfPicks = len(pickSMILE)
+                lenOfPicks = len(pickSMILE) 
             else:
                 lenOfPicks = len(modelGCMs)
             ###############################################################################
@@ -63,7 +63,7 @@ for va in range(len(variablesall)):
             ###############################################################################
             ###############################################################################
             rm_merid_mean = False
-            rm_annual_mean = True
+            rm_annual_mean = False
             ###############################################################################
             ###############################################################################
             rm_ensemble_mean = False
@@ -81,8 +81,6 @@ for va in range(len(variablesall)):
             # shuffletype = 'ALLENSRAND'
             # shuffletype = 'ALLENSRANDrmmean'
             shuffletype = 'RANDGAUSS'
-            # integer = 5 # random noise value to add/subtract from each grid point
-            sizeOfTwin = 0 # number of classes to add to other models
             ###############################################################################
             ###############################################################################
             if ensTypeExperi == 'ENS':
@@ -207,19 +205,18 @@ for va in range(len(variablesall)):
                                 if rm_annual_mean == False:
                                     typeOfAnalysis = 'Experiment-9'
                                     
-            print('\n<<<<<<<<<<<< Analysis == %s (%s) ! >>>>>>>>>>>>>>>' % (typeOfAnalysis,timeper))
+            print('\n<<<<<<<<<<<< Analysis == %s (%s) ! >>>>>>>>>>>>>>>\n' % (typeOfAnalysis,timeper))
             if typeOfAnalysis == 'issueWithExperiment':
                 sys.exit('Wrong parameters selected to analyze')
-              
+                
             ### Select how to save files
             if land_only == True:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = timeper + '_' + seasons[0] + '_LAND' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             elif ocean_only == True:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = timeper + '_' + seasons[0] + '_OCEAN' + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             else:
-                saveData = str(SAMPLEQ) + '_' + timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
+                saveData = timeper + '_' + seasons[0] + '_NoiseTwinSingleMODDIF4_' + typeOfAnalysis + '_' + variq + '_' + reg_name + '_' + dataset_obs + '_' + 'NumOfSMILE-' + str(num_of_class) + '_Method-' + ensTypeExperi
             print('*Filename == < %s >' % saveData) 
-            
             ###############################################################################
             ###############################################################################
             ###############################################################################
@@ -240,146 +237,150 @@ for va in range(len(variablesall)):
             ###############################################################################
             ###############################################################################       
             ### Read in data
-                    
+            def readData(fileLRP,directory,typemodel,saveData):
+                """
+                Read in LRP maps
+                """
+                
+                name = fileLRP + typemodel + '_' + saveData + '.nc'
+                filename = directory + name
+                data = Dataset(filename)
+                lat = data.variables['lat'][:]
+                lon = data.variables['lon'][:]
+                lrp = data.variables['LRP'][:]
+                data.close()
+                
+                return lrp,lat,lon
+            
+            ### Read in training and testing predictions and labels
+            classesltest = np.int_(np.genfromtxt(directorydata + 'testingTrueLabels_' + saveData + '.txt'))
+            predtest = np.int_(np.genfromtxt(directorydata + 'testingPredictedLabels_' + saveData + '.txt'))
+            
+            ### Count testing data
+            uniquetest,counttest = np.unique(predtest,return_counts=True)
+            
             ### Read in observational data
-            obsout= np.load(directorydata + 'obsout_' + saveData + '.npz')['arr_0'][:]
-            obsoutall.append(obsout)
+            obspred = np.int_(np.genfromtxt(directorydata + 'obsLabels_' + saveData + '.txt'))
+            uniqueobs,countobs = np.unique(obspred,return_counts=True)
+            percPickObs = np.nanmax(countobs)/len(obspred)*100.
+            modelPickObs = modelGCMsNames[uniqueobs[np.argmax(countobs)]]
             
-###############################################################################
-###############################################################################
-###############################################################################
-### See all regional data
-conf = np.asarray(obsoutall).squeeze()
-GFDLmodel = np.nanmean(conf[:,:,4],axis=1)
-        
-### Counting number of mmean and gfdl
-maxconf = np.argmax(conf,axis=2)
-countinggfdl = np.empty((maxconf.shape[1]))
-countinglens = np.empty((maxconf.shape[1]))
-countingmpi = np.empty((maxconf.shape[1]))
-for j in range(maxconf.shape[1]):
-    countinggfdl[j] = np.count_nonzero(maxconf[:,j] == 4)
-    countinglens[j] = np.count_nonzero(maxconf[:,j] == len(modelGCMs)-1)
-    countingmpi[j] = np.count_nonzero(maxconf[:,j] == 1)
-        
-directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
-if typeOfAnalysis == 'Experiment-3':
-    # np.savez(directorydataMS + 'CountingIterations_%s_%s.npz' % ('SMILEGlobe',dataset_obs),mpi=countingmpi[0,:],lens=countinglens[0,:])
-    np.savez(directorydataMS + 'CountingIterations_%s_%s.npz' % ('Arctic',dataset_obs),gfdl=countinggfdl[:],mpi=countingmpi[:])
-elif typeOfAnalysis == 'Experiment-4':
-    # np.savez(directorydataMS + 'CountingIterations_%s_%s_GLO.npz' % ('SMILEGlobe',dataset_obs),mpi=countingmpi[0,:],lens=countinglens[0,:])
-    np.savez(directorydataMS + 'CountingIterations_%s_%s_GLO.npz' % ('Arctic',dataset_obs),gfdl=countinggfdl[:],mpi=countingmpi[:])
-sys.exit()   
-###############################################################################
-###############################################################################
-###############################################################################
-def adjust_spines(ax, spines):
-    for loc, spine in ax.spines.items():
-        if loc in spines:
-            spine.set_position(('outward', 5))
-        else:
-            spine.set_color('none')  
-    if 'left' in spines:
-        ax.yaxis.set_ticks_position('left')
-    else:
-        ax.yaxis.set_ticks([])
-
-    if 'bottom' in spines:
-        ax.xaxis.set_ticks_position('bottom')
-    else:
-            ax.xaxis.set_ticks([]) 
+            ### Read in LRP maps
+            lrptestdata,lat1,lon1 = readData(fileLRP[lr],directorydata,'Testing',saveData)
             
-### Begin plot
-fig = plt.figure(figsize=(8,5))
-color=cc.Antique_6.mpl_colormap(np.linspace(0,1,len(regions)))
-for r,c in zip(range(len(regions)),color):
-    ax = plt.subplot(2,3,r+1)
-
-    adjust_spines(ax, ['left', 'bottom'])
-    ax.spines['top'].set_color('none')
-    ax.spines['right'].set_color('none')
-    ax.spines['left'].set_color('dimgrey')
-    ax.spines['bottom'].set_color('dimgrey')
-    ax.spines['left'].set_linewidth(2)
-    ax.spines['bottom'].set_linewidth(2)
-    ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-    ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
-    
-    x=np.arange(1950,2019+1,1)
-    plt.plot(yearsall,MEANmodel[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MMean}')
-    plt.plot(yearsall,GFDLmodel[r,:],linewidth=1,color=color[2],alpha=1,zorder=3,clip_on=False,label=r'\textbf{GFDL-CM3}')
-    
-    plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
-    if any([r==0,r==3]):
-        plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
-    else:
-        plt.yticks(np.arange(0,1.01,0.1),map(str,np.round(np.arange(0,1.01,0.1),2)),size=3)
-        # ax.set_yticklabels([])
-    
-    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5)
-    plt.xlim([1950,2020])   
-    plt.ylim([0,1.0])  
-    
-    if r == 0:
-        plt.text(1923,-0.5,r'\textbf{Average Confidence}',color='k',
-             fontsize=11,ha='left',rotation=90)       
-    plt.text(1950,0.01,r'\textbf{%s}' % regionnames[r],color='dimgrey',
-         fontsize=8,ha='left')  
-    
-    if r == 1:
-        leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
-                      bbox_to_anchor=(0.5,1.2),fancybox=True,ncol=4,frameon=False,
-                      handlelength=5,handletextpad=1)
-        
-# plt.tight_layout()
-# plt.subplots_adjust(bottom=0.15)
-plt.savefig(directoryfigure + '%s/Regions/Confidence/RegionsModelComparisonConfidence_%s.png' % (typeOfAnalysis),dpi=300)
+            ### Meshgrid
+            lon2,lat2 = np.meshgrid(lon1,lat1)
+            
+            ###############################################################################
+            ###############################################################################
+            ############################################################################### 
+            ### Find which model
+            print('\nPrinting *length* of predicted labels for testing!')
+                
+            model_test = []
+            for i in range(lenOfPicks):
+                modelloc = np.where((predtest == int(i)))[0]
+                print(len(modelloc))
+                model_test.append(modelloc)
+            
+            if AA == True:
+                lrptest = []
+                for i in range(lenOfPicks):
+                    lrpmodel = lrptestdata[model_test[i]]
+                    lrpmodelmeanslice = lrpmodel.reshape(lrpmodel.shape[0]//yearsall.shape[0],yearsall.shape[0],lrpmodel.shape[1],lrpmodel.shape[2])
+                    lrpmodelmean1 = np.nanmean(lrpmodelmeanslice[:,-15:,:,:],axis=0)
+                    lrpmodelmean = np.nanmean(lrpmodelmean1,axis=0)
+                    lrptest.append(lrpmodelmean)
+                lrptest = np.asarray(lrptest,dtype=object)
+            elif AA == False:
+                lrptest = []
+                for i in range(lenOfPicks):
+                    lrpmodel = lrptestdata[model_test[i]]
+                    lrpmodelmeanslice = lrpmodel.reshape(lrpmodel.shape[0]//yearsall.shape[0],yearsall.shape[0],lrpmodel.shape[1],lrpmodel.shape[2])
+                    lrpmodelmean1 = np.nanmean(lrpmodelmeanslice[:,:-15,:,:],axis=0)
+                    lrpmodelmean = np.nanmean(lrpmodelmean1,axis=0)
+                    lrptest.append(lrpmodelmean)
+                lrptest = np.asarray(lrptest,dtype=object)
+            elif AA == 'none':
+                lrptest = []
+                for i in range(lenOfPicks):
+                    lrpmodel = lrptestdata[model_test[i]]
+                    lrpmodelmean = np.nanmean(lrpmodel,axis=0)
+                    lrptest.append(lrpmodelmean)
+                lrptest = np.asarray(lrptest,dtype=object)          
+                
+            lrptestalltypes.append(lrptest)
+            
+### Look at comparison of all LRP methods
+lrptestalltypes = np.asarray(lrptestalltypes)
+plotlrp = lrptestalltypes.reshape(lrptestalltypes.shape[0]*lrptestalltypes.shape[1],
+                                              lrptestalltypes.shape[2],lrptestalltypes.shape[3])
 
 ###############################################################################
 ###############################################################################
-###############################################################################          
-### Begin plot
-fig = plt.figure(figsize=(8,5))
-color=cc.Antique_6.mpl_colormap(np.linspace(0,1,len(regions)))
-for r,c in zip(range(len(regions)),color):
-    ax = plt.subplot(2,3,r+1)
+###############################################################################
+### Plot subplot of LRP means training
+limit = np.arange(0,0.60001,0.005)
+barlim = np.round(np.arange(0,0.601,0.6),2)
+cmap = cm.cubehelix2_16.mpl_colormap
+label = r'\textbf{RELEVANCE}'
 
-    adjust_spines(ax, ['left', 'bottom'])
-    ax.spines['top'].set_color('none')
-    ax.spines['right'].set_color('none')
-    ax.spines['left'].set_color('dimgrey')
-    ax.spines['bottom'].set_color('dimgrey')
-    ax.spines['left'].set_linewidth(2)
-    ax.spines['bottom'].set_linewidth(2)
-    ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-    ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
+fig = plt.figure(figsize=(10,4))
+for r in range(plotlrp.shape[0]):
     
-    x=np.arange(1950,2019+1,1)
-    plt.plot(yearsall,countingmean[r,:],linewidth=1.5,color='k',alpha=1,zorder=3,clip_on=False,label=r'\textbf{MMean}')
-    plt.plot(yearsall,countinggfdl[r,:],linewidth=1,color=color[2],alpha=1,zorder=3,clip_on=False,label=r'\textbf{GFDL-CM3}')
+    var = plotlrp[r]
     
-    plt.xticks(np.arange(1950,2030+1,20),map(str,np.arange(1950,2030+1,20)),size=5)
-    if any([r==0,r==3]):
-        plt.yticks(np.arange(0,101,10),map(str,np.round(np.arange(0,101,10),2)),size=3)
-    else:
-        plt.yticks(np.arange(0,101,10),map(str,np.round(np.arange(0,101,10),2)),size=3)
-        # ax.set_yticklabels([])
-    
-    plt.xticks(np.arange(1950,2030+1,10),map(str,np.arange(1950,2030+1,10)),size=5)
-    plt.xlim([1950,2020])   
-    plt.ylim([0,100])  
-    
-    if r == 1:
-        leg = plt.legend(shadow=False,fontsize=9,loc='upper center',
-                      bbox_to_anchor=(0.5,1.2),fancybox=True,ncol=4,frameon=False,
-                      handlelength=5,handletextpad=1)
-    
-    if r == 0:
-        plt.text(1923,-50,r'\textbf{Frequency of Label}',color='k',
-             fontsize=11,ha='left',rotation=90)       
-    plt.text(1950,0.01,r'\textbf{%s}' % regionnames[r],color='dimgrey',
-         fontsize=8,ha='left')  
+    ax1 = plt.subplot(3,7,r+1)
+    m = Basemap(projection='npstere',boundinglat=67.3,lon_0=0,
+                resolution='l',round =True,area_thresh=10000)
+    m.drawcoastlines(color='darkgrey',linewidth=0.3)
         
-# plt.tight_layout()
-# plt.subplots_adjust(bottom=0.15)
-plt.savefig(directoryfigure + '%s/Regions/Confidence/RegionsModelComparisonConfidence_%s.png' % (typeOfAnalysis),dpi=300)
+    var, lons_cyclic = addcyclic(var, lon1)
+    var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+    lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
+    x, y = m(lon2d, lat2d)
+       
+    circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+                      linewidth=0.7)
+    circle.set_clip_on(False)
+    
+    cs1 = m.contourf(x,y,var,limit,extend='max')
+    cs1.set_cmap(cmap) 
+         
+    if r < 7:
+        ax1.annotate(r'\textbf{%s}' % allDataLabels[r],xy=(0,0),xytext=(0.5,1.13),
+                      textcoords='axes fraction',color='dimgrey',fontsize=8,
+                      rotation=0,ha='center',va='center')
+    ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+                  textcoords='axes fraction',color='k',fontsize=6,
+                  rotation=330,ha='center',va='center')
+    
+
+    ### Make colorbar
+    cbar_ax = fig.add_axes([0.91,0.35,0.011,0.3])                
+    cbar = fig.colorbar(cs1,cax=cbar_ax,orientation='vertical',
+                        extend='max',extendfrac=0.07,drawedges=False)    
+    cbar.set_label(label,fontsize=7,color='k',labelpad=6.5)      
+    cbar.set_ticks(barlim)
+    cbar.set_ticklabels(list(map(str,barlim)))
+    cbar.ax.tick_params(labelsize=4,pad=7) 
+    ticklabs = cbar.ax.get_yticklabels()
+    cbar.ax.set_yticklabels(ticklabs,ha='center')
+    cbar.ax.tick_params(axis='y', size=.001)
+    cbar.outline.set_edgecolor('dimgrey')
+    cbar.outline.set_linewidth(0.5)
+        
+ax1.annotate(fileLRPnames[2],xy=(0,0),xytext=(-6.9,0.5),
+              textcoords='axes fraction',color='k',fontsize=8,
+              rotation=90,ha='center',va='center')    
+ax1.annotate(fileLRPnames[1],xy=(0,0),xytext=(-6.9,1.53),
+              textcoords='axes fraction',color='k',fontsize=8,
+              rotation=90,ha='center',va='center')
+ax1.annotate(fileLRPnames[0],xy=(0,0),xytext=(-6.9,2.54),
+              textcoords='axes fraction',color='k',fontsize=8,
+              rotation=90,ha='center',va='center')
+
+plt.tight_layout()
+plt.subplots_adjust(hspace=0.01,wspace=0.02)
+plt.savefig(directoryfigure + 'ExplainabilityMethods_SUPPLEMENT.png',dpi=900)
+        

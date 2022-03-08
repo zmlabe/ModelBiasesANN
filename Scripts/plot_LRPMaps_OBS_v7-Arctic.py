@@ -63,7 +63,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = False
+        rm_annual_mean = True
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -380,14 +380,30 @@ for va in range(len(variablesall)):
         dataanomsobstestz = np.asarray(dataanomsobstestz,dtype=object)
 
         ### Composite actual observations based on predicted obs (z)
-        dataanomsobstestz_training = []
+        dataanomsobstestz_testing = []
         for i in range(lenOfPicks):
-            dataanomsqz_training = datastd_training[obs_test[i]]
-            dataanomsmeanz_training = np.nanmean(dataanomsqz_training,axis=0)
-            if type(dataanomsmeanz_training) == float:
-                dataanomsmeanz_training = np.full((lat1.shape[0],lon1.shape[0]),np.nan)
-            dataanomsobstestz_training.append(dataanomsmeanz_training)
-        dataanomsobstestz_training = np.asarray(dataanomsobstestz_training,dtype=object)
+            dataanomsqz_testing = datastd_training[obs_test[i]]
+            dataanomsmeanz_testing = np.nanmean(dataanomsqz_testing,axis=0)
+            if type(dataanomsmeanz_testing) == float:
+                dataanomsmeanz_testing= np.full((lat1.shape[0],lon1.shape[0]),np.nan)
+            dataanomsobstestz_testing.append(dataanomsmeanz_testing)
+        dataanomsobstestz_testing = np.asarray(dataanomsobstestz_testing,dtype=object)
+        
+        ### Save files
+        if typeOfAnalysis == 'Experiment-3':
+            directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
+            np.save(directorydataMS + 'LRPobs_ArcticALL_7classes_%s.npy' % dataset_obs,lrpobs)
+            np.save(directorydataMS + 'LRPobs_OBSCALED_ArcticALL_7classes_%s.npy' % dataset_obs,dataanomsobstestz_testing)
+            np.save(directorydataMS + 'Lat_ArcticALL.npy',np.asarray(lat1))
+            np.save(directorydataMS + 'Lon_ArcticALL.npy',np.asarray(lon1))
+            np.save(directorydataMS + 'Labels_LRPObs_%s.npy' % dataset_obs,obs_test)
+        elif typeOfAnalysis == 'Experiment-4':
+            directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
+            np.save(directorydataMS + 'LRPobs_ArcticALL_7classes_GLO_%s.npy' % dataset_obs,lrpobs)
+            np.save(directorydataMS + 'LRPobs_OBSCALED_7classes_GLO_%s.npy' % dataset_obs,dataanomsobstestz_testing)
+            np.save(directorydataMS + 'Lat_ArcticALL.npy',np.asarray(lat1))
+            np.save(directorydataMS + 'Lon_ArcticALL.npy',np.asarray(lon1))
+            np.save(directorydataMS + 'Labels_LRPObs_%s_GLO.npy' % dataset_obs,obs_test)
 
         ###############################################################################
         ###############################################################################
@@ -883,7 +899,7 @@ for va in range(len(variablesall)):
         
         fig = plt.figure(figsize=(10,2))
         for r in range(lenOfPicks):
-            var = dataanomsobstestz_training[r]
+            var = dataanomsobstestz_testing[r]
             
             ax1 = plt.subplot(1,lenOfPicks,r+1)
             if reg_name == 'Arctic':

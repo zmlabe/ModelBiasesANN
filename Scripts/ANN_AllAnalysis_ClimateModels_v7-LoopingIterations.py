@@ -67,7 +67,7 @@ datasetsingle = ['SMILE']
 dataset_obs = 'ERA5BE'
 seasons = ['annual']
 variq = 'T2M'
-reg_name = 'SMILEGlobe'
+reg_name = 'Arctic'
 timeper = 'historical'
 SAMPLEQ = 100
 ###############################################################################
@@ -357,30 +357,15 @@ for sis,singlesimulation in enumerate(datasetsingle):
             
             ### Remove the annual mean? True to subtract it from dataset ##########
             if rm_annual_mean == True:
-                directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
+                directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
             
             ### Rove the ensemble mean? True to subtract it from dataset ##########
             if rm_ensemble_mean == True:
-                directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/'
+                directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
             
             ### Split the data into training and testing sets? value of 1 will use all 
             ### data as training
             segment_data_factor = .75
-            
-            ### Hiddens corresponds to the number of hidden layers the nnet will use - 0 
-            ### for linear model, or a list [10, 20, 5] for multiple layers of nodes 
-            ### (10 nodes in first layer, 20 in second, etc); The "loop" part 
-            ### allows you to loop through multiple architectures. For example, 
-            ### hiddens_loop = [[2,4],[0],[1 1 1]] would produce three separate NNs, the 
-            ### first with 2 hidden layers of 2 and 4 nodes, the next the linear model,
-            ### and the next would be 3 hidden layers of 1 node each.
-            
-            ### Set useGPU to True to use the GPU, but only if you selected the GPU 
-            ### Runtime in the menu at the top of this page
-            useGPU = False
-            
-            ### Set Cascade to True to utilize the nnet's cascade function
-            cascade = False
             
             ### Plot within the training loop - may want to set to False when testing out 
             ### larget sets of parameters

@@ -27,7 +27,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 variablesall = ['T2M','P','SLP']
 variablesall = ['T2M']
 pickSMILEall = [[]] 
-THRESH = 0.1
+THRESH = 1/7
 for va in range(len(variablesall)):
     for m in range(len(pickSMILEall)):
         ###############################################################################
@@ -79,7 +79,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = True
+        rm_annual_mean = False
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -270,8 +270,8 @@ for va in range(len(variablesall)):
         rank = np.transpose(rank)
         directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
         if typeOfAnalysis == 'Experiment-3':
-            np.save(directorydataMS + 'Ranks_thresh-%s_%s.npy' % (THRESH,reg_name),rank)
+            np.save(directorydataMS + 'Ranks_thresh-%s_%s_%s.npy' % (THRESH,reg_name,dataset_obs),rank)
         elif typeOfAnalysis == 'Experiment-4':
-            np.save(directorydataMS + 'Ranks_thresh-%s_%s_GLO.npy' % (THRESH,reg_name),rank)
+            np.save(directorydataMS + 'Ranks_thresh-%s_%s_%s_GLO.npy' % (THRESH,reg_name,dataset_obs),rank)
         
         

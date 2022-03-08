@@ -49,6 +49,11 @@ def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule
                                                                                         bias=biasBool)
         print('LRP RULE === Epsilon !!!')
         #######################################################################
+    elif lrpRule == 'integratedgradient':
+        analyzer = innvestigate.analyzer.gradient_based.IntegratedGradients(model_nosoftmax, 
+                                                                                        steps=64)
+        print('LRP RULE === Integrated Gradient !!!')
+        #######################################################################
     else:
         print(ValueError('Wrong LRP RULE!!!!!!!!!'))
 
@@ -64,7 +69,7 @@ def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule
         deepTaylorMaps[i] = analyzer_output/np.sum(analyzer_output.flatten())
 
     ### Save only the positive contributions
-    if any([lrpRule=='z',lrpRule=='epsilon']):
+    if any([lrpRule=='z',lrpRule=='epsilon',lrpRule=='integratedgradient']):
         deepTaylorMaps[np.where(deepTaylorMaps < 0)] = 0.
         print('\nONLY POSITIVE CONTRIBUTIONS FOR LRP RULE ALLOWED!\n')    
     else:
@@ -79,9 +84,8 @@ def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule
     if numDim == 3:
         summaryDTq = np.reshape(deepTaylorMaps,(deepTaylorMaps.shape[0],deepTaylorMaps.shape[1]))
         
-        ### Reshape into gridded maps and scale
-        scale = 1000
-        lrpmaps = np.reshape(summaryDTq,(summaryDTq.shape[0],numLats,numLons))*scale
+        ### Reshape into gridded maps
+        lrpmaps = np.reshape(summaryDTq,(summaryDTq.shape[0],numLats,numLons))
         
         ### Normalize lrp to have maximum of 1
         if normLRP == True:
@@ -93,9 +97,8 @@ def calc_LRPModel(model,XXt,YYt,biasBool,annType,num_of_class,yearlabels,lrpRule
                                                 len(yearlabels),deepTaylorMaps.shape[1]))
         
         ### Reshape into gridded maps and scale
-        scale = 1000
         lrpmaps = np.reshape(summaryDTq,(summaryDTq.shape[0],len(yearlabels),
-                                         numLats,numLons))*scale
+                                         numLats,numLons))
         
         ### Normalize lrp to have maximum of 1
         if normLRP == True:
@@ -147,6 +150,11 @@ def calc_LRPObs(model,XobsS,biasBool,annType,num_of_class,yearlabels,lrpRule,nor
                                                                                         bias=biasBool)
         print('LRP RULE === Epsilon !!!')
         #######################################################################
+    elif lrpRule == 'integratedgradient':
+        analyzerobs = innvestigate.analyzer.gradient_based.IntegratedGradients(model_nosoftmax, 
+                                                                                        steps=64)
+        print('LRP RULE === Integrated Gradient !!!')
+        #######################################################################
     else:
         print(ValueError('Wrong LRP RULE!!!!!!!!!'))
 
@@ -156,7 +164,7 @@ def calc_LRPObs(model,XobsS,biasBool,annType,num_of_class,yearlabels,lrpRule,nor
     analyzer_output = analyzer_output/np.nansum(analyzer_output,axis=1)[:,np.newaxis]  
     
     ### Save only the positive contributions
-    if any([lrpRule=='z',lrpRule=='epsilon']):
+    if any([lrpRule=='z',lrpRule=='epsilon',lrpRule=='integratedgradient']):
         analyzer_output[np.where(analyzer_output < 0)] = 0.
         print('\nONLY POSITIVE CONTRIBUTIONS FOR LRP RULE ALLOWED!\n')    
     else:

@@ -22,7 +22,6 @@ import scipy.stats as sts
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']}) 
 
-variablesall = ['T2M','P','SLP']
 variablesall = ['T2M']
 pickSMILEall = [[]] 
 for va in range(len(variablesall)):
@@ -58,7 +57,7 @@ for va in range(len(variablesall)):
         ###############################################################################
         ###############################################################################
         rm_merid_mean = False
-        rm_annual_mean = True
+        rm_annual_mean = False
         ###############################################################################
         ###############################################################################
         rm_ensemble_mean = False
@@ -72,9 +71,6 @@ for va in range(len(variablesall)):
         ###############################################################################
         window = 0
         ensTypeExperi = 'ENS'
-        # shuffletype = 'TIMEENS'
-        # shuffletype = 'ALLENSRAND'
-        # shuffletype = 'ALLENSRANDrmmean'
         shuffletype = 'RANDGAUSS'
         ###############################################################################
         ###############################################################################
@@ -242,11 +238,11 @@ for va in range(len(variablesall)):
         
         directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
         if typeOfAnalysis == 'Experiment-3':
-            np.save(directorydataMS + 'Confidence_%s.npy' % reg_name, obsout)
-            np.save(directorydataMS + 'Label_%s.npy' % reg_name, label)
+            np.save(directorydataMS + 'Confidence_%s_%s.npy' % (reg_name,dataset_obs), obsout)
+            np.save(directorydataMS + 'Label_%s_%s.npy' % (reg_name,dataset_obs), label)
         elif typeOfAnalysis == 'Experiment-4':
-            np.save(directorydataMS + 'Confidence_%s_GLO.npy' % reg_name, obsout)
-            np.save(directorydataMS + 'Label_%s_GLO.npy' % reg_name, label)
+            np.save(directorydataMS + 'Confidence_%s_%s_GLO.npy' % (reg_name,dataset_obs), obsout)
+            np.save(directorydataMS + 'Label_%s_%s_GLO.npy' % (reg_name,dataset_obs), label)
         ###############################################################################
         ###############################################################################
         ###############################################################################

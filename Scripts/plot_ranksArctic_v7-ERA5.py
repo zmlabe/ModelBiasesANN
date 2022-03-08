@@ -29,10 +29,11 @@ directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
 variablesall = ['T2M']
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
-THRESH = 0.1
+THRESH = 1/7
+dataset_obs = '20CRv3'
 
 ### Read in data
-arctic = np.load(directorydata + 'Ranks_thresh-%s_%s_GLO.npy' % (THRESH,'Arctic'))
+arctic = np.load(directorydata + 'Ranks_thresh-%s_%s_%s.npy' % (THRESH,'Arctic',dataset_obs))
 
 ###############################################################################
 ###############################################################################
@@ -65,13 +66,13 @@ csm=plt.get_cmap(cmocean.cm.ice)
 norm = c.BoundaryNorm(np.arange(1,8+1,1),csm.N)
 
 cs = plt.pcolormesh(arctic,shading='faceted',edgecolor='darkgrey',
-                    linewidth=0.05,vmin=1,vmax=7,norm=norm,cmap=csm,clip_on=False)
+                    linewidth=0.4,vmin=1,vmax=7,norm=norm,cmap=csm,clip_on=False)
 
-plt.yticks(np.arange(0.5,7.5,1),allDataLabels,ha='right',va='center',color='k',size=6)
+plt.yticks(np.arange(0.5,7.5,1),allDataLabels,ha='right',va='center',color='k',size=10)
 yax = ax.get_yaxis()
 yax.set_tick_params(pad=2)
 plt.xticks(np.arange(0.5,70.5,5),map(str,np.arange(1950,2022,5)),
-            color='k',size=6)
+            color='k',size=10)
 plt.xlim([0,70])
 
 for i in range(arctic.shape[0]):
@@ -80,11 +81,11 @@ for i in range(arctic.shape[0]):
         plt.text(j+0.5,i+0.5,r'\textbf{%s}' % int(arctic[i,j]),fontsize=8,
             color=cc,va='center',ha='center')
         
-plt.text(16.65,-0.78,r'\textbf{WORST}',color=cmocean.cm.ice(0.99))
-plt.text(44.3,-0.78,r'\textbf{BEST}',color=cmocean.cm.ice(0.1))
+plt.text(15.7,-0.88,r'\textbf{LAST}',color='crimson')
+plt.text(43.3,-0.88,r'\textbf{FIRST}',color='crimson')
 
 ###############################################################################                
-cbar_ax1 = fig.add_axes([0.35,0.11,0.3,0.03])                
+cbar_ax1 = fig.add_axes([0.35,0.10,0.3,0.03])                
 cbar = fig.colorbar(cs,cax=cbar_ax1,orientation='horizontal',
                     extend='neither',extendfrac=0.07,drawedges=True)
 cbar.set_ticks([])
@@ -95,7 +96,7 @@ cbar.dividers.set_color('dimgrey')
 cbar.dividers.set_linewidth(1)
 cbar.outline.set_edgecolor('dimgrey')
 cbar.outline.set_linewidth(1)
-cbar.set_label(r'\textbf{RELATIVE MODEL CHOICE}',color='k',labelpad=7,fontsize=18)
+cbar.set_label(r'\textbf{RELATIVE MODEL CHOICE}',color='k',labelpad=12,fontsize=19)
 
 cbar.ax.get_yaxis().set_ticks([])
 for j, lab in enumerate(range(1,8,1)):
@@ -104,6 +105,6 @@ for j, lab in enumerate(range(1,8,1)):
 
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.2,hspace=0.1)
-plt.savefig(directoryfigure + 'ArcticRank_ERA5BE_GLO.png',dpi=1000)
+plt.savefig(directoryfigure + 'ArcticRank_%s.png' % dataset_obs,dpi=1000)
         
         

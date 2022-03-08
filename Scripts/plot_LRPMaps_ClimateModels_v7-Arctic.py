@@ -40,7 +40,7 @@ for va in range(len(variablesall)):
         modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth',
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
-        dataset_obs = 'ERA5BE'
+        dataset_obs = '20CRv3'
         seasons = ['annual']
         variq = variablesall[va]
         reg_name = 'Arctic'
@@ -439,33 +439,33 @@ for va in range(len(variablesall)):
         if typeOfAnalysis == 'Experiment-3':
             if AA == False:
                 directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
-                np.save(directorydataMS + 'LRPcomposites_Arctic_7classes.npy',lrptest)
+                np.save(directorydataMS + 'LRPcomposites_Arctic_7classes_%s.npy' % dataset_obs,lrptest)
                 np.save(directorydataMS + 'Lat_Arctic.npy',np.asarray(lat1))
                 np.save(directorydataMS + 'Lon_Arctic.npy',np.asarray(lon1))
             elif AA == True:
                 directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
-                np.save(directorydataMS + 'LRPcomposites_ArcticAA_7classes.npy',lrptest)
+                np.save(directorydataMS + 'LRPcomposites_ArcticAA_7classes_%s.npy' % dataset_obs,lrptest)
                 np.save(directorydataMS + 'Lat_Arctic.npy',np.asarray(lat1))
                 np.save(directorydataMS + 'Lon_Arctic.npy',np.asarray(lon1))
             elif AA == 'none':
                 directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
-                np.save(directorydataMS + 'LRPcomposites_ArcticALL_7classes.npy',lrptest)
+                np.save(directorydataMS + 'LRPcomposites_ArcticALL_7classes_%s.npy' % dataset_obs,lrptest)
                 np.save(directorydataMS + 'Lat_ArcticALL.npy',np.asarray(lat1))
                 np.save(directorydataMS + 'Lon_ArcticALL.npy',np.asarray(lon1))
         elif typeOfAnalysis == 'Experiment-4':
             if AA == False:
                 directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
-                np.save(directorydataMS + 'LRPcomposites_Arctic_7classes_GLO.npy',lrptest)
+                np.save(directorydataMS + 'LRPcomposites_Arctic_7classes_GLO_%s.npy' % dataset_obs,lrptest)
                 np.save(directorydataMS + 'Lat_Arctic.npy',np.asarray(lat1))
                 np.save(directorydataMS + 'Lon_Arctic.npy',np.asarray(lon1))
             elif AA == True:
                 directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
-                np.save(directorydataMS + 'LRPcomposites_ArcticAA_7classes_GLO.npy',lrptest)
+                np.save(directorydataMS + 'LRPcomposites_ArcticAA_7classes_GLO_%s.npy' % dataset_obs,lrptest)
                 np.save(directorydataMS + 'Lat_Arctic.npy',np.asarray(lat1))
                 np.save(directorydataMS + 'Lon_Arctic.npy',np.asarray(lon1))
             elif AA == 'none':
                 directorydataMS = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
-                np.save(directorydataMS + 'LRPcomposites_ArcticALL_7classes_GLO.npy',lrptest)
+                np.save(directorydataMS + 'LRPcomposites_ArcticALL_7classes_GLO_%s.npy' % dataset_obs,lrptest)
                 np.save(directorydataMS + 'Lat_ArcticALL.npy',np.asarray(lat1))
                 np.save(directorydataMS + 'Lon_ArcticALL.npy',np.asarray(lon1))
         
