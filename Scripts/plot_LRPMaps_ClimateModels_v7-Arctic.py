@@ -40,7 +40,7 @@ for va in range(len(variablesall)):
         modelGCMs = ['CanESM2','MPI','CSIRO-MK3.6','KNMI-ecearth',
                       'GFDL-CM3','GFDL-ESM2M','LENS']
         datasetsingle = ['SMILE']
-        dataset_obs = '20CRv3'
+        dataset_obs = 'ERA5BE'
         seasons = ['annual']
         variq = variablesall[va]
         reg_name = 'Arctic'
@@ -350,90 +350,90 @@ for va in range(len(variablesall)):
         print('\n\nAccuracy Training == %s%%' % acctrain)
         print('Accuracy Testing == %s%%' % acctest)
 
-        ###############################################################################
-        ###############################################################################
-        ###############################################################################
-        ### Plot subplot of LRP means training
-        if typeOfAnalysis == 'Experiment-4':
-            limit = np.arange(0,0.80001,0.005)
-            barlim = np.round(np.arange(0,0.801,0.1),2)
-        elif typeOfAnalysis == 'Experiment-3':
-            limit = np.arange(0,0.80001,0.005)
-            barlim = np.round(np.arange(0,0.801,0.1),2)
-        elif typeOfAnalysis == 'Experiment-7':
-            limit = np.arange(0,0.80001,0.005)
-            barlim = np.round(np.arange(0,0.801,0.1),2)
-        elif typeOfAnalysis == 'Experiment-8':
-            limit = np.arange(0,0.80001,0.005)
-            barlim = np.round(np.arange(0,0.801,0.1),2)
-        elif typeOfAnalysis == 'Experiment-9':
-            limit = np.arange(0,0.80001,0.005)
-            barlim = np.round(np.arange(0,0.801,0.1),2)
-        cmap = cm.cubehelix2_16.mpl_colormap
-        label = r'\textbf{Relevance - [ %s ] - %s}' % (variq,typeOfAnalysis)
+        # ###############################################################################
+        # ###############################################################################
+        # ###############################################################################
+        # ### Plot subplot of LRP means training
+        # if typeOfAnalysis == 'Experiment-4':
+        #     limit = np.arange(0,0.80001,0.005)
+        #     barlim = np.round(np.arange(0,0.801,0.1),2)
+        # elif typeOfAnalysis == 'Experiment-3':
+        #     limit = np.arange(0,0.80001,0.005)
+        #     barlim = np.round(np.arange(0,0.801,0.1),2)
+        # elif typeOfAnalysis == 'Experiment-7':
+        #     limit = np.arange(0,0.80001,0.005)
+        #     barlim = np.round(np.arange(0,0.801,0.1),2)
+        # elif typeOfAnalysis == 'Experiment-8':
+        #     limit = np.arange(0,0.80001,0.005)
+        #     barlim = np.round(np.arange(0,0.801,0.1),2)
+        # elif typeOfAnalysis == 'Experiment-9':
+        #     limit = np.arange(0,0.80001,0.005)
+        #     barlim = np.round(np.arange(0,0.801,0.1),2)
+        # cmap = cm.cubehelix2_16.mpl_colormap
+        # label = r'\textbf{Relevance - [ %s ] - %s}' % (variq,typeOfAnalysis)
         
-        fig = plt.figure(figsize=(10,2))
-        for r in range(lenOfPicks):
-            var = lrptest[r]/np.max(lrptest[r])
+        # fig = plt.figure(figsize=(10,2))
+        # for r in range(lenOfPicks):
+        #     var = lrptest[r]/np.max(lrptest[r])
             
-            ax1 = plt.subplot(1,lenOfPicks,r+1)
-            if reg_name == 'Arctic':
-                m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
-                            resolution='l',round =True,area_thresh=10000)
-            else:
-                m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
-                            resolution='l',round =True,area_thresh=10000)
-            m.drawcoastlines(color='darkgrey',linewidth=0.27)
+        #     ax1 = plt.subplot(1,lenOfPicks,r+1)
+        #     if reg_name == 'Arctic':
+        #         m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
+        #                     resolution='l',round =True,area_thresh=10000)
+        #     else:
+        #         m = Basemap(projection='npstere',boundinglat=71,lon_0=0,
+        #                     resolution='l',round =True,area_thresh=10000)
+        #     m.drawcoastlines(color='darkgrey',linewidth=0.27)
                 
-            var, lons_cyclic = addcyclic(var, lon1)
-            var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-            lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
-            x, y = m(lon2d, lat2d)
+        #     var, lons_cyclic = addcyclic(var, lon1)
+        #     var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
+        #     lon2d, lat2d = np.meshgrid(lons_cyclic, lat1)
+        #     x, y = m(lon2d, lat2d)
                
-            circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                              linewidth=0.7)
-            circle.set_clip_on(False)
+        #     circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
+        #                       linewidth=0.7)
+        #     circle.set_clip_on(False)
             
-            cs1 = m.contourf(x,y,var,limit,extend='max')
-            cs1.set_cmap(cmap) 
+        #     cs1 = m.contourf(x,y,var,limit,extend='max')
+        #     cs1.set_cmap(cmap) 
             
-            if ocean_only == True:
-                m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-            elif land_only == True:
-                m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
+        #     if ocean_only == True:
+        #         m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+        #     elif land_only == True:
+        #         m.drawlsmask(land_color=(0,0,0,0),ocean_color='darkgrey',lakes=True,zorder=5)
                     
-            ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
-                          textcoords='axes fraction',color='dimgrey',fontsize=8,
-                          rotation=0,ha='center',va='center')
-            ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                          textcoords='axes fraction',color='k',fontsize=6,
-                          rotation=330,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{%s}' % modelGCMsNames[r],xy=(0,0),xytext=(0.5,1.10),
+        #                   textcoords='axes fraction',color='dimgrey',fontsize=8,
+        #                   rotation=0,ha='center',va='center')
+        #     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
+        #                   textcoords='axes fraction',color='k',fontsize=6,
+        #                   rotation=330,ha='center',va='center')
             
-        ###############################################################################
-        cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
-        cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                            extend='max',extendfrac=0.07,drawedges=False)
-        cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
-        cbar1.set_ticks(barlim)
-        cbar1.set_ticklabels(list(map(str,barlim)))
-        cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
-        cbar1.outline.set_edgecolor('dimgrey')
+        # ###############################################################################
+        # cbar_ax1 = fig.add_axes([0.36,0.13,0.3,0.03])                
+        # cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
+        #                     extend='max',extendfrac=0.07,drawedges=False)
+        # cbar1.set_label(label,fontsize=9,color='dimgrey',labelpad=1.4)  
+        # cbar1.set_ticks(barlim)
+        # cbar1.set_ticklabels(list(map(str,barlim)))
+        # cbar1.ax.tick_params(axis='x', size=.01,labelsize=5)
+        # cbar1.outline.set_edgecolor('dimgrey')
         
-        plt.tight_layout()
-        if lenOfPicks == 3:
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
-        else: 
-            plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
+        # plt.tight_layout()
+        # if lenOfPicks == 3:
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.24)
+        # else: 
+        #     plt.subplots_adjust(top=0.85,wspace=0.02,hspace=0.02,bottom=0.14)
          
-        plt.text(-0.9,-1,r'\textbf{TRAINING ACCURACY = %s \%%}' % np.round(acctrain,1),color='k',
-              fontsize=7)
-        plt.text(-0.9,-2,r'\textbf{TESTING ACCURACY = %s \%%}' % np.round(acctest,1),color='k',
-                  fontsize=7)
+        # plt.text(-0.9,-1,r'\textbf{TRAINING ACCURACY = %s \%%}' % np.round(acctrain,1),color='k',
+        #       fontsize=7)
+        # plt.text(-0.9,-2,r'\textbf{TESTING ACCURACY = %s \%%}' % np.round(acctest,1),color='k',
+        #           fontsize=7)
         
-        if AA == True:
-            plt.savefig(directoryfigure + '%s/LRPComposites_%s_AA.png' % (typeOfAnalysis,saveData),dpi=300)
-        else:
-            plt.savefig(directoryfigure + '%s/LRPComposites_%s.png' % (typeOfAnalysis,saveData),dpi=300)
+        # if AA == True:
+        #     plt.savefig(directoryfigure + '%s/LRPComposites_%s_AA.png' % (typeOfAnalysis,saveData),dpi=300)
+        # else:
+        #     plt.savefig(directoryfigure + '%s/LRPComposites_%s.png' % (typeOfAnalysis,saveData),dpi=300)
         
         ### Save files
         if typeOfAnalysis == 'Experiment-3':

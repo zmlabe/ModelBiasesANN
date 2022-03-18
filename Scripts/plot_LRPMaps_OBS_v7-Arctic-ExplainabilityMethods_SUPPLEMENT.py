@@ -320,18 +320,18 @@ plotlrp = lrptestalltypes.reshape(lrptestalltypes.shape[0]*lrptestalltypes.shape
 ###############################################################################
 ###############################################################################
 ### Plot subplot of LRP means training
-limit = np.arange(0,0.60001,0.005)
-barlim = np.round(np.arange(0,0.601,0.6),2)
+limit = np.arange(0,0.80001,0.005)
+barlim = np.round(np.arange(0,0.801,0.8),2)
 cmap = cm.cubehelix2_16.mpl_colormap
 label = r'\textbf{RELEVANCE}'
 
 fig = plt.figure(figsize=(10,4))
 for r in range(plotlrp.shape[0]):
     
-    var = plotlrp[r]
+    var = plotlrp[r]/np.nanmax(plotlrp[r])
     
     ax1 = plt.subplot(3,7,r+1)
-    m = Basemap(projection='npstere',boundinglat=67.3,lon_0=0,
+    m = Basemap(projection='npstere',boundinglat=61.5,lon_0=0,
                 resolution='l',round =True,area_thresh=10000)
     m.drawcoastlines(color='darkgrey',linewidth=0.3)
         

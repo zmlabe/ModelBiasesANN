@@ -30,10 +30,10 @@ variablesall = ['T2M']
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS','MM-Mean']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
 THRESH = 1/7
-dataset_obs = '20CRv3'
+dataset_obs = 'ERA5BE'
 
 ### Read in data
-arctic = np.load(directorydata + 'Ranks_thresh-%s_%s_%s.npy' % (THRESH,'Arctic',dataset_obs))
+arctic = np.load(directorydata + 'Ranks_thresh-%s_%s_%s_GLO.npy' % (THRESH,'Arctic',dataset_obs))
 
 ###############################################################################
 ###############################################################################
@@ -105,6 +105,6 @@ for j, lab in enumerate(range(1,8,1)):
 
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.2,hspace=0.1)
-plt.savefig(directoryfigure + 'ArcticRank_%s.png' % dataset_obs,dpi=1000)
+plt.savefig(directoryfigure + 'ArcticRank_%s_GLO.png' % dataset_obs,dpi=1000)
         
         
