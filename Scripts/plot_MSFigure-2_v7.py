@@ -92,7 +92,7 @@ for r in range(lrp.shape[0]*2):
                       textcoords='axes fraction',color='dimgrey',fontsize=8,
                       rotation=0,ha='center',va='center')
         ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                      textcoords='axes fraction',color='k',fontsize=6,
+                      textcoords='axes fraction',color='k',fontsize=9,
                       rotation=330,ha='center',va='center')
     elif r >= 7:
         var = alldata[r]
@@ -118,7 +118,7 @@ for r in range(lrp.shape[0]*2):
                 
         m.drawcoastlines(color='dimgrey',linewidth=0.27)
         ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                      textcoords='axes fraction',color='k',fontsize=6,
+                      textcoords='axes fraction',color='k',fontsize=9,
                       rotation=330,ha='center',va='center')
     
     if r == 5:

@@ -27,11 +27,11 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 directorydata = '/Users/zlabe/Documents/Research/ModelComparison/Data/RevisitResults_v7/'
 directoryfigure = '/Users/zlabe/Desktop/ModelComparison_v1/v7/'
 variablesall = 'T2M'
-dataset_obs = '20CRv3'
+dataset_obs = 'ERA5BE'
 scaleLRPmax = True
 allDataLabels = ['CanESM2','MPI','CSIRO-MK3.6','EC-EARTH','GFDL-CM3','GFDL-ESM2M','LENS']
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
-
+  
 ###############################################################################
 ###############################################################################
 ############################################################################### 
@@ -90,7 +90,7 @@ for r in range(lrp.shape[0]*2):
                       textcoords='axes fraction',color='dimgrey',fontsize=8,
                       rotation=0,ha='center',va='center')
         ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                      textcoords='axes fraction',color='k',fontsize=6,
+                      textcoords='axes fraction',color='k',fontsize=9,
                       rotation=330,ha='center',va='center')
         ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r]),xy=(0,0),xytext=(0.09,0.97),
                       textcoords='axes fraction',color=cmap(0.4),fontsize=6,
@@ -118,7 +118,7 @@ for r in range(lrp.shape[0]*2):
                 
         m.drawcoastlines(color='dimgrey',linewidth=0.27)
         ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),xytext=(0.86,0.97),
-                      textcoords='axes fraction',color='k',fontsize=6,
+                      textcoords='axes fraction',color='k',fontsize=9,
                       rotation=330,ha='center',va='center')
         ax1.annotate(r'\textbf{[%s]}' % len(obs_test[r-7]),xy=(0,0),xytext=(0.09,0.97),
                       textcoords='axes fraction',color=cmapr(0.4),fontsize=6,
@@ -155,6 +155,6 @@ for r in range(lrp.shape[0]*2):
 # plt.tight_layout()
 plt.subplots_adjust(wspace=0.01,hspace=0)
 if scaleLRPmax == True:
-    plt.savefig(directoryfigure + 'MSFigure-5updated_v7_scaleLRP_20CRv3.png',dpi=1000)
+    plt.savefig(directoryfigure + 'MSFigure-5updated_v7_scaleLRP.png',dpi=1000)
 else:
-    plt.savefig(directoryfigure + 'MSFigure-5updated_v7.png_20CRv3',dpi=1000)
+    plt.savefig(directoryfigure + 'MSFigure-5updated_v7.png',dpi=1000)
