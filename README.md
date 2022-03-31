@@ -24,7 +24,7 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
     + Slivinski, L. C., Compo, G. P., Whitaker, J. S., Sardeshmukh, P. D., Giese, B. S., McColl, C., ... & Wyszyński, P. (2019). Towards a more reliable historical reanalysis: Improvements for version 3 of the Twentieth Century Reanalysis system. Quarterly Journal of the Royal Meteorological Society, 145(724), 2876-2908. doi:10.1002/qj.3598 [[PUBLICATION]](https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3598)
     
 ## Publications
-+ **[1]** **Labe, Z.M.** and E.A. Barnes (2022), Comparison of climate model large ensembles with observations in the Arctic using simple neural networks. (*submitted*)
++ **[1]** **Labe, Z.M.** and E.A. Barnes (2022), Comparison of climate model large ensembles with observations in the Arctic using simple neural networks. (*submitted*) [[PREPRINT]](https://www.essoar.org/doi/10.1002/essoar.10510977.1)
 
 ## Conferences
 + **[5]** **Labe, Z.M.** and E.A. Barnes. Using explainable neural networks for comparing climate model projections, *27th Conference on Probability and Statistics*, Virtual Attendance (Jan 2022). [[Abstract]](https://ams.confex.com/ams/102ANNUAL/meetingapp.cgi/Paper/392538) [[Slides]](https://www.slideshare.net/ZacharyLabe/using-explainable-neural-networks-for-comparing-climate-model-projections)
