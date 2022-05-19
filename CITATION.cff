@@ -7,7 +7,7 @@ authors:
 - family-names: "Barnes"
   given-names: "Elizabeth"
 title: "ModelBiasesANN"
-version: 1.0
+version: 2.0
 doi: 10.5281/zenodo.6000391
 date-released: 2022-02-07
 url: "https://github.com/zmlabe/ModelBiasesANN"
