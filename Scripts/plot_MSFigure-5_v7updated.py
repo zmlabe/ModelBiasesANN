@@ -2,8 +2,8 @@
 Script to plot figure 2
 
 Author     : Zachary M. Labe
-Date       : 2 December 2021
-Version    : 6 - standardizes observations by training data (only 7 models)
+Date       : 19 May 2022
+Version    : 7 - looks for negative relevance
 """
 
 ### Import packages
@@ -13,6 +13,7 @@ import sys
 from netCDF4 import Dataset
 from mpl_toolkits.basemap import Basemap, addcyclic, shiftgrid
 import palettable.cubehelix as cm
+import cmasher as cmr
 import palettable.cartocolors.qualitative as cc
 from sklearn.metrics import accuracy_score
 import scipy.stats as sts
@@ -38,9 +39,9 @@ letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
 ### Read in data
 lat1 = np.load(directorydata + 'Lat_ArcticALL.npy',allow_pickle=True)
 lon1 = np.load(directorydata + 'Lon_ArcticALL.npy',allow_pickle=True)
-lrp = np.load(directorydata + 'LRPobs_ArcticALL_7classes_%s.npy' % dataset_obs,allow_pickle=True)
-rawdata = np.load(directorydata + 'LRPobs_OBSCALED_ArcticALL_7classes_%s.npy' % dataset_obs,allow_pickle=True)
-obs_test = np.load(directorydata + 'Labels_LRPObs_%s.npy' % dataset_obs,allow_pickle=True)
+lrp = np.load(directorydata + 'LRPobs_ArcticALL_7classes_%s-NEG.npy' % dataset_obs,allow_pickle=True)
+rawdata = np.load(directorydata + 'LRPobs_OBSCALED_ArcticALL_7classes_%s-NEG.npy' % dataset_obs,allow_pickle=True)
+obs_test = np.load(directorydata + 'Labels_LRPObs_%s-NEG.npy' % dataset_obs,allow_pickle=True)
 
 ### Prepare data for plotting
 alldata = list(itertools.chain(*[lrp,rawdata]))
@@ -49,9 +50,9 @@ alldata = list(itertools.chain(*[lrp,rawdata]))
 ###############################################################################
 ###############################################################################
 ### Plot subplot of LRP means training
-limit = np.arange(0,0.30001,0.005)
-barlim = np.round(np.arange(0,0.301,0.3),2)
-cmap = cm.cubehelix2_16.mpl_colormap
+limit = np.arange(-0.3,0.3001,0.001)
+barlim = np.round(np.arange(-0.3,0.6,0.3),2)
+cmap = cmr.fusion_r
 label = r'\textbf{RELEVANCE}'
 
 limitr = np.arange(-2,2.01,0.01)
@@ -65,7 +66,7 @@ for r in range(lrp.shape[0]*2):
         var = alldata[r]
         
         if (scaleLRPmax == True) & (len(obs_test[r]) > 1):
-            var = var/np.nanmax(var)
+            var = var/np.nanmax(abs(var))
         else:
             var = var
         
@@ -127,7 +128,7 @@ for r in range(lrp.shape[0]*2):
     if r == 5:
         cbar_ax = fig.add_axes([0.91,0.63,0.011,0.14])                
         cbar = fig.colorbar(cs1,cax=cbar_ax,orientation='vertical',
-                            extend='max',extendfrac=0.07,drawedges=False)    
+                            extend='both',extendfrac=0.07,drawedges=False)    
         cbar.set_label(label,fontsize=7,color='k')      
         cbar.set_ticks(barlim)
         cbar.set_ticklabels(list(map(str,barlim)))
@@ -155,6 +156,6 @@ for r in range(lrp.shape[0]*2):
 # plt.tight_layout()
 plt.subplots_adjust(wspace=0.01,hspace=0)
 if scaleLRPmax == True:
-    plt.savefig(directoryfigure + 'MSFigure-5updated_v7_scaleLRP.png',dpi=1000)
+    plt.savefig(directoryfigure + 'MSFigure-5updated_v7_scaleLRP_negrel.png',dpi=1000)
 else:
-    plt.savefig(directoryfigure + 'MSFigure-5updated_v7.png',dpi=1000)
+    plt.savefig(directoryfigure + 'MSFigure-5updated_v7_negrel.png',dpi=1000)
