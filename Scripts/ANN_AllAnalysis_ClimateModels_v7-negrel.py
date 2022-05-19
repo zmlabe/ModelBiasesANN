@@ -4,8 +4,8 @@ explainable AI
 
 Reference  : Barnes et al. [2020, JAMES]
 Author     : Zachary M. Labe
-Date       : 8 December 2021
-Version    : 7 - adds validation data for early stopping
+Date       : 19 May 2022
+Version    : 7 - looks for negative relevance
 """
 
 ### Import packages
@@ -31,7 +31,7 @@ import cmocean as cmocean
 import calc_Utilities as UT
 import calc_dataFunctions as df
 import calc_Stats as dSS
-import calc_LRPclass as LRP
+import calc_LRPclassNEG as LRP
 import innvestigate
 from sklearn.metrics import accuracy_score
 
@@ -97,7 +97,7 @@ rm_ensemble_mean = False
 rm_observational_mean = False
 ###############################################################################
 ###############################################################################
-calculate_anomalies = True
+calculate_anomalies = False
 if calculate_anomalies == True:
     if timeper == 'historical': 
         baseline = np.arange(1951,1980+1,1)
@@ -1009,214 +1009,214 @@ for sis,singlesimulation in enumerate(datasetsingle):
         # np.savetxt(directoryoutput + 'trainingPredictedLabels_' + saveData + '.txt',indextrain)
         # np.savetxt(directoryoutput + 'testingPredictedLabels_' + saveData + '.txt',indextest)
     
-        # ### See more more details
-        # model.layers[0].get_config()
+        ### See more more details
+        model.layers[0].get_config()
         
         # ### Save training mean and std for normalization
         # np.savetxt(directoryoutput + 'TRAININGstandardmean_' + saveData + '.txt',Xmean)
         # np.savetxt(directoryoutput + 'TRAININGstandardstd_' + saveData + '.txt',Xstd)
    
-        # ## Define variable for analysis
-        # print('\n\n------------------------')
-        # print(variq,'= Variable!')
-        # print(monthlychoice,'= Time!')
-        # print(reg_name,'= Region!')
-        # print(lat_bounds,lon_bounds)
-        # print(dataset,'= Model!')
-        # print(dataset_obs,'= Observations!\n')
-        # print(rm_annual_mean,'= rm_annual_mean') 
-        # print(rm_merid_mean,'= rm_merid_mean') 
-        # print(rm_ensemble_mean,'= rm_ensemble_mean') 
-        # print(land_only,'= land_only')
-        # print(ocean_only,'= ocean_only')
+        ## Define variable for analysis
+        print('\n\n------------------------')
+        print(variq,'= Variable!')
+        print(monthlychoice,'= Time!')
+        print(reg_name,'= Region!')
+        print(lat_bounds,lon_bounds)
+        print(dataset,'= Model!')
+        print(dataset_obs,'= Observations!\n')
+        print(rm_annual_mean,'= rm_annual_mean') 
+        print(rm_merid_mean,'= rm_merid_mean') 
+        print(rm_ensemble_mean,'= rm_ensemble_mean') 
+        print(land_only,'= land_only')
+        print(ocean_only,'= ocean_only')
         
-        # ## Variables for plotting
-        # lons2,lats2 = np.meshgrid(lons,lats) 
-        # observations = data_obs
-        # modeldata = data
-        # modeldatamean = np.nanmean(modeldata,axis=1)
+        ## Variables for plotting
+        lons2,lats2 = np.meshgrid(lons,lats) 
+        observations = data_obs
+        modeldata = data
+        modeldatamean = np.nanmean(modeldata,axis=1)
         
-        # spatialmean_obs = UT.calc_weightedAve(observations,lats2)
-        # spatialmean_mod = UT.calc_weightedAve(modeldata,lats2)
-        # spatialmean_modmean = np.nanmean(spatialmean_mod,axis=1)
-        # plt.figure()
-        # plt.plot(spatialmean_modmean.transpose())
-        # plt.plot(spatialmean_obs,color='k',linewidth=2)
+        spatialmean_obs = UT.calc_weightedAve(observations,lats2)
+        spatialmean_mod = UT.calc_weightedAve(modeldata,lats2)
+        spatialmean_modmean = np.nanmean(spatialmean_mod,axis=1)
+        plt.figure()
+        plt.plot(spatialmean_modmean.transpose())
+        plt.plot(spatialmean_obs,color='k',linewidth=2)
         
-        # ##############################################################################
-        # ##############################################################################
-        # ##############################################################################
-        # ## Visualizing through LRP
-        # numLats = lats.shape[0]
-        # numLons = lons.shape[0]  
-        # numDim = 3
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
+        ## Visualizing through LRP
+        numLats = lats.shape[0]
+        numLons = lons.shape[0]  
+        numDim = 3
 
-        # ##############################################################################
-        # ##############################################################################
-        # ##############################################################################
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
         
-        # lrpall = LRP.calc_LRPModel(model,np.append(XtrainS,XtestS,axis=0),
-        #                                         np.append(Ytrain,Ytest,axis=0),
-        #                                         biasBool,annType,num_of_class,
-        #                                         yearsall,lrpRule,normLRP,
-        #                                         numLats,numLons,numDim)
-        # meanlrp = np.nanmean(lrpall,axis=0)
-        # fig=plt.figure()
-        # plt.contourf(meanlrp,300,cmap=cmocean.cm.thermal)
+        lrpall = LRP.calc_LRPModel(model,np.append(XtrainS,XtestS,axis=0),
+                                                np.append(Ytrain,Ytest,axis=0),
+                                                biasBool,annType,num_of_class,
+                                                yearsall,lrpRule,normLRP,
+                                                numLats,numLons,numDim)
+        meanlrp = np.nanmean(lrpall,axis=0)
+        fig=plt.figure()
+        plt.contourf(meanlrp,300,cmap=cmocean.cm.thermal)
         
-        # ### For training data only
-        # lrptrain = LRP.calc_LRPModel(model,XtrainS,Ytrain,biasBool,
-        #                                         annType,num_of_class,
-        #                                         yearsall,lrpRule,normLRP,
-        #                                         numLats,numLons,numDim)
+        ### For training data only
+        lrptrain = LRP.calc_LRPModel(model,XtrainS,Ytrain,biasBool,
+                                                annType,num_of_class,
+                                                yearsall,lrpRule,normLRP,
+                                                numLats,numLons,numDim)
         
-        # ### For testing data only (z-rule)
-        # lrptest = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
-        #                                         annType,num_of_class,
-        #                                         yearsall,lrpRule,normLRP,
-        #                                         numLats,numLons,numDim)
-        # ### For testing data only (e-rule)
-        # lrpteste = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
-        #                                         annType,num_of_class,
-        #                                         yearsall,'epsilon',normLRP,
-        #                                         numLats,numLons,numDim)
-        # ### For testing data only (integrated gradients)
-        # lrptestig = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
-        #                                         annType,num_of_class,
-        #                                         yearsall,'integratedgradient',normLRP,
-        #                                         numLats,numLons,numDim)
+        ### For testing data only (z-rule)
+        lrptest = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
+                                                annType,num_of_class,
+                                                yearsall,lrpRule,normLRP,
+                                                numLats,numLons,numDim)
+        ### For testing data only (e-rule)
+        lrpteste = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
+                                                annType,num_of_class,
+                                                yearsall,'epsilon',normLRP,
+                                                numLats,numLons,numDim)
+        ### For testing data only (integrated gradients)
+        lrptestig = LRP.calc_LRPModel(model,XtestS,Ytest,biasBool,
+                                                annType,num_of_class,
+                                                yearsall,'integratedgradient',normLRP,
+                                                numLats,numLons,numDim)
         
         
-        # ### For observations data only
-        # lrpobservations = LRP.calc_LRPObs(model,XobsS,biasBool,annType,
-        #                                     num_of_class,yearsall,lrpRule,
-        #                                     normLRP,numLats,numLons,numDim)
+        ### For observations data only
+        lrpobservations = LRP.calc_LRPObs(model,XobsS,biasBool,annType,
+                                            num_of_class,yearsall,lrpRule,
+                                            normLRP,numLats,numLons,numDim)
       
-        # ##############################################################################
-        # ##############################################################################
-        # ##############################################################################
-        # def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
-        #     print('\n>>> Using netcdfLRP function!')
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
+        def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
+            print('\n>>> Using netcdfLRP function!')
             
-        #     from netCDF4 import Dataset
-        #     import numpy as np
+            from netCDF4 import Dataset
+            import numpy as np
             
-        #     name = 'LRPMap' + typemodel + '_' + saveData + '.nc'
-        #     filename = directory + name
-        #     ncfile = Dataset(filename,'w',format='NETCDF4')
-        #     ncfile.description = 'LRP maps for using selected seed' 
+            name = 'LRPMap-NEG' + typemodel + '_' + saveData + '.nc'
+            filename = directory + name
+            ncfile = Dataset(filename,'w',format='NETCDF4')
+            ncfile.description = 'LRP maps for using selected seed' 
             
-        #     ### Dimensions
-        #     ncfile.createDimension('years',var.shape[0])
-        #     ncfile.createDimension('lat',var.shape[1])
-        #     ncfile.createDimension('lon',var.shape[2])
+            ### Dimensions
+            ncfile.createDimension('years',var.shape[0])
+            ncfile.createDimension('lat',var.shape[1])
+            ncfile.createDimension('lon',var.shape[2])
             
-        #     ### Variables
-        #     years = ncfile.createVariable('years','f4',('years'))
-        #     latitude = ncfile.createVariable('lat','f4',('lat'))
-        #     longitude = ncfile.createVariable('lon','f4',('lon'))
-        #     varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
+            ### Variables
+            years = ncfile.createVariable('years','f4',('years'))
+            latitude = ncfile.createVariable('lat','f4',('lat'))
+            longitude = ncfile.createVariable('lon','f4',('lon'))
+            varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
             
-        #     ### Units
-        #     varns.units = 'unitless relevance'
-        #     ncfile.title = 'LRP relevance'
-        #     ncfile.instituion = 'Colorado State University'
-        #     ncfile.references = 'Barnes et al. [2020]'
+            ### Units
+            varns.units = 'unitless relevance'
+            ncfile.title = 'LRP relevance'
+            ncfile.instituion = 'Colorado State University'
+            ncfile.references = 'Barnes et al. [2020]'
             
-        #     ### Data
-        #     years[:] = np.arange(var.shape[0])
-        #     latitude[:] = lats
-        #     longitude[:] = lons
-        #     varns[:] = var
+            ### Data
+            years[:] = np.arange(var.shape[0])
+            latitude[:] = lats
+            longitude[:] = lons
+            varns[:] = var
             
-        #     ncfile.close()
-        #     print('*Completed: Created netCDF4 File!')
+            ncfile.close()
+            print('*Completed: Created netCDF4 File!')
         
-        # netcdfLRP(lats,lons,lrpall,directoryoutput,'AllData',saveData)
-        # netcdfLRP(lats,lons,lrptrain,directoryoutput,'Training',saveData)
-        # netcdfLRP(lats,lons,lrptest,directoryoutput,'Testing',saveData)
-        # netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
+        netcdfLRP(lats,lons,lrpall,directoryoutput,'AllData',saveData)
+        netcdfLRP(lats,lons,lrptrain,directoryoutput,'Training',saveData)
+        netcdfLRP(lats,lons,lrptest,directoryoutput,'Testing',saveData)
+        netcdfLRP(lats,lons,lrpobservations,directoryoutput,'Obs',saveData)
         
-        # ##############################################################################
-        # ##############################################################################
-        # ##############################################################################
-        # def netcdfLRPe(lats,lons,var,directory,typemodel,saveData):
-        #     print('\n>>> Using netcdfLRP-e-rule function!')
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
+        def netcdfLRPe(lats,lons,var,directory,typemodel,saveData):
+            print('\n>>> Using netcdfLRP-e-rule function!')
             
-        #     from netCDF4 import Dataset
-        #     import numpy as np
+            from netCDF4 import Dataset
+            import numpy as np
             
-        #     name = 'LRPMap_E' + typemodel + '_' + saveData + '.nc'
-        #     filename = directory + name
-        #     ncfile = Dataset(filename,'w',format='NETCDF4')
-        #     ncfile.description = 'LRP maps for using selected seed' 
+            name = 'LRPMap_E-NEG' + typemodel + '_' + saveData + '.nc'
+            filename = directory + name
+            ncfile = Dataset(filename,'w',format='NETCDF4')
+            ncfile.description = 'LRP maps for using selected seed' 
             
-        #     ### Dimensions
-        #     ncfile.createDimension('years',var.shape[0])
-        #     ncfile.createDimension('lat',var.shape[1])
-        #     ncfile.createDimension('lon',var.shape[2])
+            ### Dimensions
+            ncfile.createDimension('years',var.shape[0])
+            ncfile.createDimension('lat',var.shape[1])
+            ncfile.createDimension('lon',var.shape[2])
             
-        #     ### Variables
-        #     years = ncfile.createVariable('years','f4',('years'))
-        #     latitude = ncfile.createVariable('lat','f4',('lat'))
-        #     longitude = ncfile.createVariable('lon','f4',('lon'))
-        #     varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
+            ### Variables
+            years = ncfile.createVariable('years','f4',('years'))
+            latitude = ncfile.createVariable('lat','f4',('lat'))
+            longitude = ncfile.createVariable('lon','f4',('lon'))
+            varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
             
-        #     ### Units
-        #     varns.units = 'unitless relevance'
-        #     ncfile.title = 'LRP relevance'
-        #     ncfile.instituion = 'Colorado State University'
-        #     ncfile.references = 'Barnes et al. [2020]'
+            ### Units
+            varns.units = 'unitless relevance'
+            ncfile.title = 'LRP relevance'
+            ncfile.instituion = 'Colorado State University'
+            ncfile.references = 'Barnes et al. [2020]'
             
-        #     ### Data
-        #     years[:] = np.arange(var.shape[0])
-        #     latitude[:] = lats
-        #     longitude[:] = lons
-        #     varns[:] = var
+            ### Data
+            years[:] = np.arange(var.shape[0])
+            latitude[:] = lats
+            longitude[:] = lons
+            varns[:] = var
             
-        #     ncfile.close()
-        #     print('*Completed: Created netCDF4 File!')
+            ncfile.close()
+            print('*Completed: Created netCDF4 File!')
             
-        # netcdfLRPe(lats,lons,lrpteste,directoryoutput,'Testing',saveData)
+        netcdfLRPe(lats,lons,lrpteste,directoryoutput,'Testing',saveData)
         
-        # ##############################################################################
-        # ##############################################################################
-        # ##############################################################################
-        # def netcdfLRPig(lats,lons,var,directory,typemodel,saveData):
-        #     print('\n>>> Using netcdfLRP-integratedgradients function!')
+        ##############################################################################
+        ##############################################################################
+        ##############################################################################
+        def netcdfLRPig(lats,lons,var,directory,typemodel,saveData):
+            print('\n>>> Using netcdfLRP-integratedgradients function!')
             
-        #     from netCDF4 import Dataset
-        #     import numpy as np
+            from netCDF4 import Dataset
+            import numpy as np
             
-        #     name = 'LRPMap_IG' + typemodel + '_' + saveData + '.nc'
-        #     filename = directory + name
-        #     ncfile = Dataset(filename,'w',format='NETCDF4')
-        #     ncfile.description = 'LRP maps for using selected seed' 
+            name = 'LRPMap_IG-NEG' + typemodel + '_' + saveData + '.nc'
+            filename = directory + name
+            ncfile = Dataset(filename,'w',format='NETCDF4')
+            ncfile.description = 'LRP maps for using selected seed' 
             
-        #     ### Dimensions
-        #     ncfile.createDimension('years',var.shape[0])
-        #     ncfile.createDimension('lat',var.shape[1])
-        #     ncfile.createDimension('lon',var.shape[2])
+            ### Dimensions
+            ncfile.createDimension('years',var.shape[0])
+            ncfile.createDimension('lat',var.shape[1])
+            ncfile.createDimension('lon',var.shape[2])
             
-        #     ### Variables
-        #     years = ncfile.createVariable('years','f4',('years'))
-        #     latitude = ncfile.createVariable('lat','f4',('lat'))
-        #     longitude = ncfile.createVariable('lon','f4',('lon'))
-        #     varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
+            ### Variables
+            years = ncfile.createVariable('years','f4',('years'))
+            latitude = ncfile.createVariable('lat','f4',('lat'))
+            longitude = ncfile.createVariable('lon','f4',('lon'))
+            varns = ncfile.createVariable('LRP','f4',('years','lat','lon'))
             
-        #     ### Units
-        #     varns.units = 'unitless relevance'
-        #     ncfile.title = 'LRP relevance'
-        #     ncfile.instituion = 'Colorado State University'
-        #     ncfile.references = 'Barnes et al. [2020]'
+            ### Units
+            varns.units = 'unitless relevance'
+            ncfile.title = 'LRP relevance'
+            ncfile.instituion = 'Colorado State University'
+            ncfile.references = 'Barnes et al. [2020]'
             
-        #     ### Data
-        #     years[:] = np.arange(var.shape[0])
-        #     latitude[:] = lats
-        #     longitude[:] = lons
-        #     varns[:] = var
+            ### Data
+            years[:] = np.arange(var.shape[0])
+            latitude[:] = lats
+            longitude[:] = lons
+            varns[:] = var
             
-        #     ncfile.close()
-        #     print('*Completed: Created netCDF4 File!')
+            ncfile.close()
+            print('*Completed: Created netCDF4 File!')
             
-        # netcdfLRPig(lats,lons,lrptestig,directoryoutput,'Testing',saveData)
+        netcdfLRPig(lats,lons,lrptestig,directoryoutput,'Testing',saveData)

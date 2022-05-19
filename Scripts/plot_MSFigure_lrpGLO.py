@@ -87,7 +87,7 @@ for r in range(0,len(allDataLabels)):
                   rotation=0,ha='center',va='center')
     ax1.annotate(r'\textbf{[%s]}' % letters[r],xy=(0,0),
             xytext=(0.85,0.89),xycoords='axes fraction',rotation=330,
-            color='dimgrey',fontsize=6)
+            color='dimgrey',fontsize=9)
     
 ###############################################################################
 cbar_ax1 = fig.add_axes([0.395,0.15,0.2,0.035])                
