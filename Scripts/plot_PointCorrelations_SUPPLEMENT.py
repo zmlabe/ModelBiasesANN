@@ -118,10 +118,7 @@ for vv in range(1):
             circle = m.drawmapboundary(fill_color='white',color='dimgrey',linewidth=0.7)
             circle.set_clip_on(False)
             
-            if variq == 'P':
-                xx = 'max'
-            else:
-                xx = 'both'
+            xx = 'neither'
             cs1 = m.contourf(x,y,var,limit,extend=xx)
             cs1.set_cmap(cmap) 
                     

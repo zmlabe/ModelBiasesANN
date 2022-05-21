@@ -202,7 +202,7 @@ for vv in range(len(variables)):
                     color='dimgrey',fontsize=6)
             
         ###############################################################################
-        cbar_ax1 = fig.add_axes([0.40,0.16,0.2,0.035])                
+        cbar_ax1 = fig.add_axes([0.40,0.18,0.2,0.035])                
         cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
                             extend='max',extendfrac=0.07,drawedges=False)
         cbar1.set_label(label,fontsize=9,color='k',labelpad=1.4)  
